@@ -13,15 +13,14 @@ from time import sleep
 import settings
 from inc.udt.types import MainStepType
 from inc import IOLink
-# User defined classes
-# define a static class to hold previous values
-class PVO_ValueClass:
-    class_Index =1
-    value = 0.0
-    def __init__(self,value):
-        PVO_ValueClass.class_Index += 1
-        self.class_Index = PVO_ValueClass.class_Index +1
-        self.value=value
+from inc.udt.classes import PVO_ValueClass
+from inc.udt.dbClass import dbClass
+
+
+# ------------------------------------------ Variables              -------------------------------------------------
+sqliteDB = dbClass()
+
+# ------------------------------------------ Methods                -------------------------------------------------
 
 # ------------------------------------------ Read IO link Data from Network -----------------------------------------
 def Inputs(aOldReadings):
@@ -32,9 +31,9 @@ def Inputs(aOldReadings):
         dataJSON=IOLink.IoLink_Read_PVO(x)
         if (aOldReadings[x-1].value != dataJSON["data"][0]["value"]): # if the data has changed then
          # save to the local DB
-         # sqliteDB.log_PVO_to_DB(dataJSON) 
-         aOldReadings[x-1].value = dataJSON["data"][0]["value"]
-         print("Main App  :  Input  : " + str(x) + " value ="+ str(dataJSON["data"][0]["value"]))
+          sqliteDB.update_PVO_Live(dataJSON,x)
+          aOldReadings[x-1].value = dataJSON["data"][0]["value"]
+          print("Main App  :  Input  : " + str(x) + " value ="+ str(dataJSON["data"][0]["value"]))
     except Exception as error:
         if settings.DEBUG:
             print("Main App  :  UpdateReading Error : " + str(error))
@@ -53,6 +52,7 @@ def mainsequence():
         # ----------------------   Step 0  ---------------------
         if udtMainStep == MainStepType.init:
             for x in(1,2,3,4,5):
+              #initalise the array of values by addaing a pvo_value class object with an inital value of 0
               PVO_PreviousValue = PVO_ValueClass(0)
               aPrevValues.append(PVO_PreviousValue)
             if xDebugOn :
