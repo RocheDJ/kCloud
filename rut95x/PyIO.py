@@ -1,13 +1,14 @@
 #!/bin/python3
 #--------------------------------------------------------------------------------------------------------------------
 # Date: January 2024
-# Description : Edge Application for K Cloud RUT95x teltonika Router 
+# Description : Edge Application for K Cloud RUT95x Teltonika Router 
 #-------------------------------------------------------------------------------------------------------------------
 # ./PyIO.py
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 from datetime import datetime
 from time import sleep
+from multiprocessing import Process
 
 # User Defined Libs
 import settings
@@ -15,17 +16,21 @@ from inc.udt.types import MainStepType
 from inc import IOLink
 from inc.udt.classes import PVO_ValueClass
 from inc.udt.dbClass import dbClass
-
+from web_server import runWebServer
 
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 
 # ------------------------------------------ Methods                -------------------------------------------------
 
-# ------------------------------------------ Read IO link Data from Network -----------------------------------------
+# --start the web interface to run as a seperate process     
+def startWEBServer(iPort,xDebugMode):
+    runWebServer(iPort,xDebugMode)
+
+# --- Read IO link Data from Network -------------
 def Inputs(aOldReadings):
     try:
-       # tempeorrylu load only 5 data points
+       # temporally load only 5 data points
        # ToDo: make PVO points dynamic 
        for x in(1,2,3,4,5):
         dataJSON=IOLink.IoLink_Read_PVO(x)
@@ -48,11 +53,12 @@ def mainsequence():
     xDebugOn = settings.DEBUG
     fStepInterval = 0.1 # 100 ms
     aPrevValues = [] # an array of previous values of inputs so we cna detect a change
+    pWebServer = Process(target=startWEBServer,args=(5000, settings.DEBUG))  
     while True:
         # ----------------------   Step 0  ---------------------
         if udtMainStep == MainStepType.init:
             for x in(1,2,3,4,5):
-              #initalise the array of values by addaing a pvo_value class object with an inital value of 0
+              #initialise the array of values by addling a pvo_value class object with an inital value of 0
               PVO_PreviousValue = PVO_ValueClass(0)
               aPrevValues.append(PVO_PreviousValue)
             if xDebugOn :
@@ -72,6 +78,8 @@ def mainsequence():
         elif udtMainStep == MainStepType.start_web_server:
             if xDebugOn :
                 print( "Main Sequence  :  Start Web Server: " )
+            
+            pWebServer.start()
             udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 4  ---------------------
         elif udtMainStep == MainStepType.read_inputs:

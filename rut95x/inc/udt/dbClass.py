@@ -144,7 +144,6 @@ class dbClass:
             self.CloseConn()
         except Exception as error:
              self.errorString ="logStatus_Of_PVO_to_DB Error " + str(error)
-             #------------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------
     def logStatus_Of_PDO_to_DB(self,id,postStatus) :
         try:
@@ -216,7 +215,7 @@ class dbClass:
             self.OpenConn()
             c = self.db.cursor()
             # generate the insert query
-            installationId = 'LOCAl'
+            installationId = 'LOCAL'
             utcTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             error = dataJSON["error"]
             data = dataJSON["data"]
@@ -231,11 +230,25 @@ class dbClass:
 
         # Save (commit) the changes
             self.db.commit()
-
         # We can also close the connection if we are done with it.
         # Just be sure any changes have been committed or they will be lost.
             self.CloseConn()
         except Exception as error:
              self.errorString ="log_PVO_to_DB Error " + str(error)
-
+#------------------------------------------------------------------------------------------
+    def read_PVO_Live(self):
+        try:
+            #define the query
+            myQuery = ("select * from pvo_live where EventDate not null order by EventDate desc")
+            # open db and connect
+            self.OpenConn()
+            self.db.row_factory = sqlite3.Row
+            c = self.db.cursor()
+            c.execute(myQuery)
+            rows = c.fetchall()
+        # We can also close the connection if we are done with it.
+            self.CloseConn()
+            return rows
+        except Exception as error:
+             self.errorString ="read_Current_PVO Error " + str(error)
 

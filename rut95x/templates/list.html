@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="https://html5-templates.com/" />
+    <title>kEdge List Page</title>
+    <meta name="description" content="Simple HTML5 Dashboard for kEdge" />
+    <meta http-equiv="refresh" content="8">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+</head>
+
+  <body>
+    <header>
+      <div id="logo">
+        <img src="{{url_for('static', filename='LoGo0016.png')}}" /> kEdge&nbsp;Dashboard
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/list">List</a></li>
+        </ul>
+      </nav>
+    </header>
+    <section id="pageHeadder">
+      <strong>Pasteurizer 1 PVO List</strong>
+    </section>
+    <section class="flex_layout_1">
+      <aside_left>
+        <div>Pasteurizer 1</div>
+      </aside_left>
+      <main role="main">
+        <article>
+          <table hidden id="dataSummery">
+            <thead>
+              <td>Rows</td>
+           </thead>
+           <tr>
+            <td id ="row_count"> {{ count }}</td>
+           </tr>
+           </table>
+        </article>
+        <article>
+          <table id="dataTable">
+            <thead>
+               <td>ID</td>
+               <td>Installation ID</td>
+               <td>EventDate</td>
+               <td>Title</td>
+               <td hidden >Data</td> 
+               <td>Value</td> 
+            </thead>
+            {% for row in rows %}
+               <tr>
+                  <td id ="row_{{row["id"]}}">{{row["id"]}}</td>
+                  <td>{{row["InstallationID"]}}</td>
+                  <td> {{row["EventDate"]}}</td>
+                  <td id ="title_row_{{row["id"]}}"></td>
+                  <td hidden id ="json_row_{{row["id"]}}">{{row['Data']}}</td>
+                  <td id ="value_row_{{row["id"]}}"></td>	
+               </tr>
+            {% endfor %}
+         </table>
+         <script>
+             UpdateDataTableValues();
+          </script>
+        </article>
+        
+      </main>
+      <aside>
+        <nav>
+          <ul>
+            <li>
+              <button class="button button_green">START Batch</button>
+            </li>
+            <li>
+              <button class="button button_red">STOP Batch</button>
+            </li>
+            <li>
+              <button class="button button_green">START Agitator</button>
+            </li>
+            <li>
+              <button class="button button_red">STOP Agitator</button>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+    </section>
+    <footer>
+      <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
+      <address>Contact: <a href="mailto:info@kilderry.ie">Mail me</a></address>
+    </footer>
+  </body>
+</html>
