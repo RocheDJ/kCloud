@@ -19,7 +19,7 @@
       </div>
       <nav>
         <ul>
-          <li><a href="/">Home</a></li>
+          <li><a href="/">Overview</a></li>
           <li><a href="/list">List</a></li>
         </ul>
       </nav>
@@ -28,9 +28,6 @@
       <strong>Pasteurizer 1 PVO List</strong>
     </section>
     <section class="flex_layout_1">
-      <aside_left>
-        <div>Pasteurizer 1</div>
-      </aside_left>
       <main role="main">
         <article>
           <table hidden id="dataSummery">
@@ -44,23 +41,23 @@
         </article>
         <article>
           <table id="dataTable">
-            <thead>
-               <td>ID</td>
-               <td>Installation ID</td>
-               <td>EventDate</td>
-               <td>Title</td>
-               <td hidden >Data</td> 
-               <td>Value</td> 
-            </thead>
+            <tr>
+               <th>ID</th>
+               <th>Installation ID</th>
+               <th>EventDate</th>
+               <th>Title</th>
+               <th hidden >Data</th> 
+               <th>Value</th> 
+            </tr>
             {% for row in rows %}
-               <tr>
-                  <td id ="row_{{row["id"]}}">{{row["id"]}}</td>
-                  <td>{{row["InstallationID"]}}</td>
-                  <td> {{row["EventDate"]}}</td>
-                  <td id ="title_row_{{row["id"]}}"></td>
-                  <td hidden id ="json_row_{{row["id"]}}">{{row['Data']}}</td>
-                  <td id ="value_row_{{row["id"]}}"></td>	
-               </tr>
+              <tr>
+                <td id ="row_{{row["id"]}}">{{row["id"]}}</td>
+                <td>{{row["InstallationID"]}}</td>
+                <td> {{row["EventDate"]}}</td>
+                <td id ="title_row_{{row["id"]}}"></td>
+                <td hidden id ="json_row_{{row["id"]}}">{{row['Data']}}</td>
+                <td id ="value_row_{{row["id"]}}"></td>	
+              </tr>
             {% endfor %}
          </table>
          <script>
@@ -90,7 +87,6 @@
     </section>
     <footer>
       <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
-      <address>Contact: <a href="mailto:info@kilderry.ie">Mail me</a></address>
     </footer>
   </body>
 </html>

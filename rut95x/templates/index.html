@@ -10,15 +10,15 @@
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
     <script src="./templates/script.js"></script>
   </head>
-
   <body>
     <header>
       <div id="logo">
-        <img src="{{url_for('static', filename='LoGo0016.png')}}" /> kEdge&nbsp;Dashboard
+        <img src="{{url_for('static', filename='LoGo0016.png')}}" />
+        kEdge&nbsp;Dashboard
       </div>
       <nav>
         <ul>
-          <li><a href="/">Home</a></li>
+          <li><a href="/">Overview</a></li>
           <li><a href="/list">List</a></li>
         </ul>
       </nav>
@@ -27,17 +27,31 @@
       <strong>Pasteurizer 1 Overview</strong>
     </section>
     <section class="flex_layout_1">
-      <aside_left>
-        <div>Pasteurizer 1</div>
-      </aside_left>
       <main role="main">
         <article>
-          <h2>Volume</h2>
-          <p>Batch Volume Total :=</p>
-        </article>
-        <article>
-          <h2>Temperature</h2>
-          <p>Current Temperature value :=.</p>
+          <div class="flex_layout_1">
+            <div>
+              <img src="{{url_for('static', filename='Pasto_1.png')}}" />
+            </div>
+            <div class="grid_1">
+              <div>
+                <h2>Temperature</h2>
+                <p>23.4 C</p>
+              </div>
+              <div>
+                <h2>Volume</h2>
+                <p>123.4 L</p>
+              </div>
+              <div>
+                <h2>Agitator</h2>
+                <p>Stopped</p>
+              </div>
+              <div>
+                <h2>Batch</h2>
+                <p>Stopped</p>
+              </div>
+            </div>
+          </div>
         </article>
       </main>
       <aside>
@@ -60,8 +74,26 @@
       </aside>
     </section>
     <footer>
-      <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
-      <address>Contact: <a href="mailto:info@kilderry.ie">Mail me</a></address>
+      <table id="statusTable">
+        <tr>
+          <th hidden>ID</th>
+          <th>EventDate</th>
+          <th>Status</th>
+          <th>Cycle Time (s)</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+          <td hidden>{{row["id"]}}</td>
+          <td>{{row["EventDate"]}}</td>
+          <td>{{row["Status"]}}</td>
+          <td>{{row["CycleTime"]}}</td>
+        </tr>
+        {% endfor %}
+      </table>
+
+      <div>
+        <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
+      </div>
     </footer>
   </body>
 </html>

@@ -1,14 +1,15 @@
 #!/bin/python3
-#--------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------
 # Date: January 2024
-# Description : Edge Application for K Cloud RUT95x Teltonika Router 
-#-------------------------------------------------------------------------------------------------------------------
+# Description : Edge Application for K Cloud RUT95x Teltonika Router
+# -------------------------------------------------------------------------------------------------------------------
 # ./PyIO.py
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 from datetime import datetime
 from time import sleep
 from multiprocessing import Process
+from multiprocessing.sharedctypes import Value, Array
 
 # User Defined Libs
 import settings
@@ -16,75 +17,99 @@ from inc.udt.types import MainStepType
 from inc import IOLink
 from inc.udt.classes import PVO_ValueClass
 from inc.udt.dbClass import dbClass
+from inc.udt.status import status_class
 from web_server import runWebServer
 
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
+main_status = status_class("")
 
 # ------------------------------------------ Methods                -------------------------------------------------
 
-# --start the web interface to run as a seperate process     
-def startWEBServer(iPort,xDebugMode):
-    runWebServer(iPort,xDebugMode)
+
+def modify(sString):
+    sString.value = sString.value.upper()
+
+
+# --start the web interface to run as a separate process
+def startWEBServer(iPort, sStatus):
+    runWebServer(iPort, sStatus)
+
+
+# --start the web interface to run as a separate process
+def log_status():
+    sqliteDB.update_status(1, main_status.status,main_status.cycle_time)
+    sqliteDB.update_status(2, "Web Server Status ToDo:",999.9)
+
 
 # --- Read IO link Data from Network -------------
 def Inputs(aOldReadings):
     try:
-       # temporally load only 5 data points
-       # ToDo: make PVO points dynamic 
-       for x in(1,2,3,4,5):
-        dataJSON=IOLink.IoLink_Read_PVO(x)
-        if (aOldReadings[x-1].value != dataJSON["data"][0]["value"]): # if the data has changed then
-         # save to the local DB
-          sqliteDB.update_PVO_Live(dataJSON,x)
-          aOldReadings[x-1].value = dataJSON["data"][0]["value"]
-          print("Main App  :  Input  : " + str(x) + " value ="+ str(dataJSON["data"][0]["value"]))
+        # temporally load only 5 data points
+        # ToDo: make PVO points dynamic
+        for x in (1, 2, 3, 4, 5):
+            dataJSON = IOLink.IoLink_Read_PVO(x)
+            sError = dataJSON["error"]
+            if sError != "":
+                main_status.status = "Main App  :  Input Error : " + str(sError)
+
+            if (
+                aOldReadings[x - 1].value != dataJSON["data"][0]["value"]
+            ):  # if the data has changed then
+                # save to the local DB
+                sqliteDB.update_PVO_Live(dataJSON, x)
+                aOldReadings[x - 1].value = dataJSON["data"][0]["value"]
+               
+            
     except Exception as error:
         if settings.DEBUG:
-            print("Main App  :  UpdateReading Error : " + str(error))
-
+            main_status.status = "Main App  :  UpdateReading Error : " + str(error)
 
 
 # ------------------------------------------ Main Control Sequence -------------------------------------------------
-def mainsequence():
+def main_sequence():
     udtMainStep = MainStepType(MainStepType.init)
     udtMainStepOld = udtMainStep
     xNewStep = 0
     xDebugOn = settings.DEBUG
-    fStepInterval = 0.1 # 100 ms
-    aPrevValues = [] # an array of previous values of inputs so we cna detect a change
-    pWebServer = Process(target=startWEBServer,args=(5000, settings.DEBUG))  
+    fStepInterval = 0.1  # 100 ms
+    aPrevValues = []  # an array of previous values of inputs so we cna detect a change
+    pWebServer = Process(
+        target=startWEBServer, args=(5000, xDebugOn)
+    )  # start beb server as seperate process
+    dtCycleStart = datetime.now()
+    dtCycleStop = datetime.now()
     while True:
         # ----------------------   Step 0  ---------------------
         if udtMainStep == MainStepType.init:
-            for x in(1,2,3,4,5):
-              #initialise the array of values by addling a pvo_value class object with an inital value of 0
-              PVO_PreviousValue = PVO_ValueClass(0)
-              aPrevValues.append(PVO_PreviousValue)
-            if xDebugOn :
-                print( "Main Sequence  :  Init: " )    
+            for x in (1, 2, 3, 4, 5):
+                # initialise the array of values by addling a pvo_value class object with an inital value of 0
+                PVO_PreviousValue = PVO_ValueClass(0)
+                aPrevValues.append(PVO_PreviousValue)
+            if xDebugOn:
+                main_status.status = "Main Sequence  :  Init: "
             udtMainStep = MainStepType.load_config
         # ----------------------   Step 1  ---------------------
         elif udtMainStep == MainStepType.load_config:
-             if xDebugOn :
-                print( "Main Sequence  :  Load Config: " )    
-             udtMainStep = MainStepType.start_web_client
+            if xDebugOn:
+                main_status.status = "Main Sequence  :  Load Config: "
+            udtMainStep = MainStepType.start_web_client
         # ----------------------   Step 2  ---------------------
         elif udtMainStep == MainStepType.start_web_client:
-             if xDebugOn :
-                print( "Main Sequence  :  Start Web Client: " )
-             udtMainStep = MainStepType.start_web_server
+            if xDebugOn:
+                main_status.status = "Main Sequence  :  Start Web Client: "
+            udtMainStep = MainStepType.start_web_server
         # ----------------------   Step 3  ---------------------
         elif udtMainStep == MainStepType.start_web_server:
-            if xDebugOn :
-                print( "Main Sequence  :  Start Web Server: " )
-            
+            if xDebugOn:
+                main_status.status = "Main Sequence  :  Start Web Server: "
             pWebServer.start()
             udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 4  ---------------------
         elif udtMainStep == MainStepType.read_inputs:
             if xNewStep:
-                Inputs(aPrevValues)       
+                dtCycleStart = datetime.now()
+                Inputs(aPrevValues)
             udtMainStep = MainStepType.check_event_triggers
         # ----------------------   Step 5  ---------------------
         elif udtMainStep == MainStepType.check_event_triggers:
@@ -100,19 +125,30 @@ def mainsequence():
             udtMainStep = MainStepType.wait
         # ----------------------   Step 9  ---------------------
         elif udtMainStep == MainStepType.wait:
-            sleep(fStepInterval)   #wait 100 ms    
-            udtMainStep = MainStepType.read_inputs
+            if xNewStep:
+                dtCycleStop = datetime.now()
+
+            delta_time= datetime.now() - dtCycleStart
+            fSeconds = float(delta_time.total_seconds())
+
+            dtCycleTime = fSeconds
+            if dtCycleTime >= fStepInterval:  # wait 100 ms
+                main_status.cycle_time = dtCycleTime
+                log_status()  # log status to updates
+                udtMainStep = MainStepType.read_inputs
+
         # ----------------------   Step 999  -------------------
         elif udtMainStep == MainStepType.error:
-            if xDebugOn :
-                print( "Main Sequence  :  ERROR : " )
-            sleep(fStepInterval)   #wait 100 ms   
-            udtMainStep = MainStepType.init   
+            if xDebugOn:
+                main_status.status = "Main Sequence  :  ERROR : "
 
-        # ----------------------   Catch All  -----------------    
+            log_status()
+            sleep(fStepInterval)  # wait 100 ms
+            udtMainStep = MainStepType.init
+
+        # ----------------------   Catch All  -----------------
         else:
-          udtMainStep = MainStepType.init
-
+            udtMainStep = MainStepType.init
 
         # ------  Check for step change  ---------------------
         if udtMainStep == udtMainStepOld:
@@ -120,10 +156,8 @@ def mainsequence():
         else:
             xNewStep = 1
             udtMainStepOld = udtMainStep
-        
-        
+
 
 # ------------------------  Call main Sequence    -----------------------------------------------
-if __name__ == '__main__':
-    mainsequence()
-
+if __name__ == "__main__":
+    main_sequence()
