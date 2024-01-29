@@ -66,7 +66,6 @@ def Inputs(aOldReadings):
         if settings.DEBUG:
             main_status.status = "Main App  :  UpdateReading Error : " + str(error)
 
-
 # ------------------------------------------ Main Control Sequence -------------------------------------------------
 def main_sequence():
     udtMainStep = MainStepType(MainStepType.init)
@@ -76,7 +75,7 @@ def main_sequence():
     fStepInterval = 0.500  # 100 ms
     aPrevValues = []  # an array of previous values of inputs so we cna detect a change
     pWebServer = Process(
-        target=startWEBServer, args=(5001, xDebugOn)
+        target=startWEBServer, args=(8080, xDebugOn)
     )  # start beb server as seperate process
     dtCycleStart = datetime.now()
     dtCycleStop = datetime.now()

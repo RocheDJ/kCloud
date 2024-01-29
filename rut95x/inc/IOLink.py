@@ -22,11 +22,11 @@ IOLINK_TOUT = settings.IOLINK_TOUT
 #   ref https://stackoverflow.com/questions/6198372/most-pythonic-way-to-provide-global-configuration-variables-in-config-py
 Pvo_Config= lambda Port,Sensor,Description,Unit,Datatype:{'Port':Port,'Sensor':Sensor,'Description':Description,'Unit':Unit,'Datatype':Datatype}
 
-IOLINK_PVO= {1 : Pvo_Config(1,'TV7105',"Tank_Temperature", "C",types.valueType.real),
-             2 : Pvo_Config(2,'LDL100', "Outlet_Conductivity", "uS",types.valueType.real),
-             3:  Pvo_Config(2,'LDL100',"Outlet_Temperature", "C",types.valueType.real),
-             4 : Pvo_Config(3,'DI',"CIP_Active", "QI",types.valueType.bool),
-             5 : Pvo_Config(4,'DI',"Agitator_Active", "QI",types.valueType.bool)
+IOLINK_PVO= {1 : Pvo_Config(1,'TV7105',"Outlet Temperature", "C",types.valueType.real),
+             2 : Pvo_Config(2,'LDL100', "Conductivity", "uS",types.valueType.real),
+             3:  Pvo_Config(2,'LDL100',"Temperature", "C",types.valueType.real),
+             4 : Pvo_Config(3,'DI',"Agitator", "QI",types.valueType.bool),
+             5 : Pvo_Config(4,'LR2750',"Volume", "L",types.valueType.real)
             }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ def IOLinkDecodeValues(SensorType_In,ProcessData_In):
         # add 0x as prefix to hex which will allow Python to decode base automatically
         # First 32 bits are Conductivity Word 0 and Word 1
         # Next  16 bits are Scale COND Word 2 LSB not Used
-        # next  32 are Tempriture Word 3 and Word 4
+        # next  32 are Temperature Word 3 and Word 4
         # Next  16 bits are Scale Temp and Device Status Word 5
         # eg 00000000FC00000000CFFF00 = 0000,0000,FC00,0000,00CF,FF00
         # Conductivity   
@@ -98,7 +98,33 @@ def IOLinkDecodeValues(SensorType_In,ProcessData_In):
         else:
             return 0    
         
-    
+    if SensorType_In =='LR2750':
+         # Process data is 16 bits long
+         # add 0x as prefix to hex which will allow Python to decode base automatically
+         # first 2 bits are Output States
+         sHexData = '0x' + ProcessData_In 
+         #convert the hex value to integer
+         iDataValue = int(ProcessData_In,16) # ,0 invokes get base from hex value
+       
+         # shift right twice to get rit of first two bits
+         iDataValue = iDataValue//2
+         iDataValue = iDataValue//2 
+         if (iDataValue <= 1970): # from iodd sheet range 10 to 1970
+            if iDataValue <10:
+                iDataValue =0
+            # assume tank is 500 L which is 
+            fFullVolume = 500 # full volume
+            fFullMM     = 250 # full mm
+            # scale the values
+            rRatio =  iDataValue / fFullMM
+            rVolume =  fFullVolume *  rRatio
+            volume = round(rVolume, 1)
+         else:
+            if (iDataValue == 8189):
+                level = fFullVolume # full
+            else:
+                level = -99 # default out of limit level
+         return volume   
     return -99 # return catch all error
 
 #----------------------------------------------------------------------------------------------------------------------
