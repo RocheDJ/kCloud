@@ -7,6 +7,7 @@
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 from datetime import datetime
+from os import kill
 from time import sleep
 from multiprocessing import Process
 from multiprocessing.sharedctypes import Value, Array
@@ -15,7 +16,7 @@ from multiprocessing.sharedctypes import Value, Array
 import settings
 from inc.udt.types import MainStepType
 from inc import IOLink
-from inc.udt.classes import PVO_ValueClass
+from inc.udt.classes import PVO_ValueClass , SignalHandler
 from inc.udt.dbClass import dbClass
 from inc.udt.status import status_class
 from web_server import runWebServer
@@ -72,14 +73,17 @@ def main_sequence():
     udtMainStepOld = udtMainStep
     xNewStep = 0
     xDebugOn = settings.DEBUG
-    fStepInterval = 0.1  # 100 ms
+    fStepInterval = 0.500  # 100 ms
     aPrevValues = []  # an array of previous values of inputs so we cna detect a change
     pWebServer = Process(
-        target=startWEBServer, args=(5000, xDebugOn)
+        target=startWEBServer, args=(5001, xDebugOn)
     )  # start beb server as seperate process
     dtCycleStart = datetime.now()
     dtCycleStop = datetime.now()
-    while True:
+    # handles systemd calls in linux
+    signal_handler = SignalHandler()
+    
+    while signal_handler.can_run():
         # ----------------------   Step 0  ---------------------
         if udtMainStep == MainStepType.init:
             for x in (1, 2, 3, 4, 5):
@@ -127,15 +131,18 @@ def main_sequence():
         elif udtMainStep == MainStepType.wait:
             if xNewStep:
                 dtCycleStop = datetime.now()
-
-            delta_time= datetime.now() - dtCycleStart
-            fSeconds = float(delta_time.total_seconds())
-
-            dtCycleTime = fSeconds
-            if dtCycleTime >= fStepInterval:  # wait 100 ms
-                main_status.cycle_time = dtCycleTime
-                log_status()  # log status to updates
-                udtMainStep = MainStepType.read_inputs
+                delta_time= datetime.now() - dtCycleStart
+                fSeconds = float(delta_time.total_seconds())
+                dtCycleTime = fSeconds
+               
+            # Do we have any time left oer to sleep    
+            if (fSeconds <  fStepInterval): 
+                fSleep =fStepInterval -fSeconds
+                sleep(fSleep)
+                
+            main_status.cycle_time = dtCycleTime
+            log_status()  # log status to updates
+            udtMainStep = MainStepType.read_inputs
 
         # ----------------------   Step 999  -------------------
         elif udtMainStep == MainStepType.error:
@@ -157,7 +164,11 @@ def main_sequence():
             xNewStep = 1
             udtMainStepOld = udtMainStep
 
-
+    # end of while tidy up app
+    print('Closing Local Web Server')
+    pWebServer.terminate() # stop the web server process
+    pWebServer.join() #Wait for it to stop
+    print('Application Halted')
 # ------------------------  Call main Sequence    -----------------------------------------------
 if __name__ == "__main__":
     main_sequence()

@@ -155,3 +155,5 @@ cython_debug/
 .vs
 *.sln
 *.pyproj
+rut95x/PyIO.pyproj.user
+rut95x/PyIO.pyproj.user
