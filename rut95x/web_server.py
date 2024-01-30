@@ -60,6 +60,12 @@ def list():
     myCount = 6
     return render_template("list.html", rows=myRows, count=myCount)
 
+# -------------------------------------------------------------------------------------------------------------------
+# local list page
+@app.route("/trend")
+def trend():
+    return render_template("trend.html")
+
 
 # ------------------------------------------ Web Server              -------------------------------------------------
 def runWebServer(ServerPort, xDebugMode):

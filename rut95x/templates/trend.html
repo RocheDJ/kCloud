@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="https://html5-templates.com/" />
+    <title>kEdge Home Page</title>
+    <meta name="description" content="Simple HTML5 Dashboard for kEdge" />
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
+    <script src="{{url_for('static', filename='Chart.min.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+</head>
+
+<body>
+    <header>
+        <div id="logo">
+            <img src="{{url_for('static', filename='LoGo0016.png')}}" />
+            kEdge&nbsp;Dashboard
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Overview</a></li>
+                <li><a href="/list">List</a></li>
+                <li><a href="/trend">Trend</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section id="pageHeadder">
+        <strong>Pasteurizer 1 Trend</strong>
+    </section>
+    <section class="flex_layout_1">
+        <main role="main">
+            <article>
+                <div class="flex_layout_1">
+                   
+                        <canvas id="myChart" style="width:100%;max-width:90%"></canvas>
+                        <script>
+                            UpdateTrendChart();
+                        </script>
+                
+                </div>
+                <div class="grid_1">
+                    <div>
+                        <label for="myStartDate">Start Date:</label>
+                        <input type="datetime-local" id="myStartDate" value="2014-11-16T15:25:33">
+                    </div>
+                    <div>
+                        <label for="myStopDate">Stop Date:</label>
+                        <input type="datetime-local" id="myStopDate" value="2014-11-16T15:25:33">
+                    </div>
+                </div>
+
+            </article>
+
+            </div>
+        </main>
+
+
+        <aside>
+            <nav>
+                <ul>
+                    <li>
+                        <button class="button button_green">START Batch</button>
+                    </li>
+                    <li>
+                        <button class="button button_red">STOP Batch</button>
+                    </li>
+                    <li>
+                        <button class="button button_green">START Agitator</button>
+                    </li>
+                    <li>
+                        <button class="button button_red">STOP Agitator</button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+    </section>
+    <footer>
+        <div>
+            <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
+        </div>
+    </footer>
+</body>
+
+</html>
