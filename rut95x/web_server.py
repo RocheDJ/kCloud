@@ -61,12 +61,24 @@ def list():
     return render_template("list.html", rows=myRows, count=myCount)
 
 # -------------------------------------------------------------------------------------------------------------------
-# local list page
+# local trend page
 @app.route("/trend")
 def trend():
     return render_template("trend.html")
 
+# -------------------------------------------------------------------------------------------------------------------
+# get value of single variable between start date and stop date
+@app.route('/data/read', methods=['GET'])
+def query_records():
+ pdoKey = request.args.get('pdoKey')
+ StartDate = request.args.get('StartDate')
+ StopDate = request.args.get('StopDate')
 
+ jData = webServerDB.read_PVO_specific(pdoKey,StartDate,StopDate)
+ 
+ if jData == 999:
+    return 400
+ return jData, 200
 # ------------------------------------------ Web Server              -------------------------------------------------
 def runWebServer(ServerPort, xDebugMode):
     try:

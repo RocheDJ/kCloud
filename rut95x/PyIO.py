@@ -7,6 +7,7 @@
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 from datetime import datetime
+
 from os import kill
 from time import sleep
 from multiprocessing import Process
@@ -53,15 +54,12 @@ def Inputs(aOldReadings):
             sError = dataJSON["error"]
             if sError != "":
                 main_status.status = "Main App  :  Input Error : " + str(sError)
-
             if (
                 aOldReadings[x - 1].value != dataJSON["data"][0]["value"]
-            ):  # if the data has changed then
-                # save to the local DB
+            ): 
                 sqliteDB.update_PVO_Live(dataJSON, x)
                 aOldReadings[x - 1].value = dataJSON["data"][0]["value"]
                
-            
     except Exception as error:
         if settings.DEBUG:
             main_status.status = "Main App  :  UpdateReading Error : " + str(error)
@@ -72,6 +70,7 @@ def main_sequence():
     udtMainStepOld = udtMainStep
     xNewStep = 0
     xDebugOn = settings.DEBUG
+    iMaxPVO = 6
     fStepInterval = 0.500  # 100 ms
     aPrevValues = []  # an array of previous values of inputs so we cna detect a change
     pWebServer = Process(
@@ -85,10 +84,14 @@ def main_sequence():
     while signal_handler.can_run():
         # ----------------------   Step 0  ---------------------
         if udtMainStep == MainStepType.init:
+            
+            sqliteDB.create_PVO_Live(iMaxPVO) # create teh localtables
+            
             for x in (1, 2, 3, 4, 5):
                 # initialise the array of values by addling a pvo_value class object with an inital value of 0
                 PVO_PreviousValue = PVO_ValueClass(0)
                 aPrevValues.append(PVO_PreviousValue)
+                
             if xDebugOn:
                 main_status.status = "Main Sequence  :  Init: "
             udtMainStep = MainStepType.load_config

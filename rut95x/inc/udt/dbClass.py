@@ -3,7 +3,7 @@ import sqlite3
 import uuid
 import settings
 import datetime
-
+import json
 
 class dbClass:
     """Class to interface to an SQlite Database"""
@@ -118,6 +118,7 @@ class dbClass:
             utcTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             error = dataJSON["error"]
             data = dataJSON["data"]
+      
 
             myQuery = (
                 "INSERT INTO pvo VALUES ('"
@@ -195,21 +196,6 @@ class dbClass:
             self.errorString = "logStatus_Of_PDO_to_DB Error " + str(error)
 
     # ----------------------------------------------------------------------------------------------------------------------
-    def read_PVO_From_DB(self, PVO_id):
-        try:
-            # open db and connect
-            # open db and connect
-            self.OpenConn()
-            c = self.db.cursor()
-            rows = c.execute('SELECT * FROM pvo WHERE _id = "' + str(PVO_id) + '"')
-            rows = c.fetchall()
-            for row in rows:
-                print(row)
-            self.CloseConn()
-        except Exception as error:
-            self.errorString = "read_PVO_From_DB Error " + str(error)
-
-    # ----------------------------------------------------------------------------------------------------------------------
     def read_outStanding_PVO(self):
         try:
             # af status 200 as is ok else need read to
@@ -244,6 +230,47 @@ class dbClass:
             return nullcontext
 
     # ----------------------------------------------------------------------------------------------------------------------
+    def create_PVO_Live(self,pvoIndexMax):
+        try:
+            # open db and connect
+            self.OpenConn()
+            c = self.db.cursor()
+            # generate construct query
+            myQuery = (
+               "DROP TABLE IF EXISTS 'pvo_live';" 
+            )
+            c.execute(myQuery)
+             # Save (commit) the changes
+            self.db.commit()
+            myQuery = (
+               " CREATE TABLE IF NOT EXISTS 'pvo_live' ( `id` TEXT UNIQUE, `InstallationID` text, `EventDate` TEXT, `Status` INTEGER DEFAULT 0, `jData` JSON, `error` TEXT, PRIMARY KEY(`id`) );"
+            )
+            c.execute(myQuery)
+             # Save (commit) the changes
+            self.db.commit()
+            # add a row for each pvo
+            for num in range(1, pvoIndexMax):
+                myQuery = (
+                 "INSERT INTO pvo_live ('id') VALUES ('"+ str(num)+"');"
+                 )
+                c.execute(myQuery)
+                  # Save (commit) the changes
+                self.db.commit()
+                myQuery = (
+                    "UPDATE pvo_live SET jData='{\"title\": \"Blank Title\", \"unit\": \"-\", \"valueType\": 5, \"value\": 0}' WHERE  id='" +str(num) +"';"
+                 )
+                c.execute(myQuery)
+                # Save (commit) the changes
+                self.db.commit()
+           
+
+            # We can also close the connection if we are done with it.
+            # Just be sure any changes have been committed or they will be lost.
+          
+            self.CloseConn()
+        except Exception as error:
+            self.errorString = "log_PVO_to_DB Error " + str(error)
+    # ----------------------------------------------------------------------------------------------------------------------
     def update_PVO_Live(self, dataJSON, pvoIndex):
         try:
             # open db and connect
@@ -253,32 +280,64 @@ class dbClass:
             installationId = "LOCAL"
             utcTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             error = dataJSON["error"]
-            data = dataJSON["data"]
-
+            sTitle = dataJSON["data"][0]["title"] # load from directory type
+            sUnit = dataJSON["data"][0]["unit"]
+            sValueType = dataJSON["data"][0]["valueType"]
+            sValue  =dataJSON["data"][0]["value"]
+            if sValueType == '1':  #string
+                sqlJSON = "', jData = json_set(jData,'$.value','" +str(sValue) + "')"
+            else:
+                sqlJSON = "', jData = json_set(jData,'$.value'," +str(sValue) + ")"
+                
             myQuery = (
                 "UPDATE pvo_live set InstallationID ='"
                 + str(installationId)
                 + "', EventDate ='"
                 + str(utcTime)
                 + "',error ='"
-                + str(error)
-                + "', Data = \""
-                + str(data)
-                + "\" where id ='"
+                + str(error) 
+                + sqlJSON
+                + " where id ='"
                 + str(pvoIndex)
                 + "';"
             )
-
             c.execute(myQuery)
-
             # Save (commit) the changes
             self.db.commit()
+            
+            # ToDo: move this to init table sequence
+            sqlJSON = "jData = json_set(jData,'$.title','" +str(sTitle) + "')"
+            myQuery = (
+                "UPDATE pvo_live set "
+                + sqlJSON
+                + " where id ='"
+                + str(pvoIndex)
+                + "';"
+            )
+            c.execute(myQuery)
+            # Save (commit) the changes
+            self.db.commit()
+            
+             # ToDo: move this to init table sequence
+            sqlJSON = "jData = json_set(jData,'$.unit','" +str(sUnit) + "')"
+            myQuery = (
+                "UPDATE pvo_live set "
+                + sqlJSON
+                + " where id ='"
+                + str(pvoIndex)
+                + "';"
+            )
+            c.execute(myQuery)
+            # Save (commit) the changes
+            self.db.commit()
+
             # We can also close the connection if we are done with it.
             # Just be sure any changes have been committed or they will be lost.
             self.CloseConn()
         except Exception as error:
             self.errorString = "log_PVO_to_DB Error " + str(error)
-
+            
+                    
     # ------------------------------------------------------------------------------------------
     def read_pvo_live(self):
         try:
@@ -349,3 +408,27 @@ class dbClass:
             return rows
         except Exception as error:
             self.errorString = "read_status Error " + str(error)
+
+    # ----------------------------------------------------------------------------------------------------------------------
+    def read_PVO_specific(self,pdoVariableKey,dtStart,dtEnd):
+        try:
+            # open db and connect
+            # construct the query
+           # myQuery = ("SELECT * FROM pvo WHERE EventDate between '" +
+           #            str(dtStart) + "' and '" + str(dtEnd)+"'")
+
+            myQuery = ("SELECT json_extract("+
+                        pdoVariableKey + ", '$.title')FROM pvo WHERE EventDate between '" +
+                       str(dtStart) + "' and '" + str(dtEnd)+"'")
+
+            dbPath = str(settings.BASE_DIR) + "/data/" + settings.SQLITE_DB
+            conn = sqlite3.connect(dbPath)
+            c = conn.cursor()
+            rows = c.execute(myQuery)
+            rows = c.fetchall()
+            count = len(rows)
+            self.CloseConn()
+            return rows
+        except Exception as error:
+            self.errorString = "read_PVO_specific Error " + str(error)
+            return 999

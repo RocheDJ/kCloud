@@ -28,12 +28,12 @@ function UpdateDataTableValues(){
        
           let sID = "row_" + i
           let sJSON = document.getElementById("json_"+ sID).innerHTML;
-          let jJSON = sJSON.replaceAll("'",'"')
-          let oJSON = JSON.parse(jJSON);
+         // let jJSON = sJSON.replaceAll("'",'"')
+          let oJSON = JSON.parse(sJSON);
           let sRowValueID = "value_" + sID
-          document.getElementById(sRowValueID).innerHTML = oJSON[0].value;
+          document.getElementById(sRowValueID).innerHTML = oJSON.value;
           let sRowTitleID = "title_" + sID
-          document.getElementById(sRowTitleID).innerHTML = oJSON[0].title;
+          document.getElementById(sRowTitleID).innerHTML = oJSON.title;
           }
       catch (error) {
           console.log(error)
