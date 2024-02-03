@@ -336,8 +336,7 @@ class dbClass:
             self.CloseConn()
         except Exception as error:
             self.errorString = "log_PVO_to_DB Error " + str(error)
-            
-                    
+                             
     # ------------------------------------------------------------------------------------------
     def read_pvo_live(self):
         try:
@@ -353,8 +352,29 @@ class dbClass:
             self.CloseConn()
             return rows
         except Exception as error:
-            self.errorString = "read_Current_PVO Error " + str(error)
-
+            self.errorString = "read_pvo_live Error " + str(error)
+# ------------------------------------------------------------------------------------------
+    def read_pvo_live_JSON(self):
+        try:
+            # define the query
+            myQuery = "select * from pvo_live where EventDate not null order by EventDate desc"
+            # open db and connect
+            self.OpenConn()
+            self.db.row_factory = sqlite3.Row
+            c = self.db.cursor()
+            c.execute(myQuery)
+            rows = c.fetchall()
+            #modify to return Json
+            # from https://www.askpython.com/python/examples/python-sql-data-to-json
+            columns = [col[0] for col in c.description]
+            data = [dict(zip(columns, row)) for row in rows]
+            to_json = json.dumps(data, indent=2)
+            # We can also close the connection if we are done with it.
+            self.CloseConn()
+            return to_json
+        except Exception as error:
+            self.errorString = "read_pvo_live JSON Error " + str(error)
+            return 999
     # --------------------------------------------------------------------------------------------
     def update_status(
         self, iProcess, sStatus, fCycleTime
@@ -418,7 +438,7 @@ class dbClass:
            #            str(dtStart) + "' and '" + str(dtEnd)+"'")
 
             myQuery = ("SELECT json_extract("+
-                        pdoVariableKey + ", '$.title')FROM pvo WHERE EventDate between '" +
+                        pdoVariableKey + ", '$.title') FROM pvo WHERE EventDate between '" +
                        str(dtStart) + "' and '" + str(dtEnd)+"'")
 
             dbPath = str(settings.BASE_DIR) + "/data/" + settings.SQLITE_DB
@@ -432,3 +452,69 @@ class dbClass:
         except Exception as error:
             self.errorString = "read_PVO_specific Error " + str(error)
             return 999
+ # --------------------------------------------------------------------------------------------
+    def read_status(self):
+        try:
+            # define the query
+            myQuery = (
+                "select * from status where EventDate not null order by EventDate desc"
+            )
+            # open db and connect
+            self.OpenConn()
+            self.db.row_factory = sqlite3.Row
+            c = self.db.cursor()
+            c.execute(myQuery)
+            rows = c.fetchall()
+            # We can also close the connection if we are done with it.
+            self.CloseConn()
+            return rows
+        except Exception as error:
+            self.errorString = "read_status Error " + str(error)
+
+# --------------------------------------------------------------------------------------------
+#read the triggers table from the db and reset the values
+    def read_reset_triggers(self):
+        try:
+            return_value = [False for i in range (8)] # we will return up to 8 triggers
+            # define the query
+            myQuery = (
+                "select * from triggers desc"
+            )
+            # open db and connect
+            self.OpenConn()
+            self.db.row_factory = sqlite3.Row
+            c = self.db.cursor()
+            c.execute(myQuery)
+            rows = c.fetchall()
+            #set the triggers on the return values
+            for row in rows:
+                 if row[1] ==1:
+                    return_value[row[0]] = True  
+            # We can also close the connection if we are done with it.
+            myQuery = ("UPDATE triggers SET trigger = 0;")
+            c.execute(myQuery)
+            # Save (commit) the changes
+            self.db.commit()
+            self.CloseConn()
+            return return_value
+        except Exception as error:
+            self.errorString = "read_reset_triggers Error " + str(error)
+# --------------------------------------------------------------------------------------------
+#read the triggers table from the db and reset the values
+    def set_triggers(self,index,value):
+        try:
+            self.OpenConn()
+            c = self.db.cursor()
+            myQuery = (
+                "UPDATE triggers set trigger ="
+                + str(value)
+                + " where id ="
+                + str(index)
+                + ";"
+            )
+            c.execute(myQuery)
+            # Save (commit) the changes
+            self.db.commit()
+            self.CloseConn()
+        except Exception as error:
+            self.errorString = "set_triggers Error " + str(error)

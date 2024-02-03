@@ -8,7 +8,7 @@
     <title>kEdge Home Page</title>
     <meta name="description" content="Simple HTML5 Dashboard for kEdge" />
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
-    <script src="./templates/script.js"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
   </head>
   <body>
     <header>
@@ -37,38 +37,40 @@
             <div class="grid_1">
               <div>
                 <h2>Temperature</h2>
-                <p>23.4 C</p>
+                <p id = "Temperature">#com</p>
               </div>
               <div>
                 <h2>Volume</h2>
-                <p>123.4 L</p>
+                <p id = "Volume">#com</p>
               </div>
               <div>
                 <h2>Agitator</h2>
-                <p>Stopped</p>
-              </div>
-              <div>
-                <h2>Batch</h2>
-                <p>Stopped</p>
+                <p id = "Agitator">#com</p>
               </div>
             </div>
           </div>
         </article>
+        <script>
+          setInterval(function() {
+              // code to be executed repeatedly
+                        Update_Overview();
+              }, 2000);
+       </script>
       </main>
       <aside>
         <nav>
           <ul>
             <li>
-              <button class="button button_green">START Batch</button>
+              <button class="button button_green" onclick="Start_Batch()">START Batch</button>
             </li>
             <li>
-              <button class="button button_red">STOP Batch</button>
+              <button class="button button_red" onclick="Stop_Batch()">STOP Batch</button>
             </li>
             <li>
-              <button class="button button_green">START Agitator</button>
+              <button class="button button_green" onclick="Start_Agitator()">START Agitator</button>
             </li>
             <li>
-              <button class="button button_red">STOP Agitator</button>
+              <button class="button button_red"onclick="Stop_Agitator()">STOP Agitator</button>
             </li>
           </ul>
         </nav>

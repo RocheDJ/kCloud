@@ -22,11 +22,11 @@ IOLINK_TOUT = settings.IOLINK_TOUT
 #   ref https://stackoverflow.com/questions/6198372/most-pythonic-way-to-provide-global-configuration-variables-in-config-py
 Pvo_Config= lambda Port,Sensor,Description,Unit,Datatype:{'Port':Port,'Sensor':Sensor,'Description':Description,'Unit':Unit,'Datatype':Datatype}
 
-IOLINK_PVO= {1 : Pvo_Config(1,'TV7105',"Outlet Temperature", "C",types.valueType.real),
+IOLINK_PVO= {1 : Pvo_Config(1,'LR2750',"Level", "mm",types.valueType.real),
              2 : Pvo_Config(2,'LDL100', "Conductivity", "uS",types.valueType.real),
-             3:  Pvo_Config(2,'LDL100',"Temperature", "C",types.valueType.real),
+             3 : Pvo_Config(2,'LDL100',"Temperature", "C",types.valueType.real),
              4 : Pvo_Config(3,'DI',"Agitator", "QI",types.valueType.bool),
-             5 : Pvo_Config(4,'LR2750',"Volume", "L",types.valueType.real)
+             5 : Pvo_Config(1,'LR2750',"Volume", "L",types.valueType.real)
             }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ def IolinkMakeProcessVariablePath(Node,Port,SensorType):
 #----------------------------------------------------------------------------------------------------------------------
 
 #Function to recode raw input values depending on SensorType and values
-def IOLinkDecodeValues(SensorType_In,ProcessData_In):
+def IOLinkDecodeValues(SensorType_In,ProcessData_In,Unit_In):
     if SensorType_In =='TV7105':
          # Process data is 32 bits long
          # add 0x as prefix to hex which will allow Python to decode base automatically
@@ -58,7 +58,7 @@ def IOLinkDecodeValues(SensorType_In,ProcessData_In):
             fDegC = iWord0 * 0.1
             temperature = round(fDegC, 1)
          else:
-            temperature = -70.0 # deafult out of limit tempriture
+            temperature = -70.0 # default out of limit temperature
          return temperature
     
     if SensorType_In =='LDL100':
@@ -124,6 +124,9 @@ def IOLinkDecodeValues(SensorType_In,ProcessData_In):
                 level = fFullVolume # full
             else:
                 level = -99 # default out of limit level
+
+         if Unit_In =='mm':
+            return level
          return volume   
     return -99 # return catch all error
 
@@ -141,6 +144,7 @@ def IoLink_Read_PVO(PVO_INDEX):
       
         sNode = settings.IOLINK_NODE_1
         sSensorType = IOLINK_PVO[PVO_INDEX].get('Sensor')
+        sUnit = IOLINK_PVO[PVO_INDEX].get('Unit')
         sApiUrl = IolinkMakeProcessVariablePath(sNode,iIOLinkPort,sSensorType)
         iResponse = requests.get(sApiUrl, timeout=int(IOLINK_TOUT))  # send request to IOlink master
         
@@ -156,31 +160,31 @@ def IoLink_Read_PVO(PVO_INDEX):
                     # scale the raw values locally for now
                     if PVO_INDEX == 1:  # TV7105 Temp sensor
                         # make the pvoData
-                        TempPVO = list(udtPVO) #cant edit a touple so convert to list          
-                        TempPVO[3] =    IOLinkDecodeValues(sSensorType,hexDataValue)
+                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list          
+                        TempPVO[3] =    IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         # convert back to the type
                         udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
                         
                     if PVO_INDEX == 2:  # LDL100 - conductivity
-                        TempPVO = list(udtPVO) #cant edit a touple so convert to list          
-                        Cond,Temp = IOLinkDecodeValues(sSensorType,hexDataValue)
+                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list          
+                        Cond,Temp = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         TempPVO[3] = Cond
                         udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
                         
                     if PVO_INDEX == 3:  # LDL100 - Temp
-                        TempPVO = list(udtPVO) #cant edit a touple so convert to list          
-                        Cond,Temp = IOLinkDecodeValues(sSensorType,hexDataValue)
+                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list          
+                        Cond,Temp = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         TempPVO[3] = Temp
                         udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
                         
                     if PVO_INDEX == 4:  #
                         TempPVO = list(udtPVO) #
-                        TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue)
+                        TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
                         
                     if PVO_INDEX == 5:  #
                         TempPVO = list(udtPVO) #
-                        TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue)
+                        TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
                 else:
                     sError = "Error On Port " + str(iIOLinkPort) + " code " + str(iIOLinkCode)

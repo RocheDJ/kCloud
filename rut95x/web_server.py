@@ -10,6 +10,7 @@ from inc.udt import types
 from inc.udt.dbClass import dbClass
 from inc.udt.status import status_class
 from multiprocessing.sharedctypes import Value
+
 app = Flask(__name__)
 CORS(app)
 
@@ -43,7 +44,6 @@ def testPVOValues():  # read the updates list of PVO values from the Database
     }
     return sJSONData
 
-
 # ------------------------------------------ Web Routes             -------------------------------------------------
 # local index page
 @app.route("/")
@@ -59,7 +59,15 @@ def list():
     myRows = webServerDB.read_pvo_live()
     myCount = 6
     return render_template("list.html", rows=myRows, count=myCount)
+# -------------------------------------------------------------------------------------------------------------------
+# get value of single variable between start date and stop date
+@app.route('/list/read', methods=['GET'])
+def list_read():
+ jData = webServerDB.read_pvo_live_JSON()
 
+ if jData == 999:
+    return 400
+ return jData, 200
 # -------------------------------------------------------------------------------------------------------------------
 # local trend page
 @app.route("/trend")
@@ -69,7 +77,7 @@ def trend():
 # -------------------------------------------------------------------------------------------------------------------
 # get value of single variable between start date and stop date
 @app.route('/data/read', methods=['GET'])
-def query_records():
+def data_read():
  pdoKey = request.args.get('pdoKey')
  StartDate = request.args.get('StartDate')
  StopDate = request.args.get('StopDate')
@@ -79,6 +87,19 @@ def query_records():
  if jData == 999:
     return 400
  return jData, 200
+
+# -------------------------------------------------------------------------------------------------------------------
+# get value of single variable between start date and stop date
+@app.route('/trigger/set', methods=['POST'])
+def trigger_set():  
+ content_type = request.headers.get('Content-Type')
+ setIndex = request.args.get('index')
+ setValue = request.args.get('value')
+ webServerDB.set_triggers(setIndex,setValue)
+ sData = "Done"
+ return sData, 200
+
+
 # ------------------------------------------ Web Server              -------------------------------------------------
 def runWebServer(ServerPort, xDebugMode):
     try:

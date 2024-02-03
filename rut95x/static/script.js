@@ -1,25 +1,5 @@
-setInterval(function () {
-    $.ajax({
-        type: "GET",
-        url: "/",
-    })
-        .done(function (data) {
-            console.log(data);
-            var tableHtml = '';
-            for (row in data) {
-                tableHtml += '<tr>';
-                for (d in row) {
-                    tableHtml += '<td>' + d + '</td>';
-                }
-                tableHtml += '</tr>';
-            }
-            $("#dataTable").html(tableHtml)
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR, textStatus, errorThrown);
-        });
-}, 1000 * 60); 
 
-
+// --------------------------------------------------------------------------------
 function UpdateDataTableValues(){
     let rowCount = document.getElementById("row_count").innerHTML;
     for (let i = 1; i < rowCount; i++) {
@@ -71,3 +51,177 @@ function UpdateTrendChart(){
     });
 }
 
+// --------------------------------------------------------------------------------
+function Update_Overview(){
+
+  const apiUrl = 'http://127.0.0.1:8080/list/read';
+  fetch(apiUrl)
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Data not found');
+      } else if (response.status === 500) {
+        throw new Error('Server error');
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    }
+    return response.json();
+  })
+  .then(data => {
+    var sJson = JSON.stringify(data, null, 2);
+    //var data = JSON.parse(this.response);
+    data.forEach((pvo) => {
+      jData = JSON.parse(pvo.jData); 
+      if (jData.title == "Temperature"){
+        document.getElementById("Temperature").innerHTML = jData.value;
+      }
+      if (jData.title == "Volume"){
+        document.getElementById("Volume").innerHTML = jData.value;
+      }
+      if (jData.title == "Agitator"){
+        document.getElementById("Agitator").innerHTML = jData.value;
+      }
+    })
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  
+}
+//-----------------------------------------------------------------------------
+function Start_Agitator(){
+  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=3&value=1';
+  const data ={
+    name:"Not Used"
+  }
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  fetch(apiUrl,requestOptions)
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('API not found');
+      } else if (response.status === 500) {
+        throw new Error('Server error');
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Start Agitator:', data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  
+}
+//-----------------------------------------------------------------------------
+function Stop_Agitator(){
+  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=4&value=1';
+  const data ={
+    name:"Not Used"
+  }
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  fetch(apiUrl,requestOptions)
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('API not found');
+      } else if (response.status === 500) {
+        throw new Error('Server error');
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Start Agitator:', data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  
+}
+//-----------------------------------------------------------------------------
+function Start_Batch(){
+  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=1&value=1';
+  const data ={
+    name:"Not Used"
+  }
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  fetch(apiUrl,requestOptions)
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('API not found');
+      } else if (response.status === 500) {
+        throw new Error('Server error');
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Start Agitator:', data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  
+}
+//-----------------------------------------------------------------------------
+function Stop_Batch(){
+  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=2&value=1';
+  const data ={
+    name:"Not Used"
+  }
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  fetch(apiUrl,requestOptions)
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('API not found');
+      } else if (response.status === 500) {
+        throw new Error('Server error');
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Start Agitator:', data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  
+}

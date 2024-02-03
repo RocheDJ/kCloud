@@ -17,11 +17,11 @@ from multiprocessing.sharedctypes import Value, Array
 import settings
 from inc.udt.types import MainStepType
 from inc import IOLink
-from inc.udt.classes import PVO_ValueClass , SignalHandler
+from inc.udt.classes import PVO_ValueClass,SignalHandler,step_class,io_eight_class,dt_three_class,aio_eight_class
 from inc.udt.dbClass import dbClass
 from inc.udt.status import status_class
 from web_server import runWebServer
-
+from inc.Control import Control_Sequence
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 main_status = status_class("")
@@ -45,7 +45,7 @@ def log_status():
 
 
 # --- Read IO link Data from Network -------------
-def Inputs(aOldReadings):
+def Read_Inputs_Physical(aInputs):
     try:
         # temporally load only 5 data points
         # ToDo: make PVO points dynamic
@@ -55,17 +55,28 @@ def Inputs(aOldReadings):
             if sError != "":
                 main_status.status = "Main App  :  Input Error : " + str(sError)
             if (
-                aOldReadings[x - 1].value != dataJSON["data"][0]["value"]
+                aInputs.value[x - 1] != dataJSON["data"][0]["value"]
             ): 
                 sqliteDB.update_PVO_Live(dataJSON, x)
-                aOldReadings[x - 1].value = dataJSON["data"][0]["value"]
-               
+                aInputs.value[x - 1] = dataJSON["data"][0]["value"]
     except Exception as error:
         if settings.DEBUG:
             main_status.status = "Main App  :  UpdateReading Error : " + str(error)
 
+# --- Read IO link Data from Network -------------
+def Read_Inputs_Software(oTriggers):
+    try:
+        triggers= sqliteDB.read_reset_triggers()
+        for x in [0,1,2,3,4]:
+            oTriggers.value[x] = triggers[x]
+       
+        
+    except Exception as error:
+        if settings.DEBUG:
+            main_status.status = "Main App  :  Read_Inputs_Software Error : " + str(error)
 # ------------------------------------------ Main Control Sequence -------------------------------------------------
 def main_sequence():
+    
     udtMainStep = MainStepType(MainStepType.init)
     udtMainStepOld = udtMainStep
     xNewStep = 0
@@ -73,25 +84,30 @@ def main_sequence():
     iMaxPVO = 6
     fStepInterval = 0.500  # 100 ms
     aPrevValues = []  # an array of previous values of inputs so we cna detect a change
+    # start web server as separate process
     pWebServer = Process(
         target=startWEBServer, args=(8080, xDebugOn)
-    )  # start beb server as seperate process
+    )  
+    # variables to calculate cycle time
     dtCycleStart = datetime.now()
     dtCycleStop = datetime.now()
-    # handles systemd calls in linux
+    # handles systemd calls in linux to allow for controlled shutdown
     signal_handler = SignalHandler()
-    
+    # control Sequence Variables
+    max_heating_time = (300)
+    control_step = step_class()#
+    process_times = dt_three_class()# start,hold start,stop time for process
+    digital_outputs =  io_eight_class()
+    analogue_inputs = aio_eight_class()
+    trigger_inputs = io_eight_class()
+    hold_temperature = 72
+    hold_seconds = 600
+    current_temperature = 23.4 # this needs to be updated
+    #-----------------------------------------
     while signal_handler.can_run():
         # ----------------------   Step 0  ---------------------
         if udtMainStep == MainStepType.init:
-            
-            sqliteDB.create_PVO_Live(iMaxPVO) # create teh localtables
-            
-            for x in (1, 2, 3, 4, 5):
-                # initialise the array of values by addling a pvo_value class object with an inital value of 0
-                PVO_PreviousValue = PVO_ValueClass(0)
-                aPrevValues.append(PVO_PreviousValue)
-                
+            sqliteDB.create_PVO_Live(iMaxPVO) # create the local tables
             if xDebugOn:
                 main_status.status = "Main Sequence  :  Init: "
             udtMainStep = MainStepType.load_config
@@ -115,16 +131,21 @@ def main_sequence():
         elif udtMainStep == MainStepType.read_inputs:
             if xNewStep:
                 dtCycleStart = datetime.now()
-                Inputs(aPrevValues)
+                Read_Inputs_Physical(analogue_inputs)
+                Read_Inputs_Software(trigger_inputs)
             udtMainStep = MainStepType.check_event_triggers
         # ----------------------   Step 5  ---------------------
-        elif udtMainStep == MainStepType.check_event_triggers:
+        elif udtMainStep == MainStepType.check_event_triggers:      
             udtMainStep = MainStepType.check_timed_triggers
         # ----------------------   Step 6  ---------------------
         elif udtMainStep == MainStepType.check_timed_triggers:
             udtMainStep = MainStepType.control_logic
         # ----------------------   Step 7  ---------------------
         elif udtMainStep == MainStepType.control_logic:
+            Control_Sequence(control_step,trigger_inputs,digital_outputs,
+                            analogue_inputs,   
+                            process_times,hold_seconds, hold_temperature,
+                            max_heating_time) 
             udtMainStep = MainStepType.write_outputs
         # ----------------------   Step 8  ---------------------
         elif udtMainStep == MainStepType.write_outputs:
