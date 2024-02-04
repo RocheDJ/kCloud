@@ -3,10 +3,10 @@
 # ./inc/IOLink.py
 #-------------------------------------------------------------------------------------------------------------------
 # IOLink read data from an 4 Port IO link Master AL1350 with the following configuration
-# Port 1 - 
-# Port 2 - 
-# Port 3 -
-# Port 4 - 
+# Port 1 - LR2750 - level in mm
+# Port 2 - LDL100 - Tempriture and conductivity
+# Port 3 - Agitator output feedback
+# Port 4 - Heater output feedback
 #-------------------------------------------------------------------------------------------------------------------
 
 import requests
@@ -20,13 +20,15 @@ IOLINK_TOUT = settings.IOLINK_TOUT
 #-------------------------------------------------------------------------------------------------------------------
 # define the data for the io link ports
 #   ref https://stackoverflow.com/questions/6198372/most-pythonic-way-to-provide-global-configuration-variables-in-config-py
-Pvo_Config= lambda Port,Sensor,Description,Unit,Datatype:{'Port':Port,'Sensor':Sensor,'Description':Description,'Unit':Unit,'Datatype':Datatype}
+Pvo_Config= lambda Node,Port,Sensor,Description,Unit,Datatype:{'Node':Node,'Port':Port,'Sensor':Sensor,'Description':Description,'Unit':Unit,'Datatype':Datatype}
 
-IOLINK_PVO= {1 : Pvo_Config(1,'LR2750',"Level", "mm",types.valueType.real),
-             2 : Pvo_Config(2,'LDL100', "Conductivity", "uS",types.valueType.real),
-             3 : Pvo_Config(2,'LDL100',"Temperature", "C",types.valueType.real),
-             4 : Pvo_Config(3,'DI',"Agitator", "QI",types.valueType.bool),
-             5 : Pvo_Config(1,'LR2750',"Volume", "L",types.valueType.real)
+iNode1 = settings.IOLINK_NODE_1
+IOLINK_PVO= {0 : Pvo_Config(iNode1,1,'LR2750',"Level", "mm",types.valueType.real),
+             1 : Pvo_Config(iNode1,2,'LDL100',"Conductivity", "uS",types.valueType.real),
+             2 : Pvo_Config(iNode1,2,'LDL100',"Temperature", "C",types.valueType.real),
+             3 : Pvo_Config(iNode1,3,'DI',"Agitator", "QI",types.valueType.bool),
+             4 : Pvo_Config(iNode1,1,'LR2750',"Volume", "L",types.valueType.real),
+             5 : Pvo_Config(iNode1,4,'DI',"Heater", "QI",types.valueType.bool),
             }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -105,26 +107,27 @@ def IOLinkDecodeValues(SensorType_In,ProcessData_In,Unit_In):
          sHexData = '0x' + ProcessData_In 
          #convert the hex value to integer
          iDataValue = int(ProcessData_In,16) # ,0 invokes get base from hex value
-       
+        # assume tank is 500 L which is 
+         fFullVolume = 1000 # full volume
+         fFullMM     = 500 # full mm
          # shift right twice to get rit of first two bits
          iDataValue = iDataValue//2
          iDataValue = iDataValue//2 
          if (iDataValue <= 1970): # from iodd sheet range 10 to 1970
             if iDataValue <10:
                 iDataValue =0
-            # assume tank is 500 L which is 
-            fFullVolume = 500 # full volume
-            fFullMM     = 250 # full mm
+           
             # scale the values
             rRatio =  iDataValue / fFullMM
             rVolume =  fFullVolume *  rRatio
             volume = round(rVolume, 1)
          else:
             if (iDataValue == 8189):
-                level = fFullVolume # full
+                level = fFullMM # full
+                volume = fFullVolume
             else:
                 level = -99 # default out of limit level
-
+                volume = -99
          if Unit_In =='mm':
             return level
          return volume   
@@ -140,12 +143,12 @@ def IoLink_Read_PVO(PVO_INDEX):
         iIOLinkPort = IOLINK_PVO[PVO_INDEX].get('Port')
         
         udtPVO = types.PVOType(IOLINK_PVO[PVO_INDEX].get('Description'), IOLINK_PVO[PVO_INDEX].get('Unit'),
-                                 IOLINK_PVO[PVO_INDEX].get('Datatype').value,0,IOLINK_PVO[PVO_INDEX].get('Port'))
+                                 IOLINK_PVO[PVO_INDEX].get('Datatype').value,0,IOLINK_PVO[PVO_INDEX].get('Port'),IOLINK_PVO[PVO_INDEX].get('Node'))
       
-        sNode = settings.IOLINK_NODE_1
+        sIoLinkNode = IOLINK_PVO[PVO_INDEX].get('Node')
         sSensorType = IOLINK_PVO[PVO_INDEX].get('Sensor')
         sUnit = IOLINK_PVO[PVO_INDEX].get('Unit')
-        sApiUrl = IolinkMakeProcessVariablePath(sNode,iIOLinkPort,sSensorType)
+        sApiUrl = IolinkMakeProcessVariablePath(sIoLinkNode,iIOLinkPort,sSensorType)
         iResponse = requests.get(sApiUrl, timeout=int(IOLINK_TOUT))  # send request to IOlink master
         
         # Read Port Data values
@@ -158,34 +161,40 @@ def IoLink_Read_PVO(PVO_INDEX):
                 if iIOLinkCode == 200:
                     hexDataValue = oJson['data']['value']  # read the process data value from the system
                     # scale the raw values locally for now
-                    if PVO_INDEX == 1:  # TV7105 Temp sensor
+                    if PVO_INDEX == 0:  # LR2750 Level sensor mm
                         # make the pvoData
-                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list          
-                        TempPVO[3] =    IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
+                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list
+                        # index 3 of the list is the value          
+                        TempPVO[3] =   IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         # convert back to the type
-                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
-                        
-                    if PVO_INDEX == 2:  # LDL100 - conductivity
-                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list          
+                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort,sIoLinkNode)
+
+                    if PVO_INDEX == 1:  # LDL100 - conductivity 
+                        TempPVO = list(udtPVO)         
                         Cond,Temp = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         TempPVO[3] = Cond
-                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
+                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort,sIoLinkNode)
                         
-                    if PVO_INDEX == 3:  # LDL100 - Temp
-                        TempPVO = list(udtPVO) #cant edit a tuple so convert to list          
+                    if PVO_INDEX == 2:  # LDL100 - Temp
+                        TempPVO = list(udtPVO)          
                         Cond,Temp = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
                         TempPVO[3] = Temp
-                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
+                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort,sIoLinkNode)
                         
-                    if PVO_INDEX == 4:  #
+                    if PVO_INDEX == 3:  # DI feedback 
                         TempPVO = list(udtPVO) #
                         TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
-                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
+                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort,sIoLinkNode)
                         
-                    if PVO_INDEX == 5:  #
+                    if PVO_INDEX == 4:  # LR2750 Level sensor volume
                         TempPVO = list(udtPVO) #
                         TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
-                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort)
+                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort,sIoLinkNode)
+                        
+                    if PVO_INDEX == 5:  # # DI feedback Heater
+                        TempPVO = list(udtPVO) #
+                        TempPVO[3] = IOLinkDecodeValues(sSensorType,hexDataValue,sUnit)
+                        udtPVO = types.PVOType(TempPVO[0],TempPVO[1],TempPVO[2],TempPVO[3],iIOLinkPort,sIoLinkNode)
                 else:
                     sError = "Error On Port " + str(iIOLinkPort) + " code " + str(iIOLinkCode)
             else:
@@ -219,3 +228,42 @@ def IoLink_Read_PVO(PVO_INDEX):
         }
        
         return sJSONData #
+
+#----------------------------------------------------------------------------------------------------------------------
+def IoLink_Write_DQ(iNode,iPort,xValue):
+    try:
+        sApiUrl =  'http://' +str(settings.IP4_BASE)+'.'+str(iNode)
+        sValue="00"
+        if xValue:
+            sValue ="01"
+
+        jData={    "code": "request",
+                    "cid": 22,
+                    "adr": "iolinkmaster/port["+str(iPort)+"]/iolinkdevice/pdout/setdata",
+                    "data": {
+                    "newvalue": sValue
+              }}
+
+        iResponse = requests.post(url=sApiUrl,
+                                        json=jData,
+                                        timeout=int(IOLINK_TOUT))  # send request to IOlink master
+        if iResponse:
+            iResponseCode = iResponse.status_code  # read the response code
+            if iResponseCode == 200:
+                oJson = iResponse.json()  # read the json response string
+                iIOLinkCode = oJson['code'] 
+                # if the operation was successful then the iolink master will return a json code 200 and the id
+                # code {
+                #        "cid": 10,
+                #         "code": 200
+                #       }
+                if iIOLinkCode == 200:
+                    return True    
+                return False
+
+
+        return False
+    except Exception as sError:
+        myError = "Error IoLink_Write_DQ " + str(sError)
+       
+        return False #

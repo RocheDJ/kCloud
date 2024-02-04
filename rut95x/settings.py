@@ -19,3 +19,5 @@ IP4_BASE = config("IP4_BASE", default="172.17.17")
 IOLINK_NODE_1 = config("IOLINK_NODE_1", default="106")
 
 SQLITE_DB = config("SQLITE_DB", "installation.db")
+
+IOLINK_PVO_MAX = config("IOLINK_PVO_MAX", default=6,cast=int)

@@ -91,109 +91,25 @@ function Update_Overview(){
 }
 //-----------------------------------------------------------------------------
 function Start_Agitator(){
-  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=3&value=1';
-  const data ={
-    name:"Not Used"
-  }
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
-  fetch(apiUrl,requestOptions)
-  .then(response => {
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('API not found');
-      } else if (response.status === 500) {
-        throw new Error('Server error');
-      } else {
-        throw new Error('Network response was not ok');
-      }
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Start Agitator:', data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-  
+  Call_Trigger_API(3,1);
 }
 //-----------------------------------------------------------------------------
 function Stop_Agitator(){
-  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=4&value=1';
-  const data ={
-    name:"Not Used"
-  }
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
-  fetch(apiUrl,requestOptions)
-  .then(response => {
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('API not found');
-      } else if (response.status === 500) {
-        throw new Error('Server error');
-      } else {
-        throw new Error('Network response was not ok');
-      }
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Start Agitator:', data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+  Call_Trigger_API(4,1);
   
 }
 //-----------------------------------------------------------------------------
 function Start_Batch(){
-  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=1&value=1';
-  const data ={
-    name:"Not Used"
-  }
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
-  fetch(apiUrl,requestOptions)
-  .then(response => {
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('API not found');
-      } else if (response.status === 500) {
-        throw new Error('Server error');
-      } else {
-        throw new Error('Network response was not ok');
-      }
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Start Agitator:', data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-  
+  Call_Trigger_API(1,1);
 }
+ 
 //-----------------------------------------------------------------------------
 function Stop_Batch(){
-  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index=2&value=1';
+  Call_Trigger_API(2,1);
+}
+
+function Call_Trigger_API(index,value ){
+  const apiUrl = 'http://127.0.0.1:8080/trigger/set?index='+ index + '&value=' + value;
   const data ={
     name:"Not Used"
   }

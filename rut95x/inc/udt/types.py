@@ -27,5 +27,11 @@ class MainStepType(Enum):
 
 
 
-#PVO data type as defined in data mode     
-PVOType = collections.namedtuple('PVOType', 'title unit valuetype value port')
+#PVO data type 
+# title = what the process variable is called
+# unit = text of the unit of variable measurement
+# value type = ordinal from valueType class 
+# value = actual value
+# port = iolink port number
+# node = iolink node number     
+PVOType = collections.namedtuple('PVOType', 'title unit valuetype value port node')

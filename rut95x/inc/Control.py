@@ -39,10 +39,10 @@ def Control_Sequence(step,sdIn,dOut,
              sdIn.value[1] = False
         elif(sdIn.value[3]): # Agitator Start Trigger
              sdIn.value[3] = False
-             dOut.value[2] = True #  Agitator on   
+             dOut.value[0] = True #  Agitator on   
         elif(sdIn.value[4]): # Agitator Stop Trigger
              sdIn.value[4] = False
-             dOut.value[2] = False #  Agitator off
+             dOut.value[0] = False #  Agitator off
            
     #start the batch process         
     elif(step.step ==10):
@@ -53,12 +53,12 @@ def Control_Sequence(step,sdIn,dOut,
     #run the process ramp up to temp
     elif(step.step==20):
         xAgitator =  Calc_OneInThree(dStartTime_StopTime.value[0]) 
-        if ( xAgitator and dOut.value[2]== False):
-            dOut.value[2] =True
+        if ( xAgitator and dOut.value[0]== False):
+            dOut.value[0] =True
             print("Activating Agitator")
             
-        if ( xAgitator ==False and dOut.value[2]== True):
-            dOut.value[2] =False
+        if ( xAgitator ==False and dOut.value[0]== True):
+            dOut.value[0] =False
             print("Stopping Agitator")
 
         dtDiff = datetime.utcnow() - dStartTime_StopTime.value[0]
@@ -81,17 +81,17 @@ def Control_Sequence(step,sdIn,dOut,
         elif (sdIn.value[2]): # Stop the process
            step.step = 990
     elif(step.step ==40):
-         dOut.value[1]= False #  Heater Off   
-         dOut.value[2]= False #  Agitator off
+         dOut.value[0]= False #  Heater Off   
+         dOut.value[1]= False #  Agitator off
          step = 0
     elif(step.step ==990):
-         dOut.value[1]= False #  Heater Off   
-         dOut.value[2]= False #  Agitator off
+         dOut.value[0]= False #  Heater Off   
+         dOut.value[1]= False #  Agitator off
          print("Process Stopped by user")
          step.step = 0
     elif(step.step ==991):
-         dOut.value[1]= False #  Heater Off   
-         dOut.value[2]= False #  Agitator off
+         dOut.value[0]= False #  Heater Off   
+         dOut.value[1]= False #  Agitator off
          print("Process Stopped heater not working")
          step.step = 0
     
