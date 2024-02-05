@@ -256,6 +256,20 @@ article h2 {
   flex-grow: 1;
 }
 
+.flex_layout_chart {
+  background-color: #dbdde0; 
+  max-width: 93.5%;
+  display: flex;
+  gap: 2%;
+}
+
+.flex_layout_chart_select {
+  background-color: #808183; 
+  max-width: 93.5%;
+  display: flex;
+  gap: 2%;
+}
+
 .grid_1 {
     max-width: 93.5%;
     display: grid;

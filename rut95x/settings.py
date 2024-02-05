@@ -21,3 +21,7 @@ IOLINK_NODE_1 = config("IOLINK_NODE_1", default="106")
 SQLITE_DB = config("SQLITE_DB", "installation.db")
 
 IOLINK_PVO_MAX = config("IOLINK_PVO_MAX", default=6,cast=int)
+# log data locally every ten seconds when batch is running
+PVO_LOG_INTERVAL_RUN = config("PVO_LOG_INTERVAL", default=10.0, cast=float)
+# log data locally every 60 seconds when batch is idle
+PVO_LOG_INTERVAL_IDLE = config("PVO_LOG_INTERVAL_IDLE", default=60.0, cast=float)

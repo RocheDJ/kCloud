@@ -3,5 +3,6 @@
         "IIOT",
         "IOLINK",
         "Kilderry"
-    ]
+    ],
+    "python.formatting.provider": "black"
 }
