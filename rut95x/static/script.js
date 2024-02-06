@@ -25,6 +25,7 @@ function UpdateTrendChart() {
   //https://www.chartjs.org/docs/latest/getting-started/usage.html
 
   const pvoKey = document.getElementById("pvo_title").value// "Temperature";
+  const chart_type = document.getElementById("chart_type").value// "line";
   var startDate = document.getElementById("myStartDate").value; //'2024-02-05 20:18:44';
   var stopDate = document.getElementById("myStopDate").value;
   //const xValues = [100,200,300,400,500,600,700,800,900,1000]; //for testing
@@ -32,7 +33,7 @@ function UpdateTrendChart() {
 
   startDate = startDate.replace("T", " ");
   stopDate = stopDate.replace("T", " ");
-  
+  chart_type 
   const apiUrl =
     "http://127.0.0.1:8080/data/read?pvoKey=" +
     pvoKey +
@@ -65,7 +66,7 @@ function UpdateTrendChart() {
       }
 
       new Chart("myChart", {
-        type: "line",
+        type: chart_type,
         data: {
           labels: xValues,
           datasets: [

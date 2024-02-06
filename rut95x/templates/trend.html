@@ -43,6 +43,7 @@
                         <input type="datetime-local" id="myStopDate" value="2024-02-05T20:25:33">
                     </div>
                     <div>
+                        <label for="pvo_title">Process Variable:</label>
                         <select name="Value" id="pvo_title">
                             <option value="Temperature">Temperature</option>
                             <option value="Volume">Volume</option>
@@ -50,7 +51,19 @@
                             <option value="Conductivity">Conductivity</option>
                           </select>
                     </div>
-                    <div><button type="button" onclick="UpdateTrendChart()">Update Trend</button></div>
+                    <div>
+                        <label for="pvo_title">Chart Type:</label>
+                        <select name="Value" id="chart_type">
+                            <option value="line">Line</option>
+                            <option value="bar">Bar</option>
+                            <option value="scatter">Scatter</option>
+                          </select>
+                    </div>
+                    <div>
+                        <button class="button button_green" type="button" onclick="UpdateTrendChart()">
+                            Update Trend
+                        </button>
+                    </div>
 
                 </div>
                    
