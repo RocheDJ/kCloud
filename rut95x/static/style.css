@@ -256,6 +256,13 @@ article h2 {
   flex-grow: 1;
 }
 
+.flex_layout_buttons {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  
+}
+
 .flex_layout_chart {
   background-color: #dbdde0; 
   max-width: 93.5%;

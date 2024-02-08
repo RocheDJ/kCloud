@@ -1,3 +1,15 @@
+#!/bin/python3
+# --------------------------------------------------------------------------------------------------------------------
+# Author: David Roche
+# Date: January 2024
+# Description : Class  for handling all access to the data base
+# -------------------------------------------------------------------------------------------------------------------
+# ./inc/udt/dbClass.py
+# ------------------------------------------  Import Decelerations -------------------------------------------------
+# Python Libs
+# -------------------------------------------------------------------------------------------
+
+
 from contextlib import nullcontext
 import sqlite3
 import uuid
@@ -5,10 +17,9 @@ import settings
 import datetime
 import json
 
-
+ # ----------------------------------------------------------------------------------------
 class dbClass:
     """Class to interface to an SQlite Database"""
-
     # ----------------------------------------------------------------------------------------
     def __init__(self):
         self.dbPath = str(settings.BASE_DIR) + "/data/" + settings.SQLITE_DB
@@ -62,37 +73,39 @@ class dbClass:
             self.errorString = "ClearOldData Error " + str(error)
 
     # -----------------------------------------------------------------------------------------
-    def log_PDO_to_DB(self, dataJSON):
+    def log_PDO_to_DB(self, dataJSON, report_type, report_version):
         try:
             # open db and connect
             self.OpenConn()
-
             c = self.db.cursor()
             # generate the insert query
             myUuid = uuid.uuid4()
-            installationId = dataJSON["InstallationID"]
-            EventDate = dataJSON["EventDate"]
-            Node = dataJSON["Node"]
-            Type = dataJSON["Type"]
-            Version = dataJSON["Version"]
-            Data = dataJSON["Data"]
+            installationId = str(settings.INSTALLATION_ID)
+            utcTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Convert the dictionary to a
+            # JSON string with double quotes
+            jData = json.dumps(dataJSON, ensure_ascii=False)
+
+            #
+            # if sValueType == '1':  # if the value in the PVO is string add quotes
+            #   sqlJSON = "', jData = json_set(jData,'$.value','" +str(sValue) + "')"
+            # else:
+            #    sqlJSON = "', jData = json_set(jData,'$.value'," +str(sValue) + ")"
 
             myQuery = (
                 "INSERT INTO pdo VALUES ('"
                 + str(myUuid)
-                + "',' "
+                + "','"
                 + str(installationId)
+                + "',"
+                + str(report_type.value)
+                + ","
+                + str(report_version)
+                + ",'"
+                + str(utcTime)
                 + "','"
-                + str(Node)
-                + "','"
-                + str(Type)
-                + "','"
-                + str(Version)
-                + "','"
-                + str(EventDate)
-                + "',\""
-                + str(Data)
-                + '",0)'
+                + jData
+                + "')"
             )
 
             c.execute(myQuery)
@@ -104,7 +117,7 @@ class dbClass:
             # Just be sure any changes have been committed or they will be lost.
             self.CloseConn()
         except Exception as error:
-            self.errorString = "log_PVO_to_DB Error " + str(error)
+            self.errorString = "log_PDO_to_DB Error " + str(error)
 
     # -----------------------------------------------------------------------------------------
     def log_PVO_to_DB(self, dataJSON):
@@ -120,11 +133,10 @@ class dbClass:
             sTitle = dataJSON["data"][0]["title"]  # load from directory type
             sUnit = dataJSON["data"][0]["unit"]
             sValueType = dataJSON["data"][0]["valueType"]
-         #   jData = dataJSON["data"][0]
-            # Convert the dictionary to a 
+            #   jData = dataJSON["data"][0]
+            # Convert the dictionary to a
             # JSON string with double quotes
-            jData = json.dumps(dataJSON["data"][0],
-                         ensure_ascii=False)
+            jData = json.dumps(dataJSON["data"][0], ensure_ascii=False)
             sNodeId = dataJSON["node"]
             sPortId = dataJSON["port"]
             #
@@ -139,9 +151,9 @@ class dbClass:
                 + "','"
                 + str(installationId)
                 + "',"
-                + str(sNodeId) 
+                + str(sNodeId)
                 + ","
-                + str(sPortId) 
+                + str(sPortId)
                 + ",'"
                 + str(utcTime)
                 + "',0,'"
@@ -446,11 +458,13 @@ class dbClass:
 
             myQuery = (
                 "SELECT json_extract(jData, '$.title') as Title,"
-                +"json_extract(JData, '$.value') as Value,EventDate FROM pvo WHERE EventDate between '"
+                + "json_extract(JData, '$.value') as Value,EventDate FROM pvo WHERE EventDate between '"
                 + str(dtStart)
                 + "' and '"
                 + str(dtEnd)
-                + "' and Title ='"+ str(pdoVariableKey)+ "';"
+                + "' and Title ='"
+                + str(pdoVariableKey)
+                + "';"
             )
 
             dbPath = str(settings.BASE_DIR) + "/data/" + settings.SQLITE_DB
@@ -465,7 +479,7 @@ class dbClass:
             to_json = json.dumps(data, indent=2)
             count = len(rows)
             self.CloseConn()
-            return  to_json
+            return to_json
         except Exception as error:
             self.errorString = "read_PVO_specific Error " + str(error)
             return 999

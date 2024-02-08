@@ -1,13 +1,13 @@
 #!/bin/python3
 # --------------------------------------------------------------------------------------------------------------------
+# Author: David Roche
 # Date: January 2024
-# Description : Edge Application for K Cloud RUT95x Teltonika Router
+# Description : Core file for Edge Application for K Cloud RUT95x Teltonika Router
 # -------------------------------------------------------------------------------------------------------------------
 # ./PyIO.py
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 from datetime import datetime
-
 from os import kill
 from time import sleep
 from multiprocessing import Process
@@ -15,7 +15,7 @@ from multiprocessing.sharedctypes import Value, Array
 
 # User Defined Libs
 import settings
-from inc.udt.types import MainStepType
+from inc.udt.types import MainStepType, reportType
 from inc import IOLink
 from inc.udt.classes import (
     PVO_ValueClass,
@@ -33,12 +33,12 @@ from inc.Control import Control_Sequence
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 main_status = status_class("")
-
+old_process_outputs = io_eight_class()
+process_inputs = aio_eight_class()
+process_times = dt_three_class()  # start,hold start,stop time for process
+hold_temperature = 72
+hold_seconds = 600
 # ------------------------------------------ Methods                -------------------------------------------------
-
-
-def modify(sString):
-    sString.value = sString.value.upper()
 
 
 # --start the web interface to run as a separate process
@@ -49,7 +49,7 @@ def startWEBServer(iPort, sStatus):
 # --start the web interface to run as a separate process
 def log_status():
     sqliteDB.update_status(1, main_status.status, main_status.cycle_time)
-    sqliteDB.update_status(2, "Web Server Status ToDo:", 999.9)
+    sqliteDB.update_status(2, "ToDo: Web Server Status ", 999.9)
 
 
 # --- Read IO link Data from Network -------------
@@ -85,10 +85,7 @@ def Read_Inputs_Software(oTriggers):
             )
 
 
-# --- Read IO link Data from Network -------------
-old_process_outputs = io_eight_class()
-
-
+# --- Write Outputs to Network -------------
 def Write_Outputs_Physical(aOutputs):
     try:
         for x in range(8):
@@ -103,6 +100,48 @@ def Write_Outputs_Physical(aOutputs):
             main_status.status = "Main App  :  Write_Outputs_Physical Error : " + str(
                 error
             )
+
+
+# --- Write process report Object
+def make_report(report_type, stepCode):  # start,hold start,stop time for process
+    try:
+        # batch start
+        if report_type == reportType.batch_start:
+            # make the report
+            sJSONData = {
+                "Batch_Start": str(process_times.value[0]),
+                "Start_Temperature": str(process_inputs.value[1]),
+                "Start_Volume": str(process_inputs.value[3]),
+                "Hold_Temperature": str(hold_temperature),
+                "Hold_Duration": str(hold_seconds),
+            }
+            return sJSONData
+        # batch stop
+        if report_type == reportType.batch_stop:
+            # make the report
+            batch_code = 3
+            dtDiff = process_times.value[2] - process_times.value[0]
+            Batch_Duration = dtDiff.seconds
+            if stepCode.step == 990:  # stopped by user
+                batch_code = 1
+            if stepCode.step == 991:  # stopped by user
+                batch_code = 2
+            if stepCode.step == 40:  # stopped by user
+                batch_code = 0
+            sJSONData = {
+                "Batch_Start": str(process_times.value[0]),
+                "Hold_Start": str(process_times.value[1]),
+                "Batch_Stop": str(process_times.value[2]),
+                "Temperature": str(process_inputs.value[1]),
+                "Stop_Volume": str(process_inputs.value[3]),
+                "Batch_Duration": str(Batch_Duration),
+                "Batch_Code": str(batch_code),
+            }
+            return sJSONData
+
+    except Exception as error:
+        if settings.DEBUG:
+            main_status.status = "Main App  :  make_report Error : " + str(error)
 
 
 # ------------------------------------------ Main Control Sequence -------------------------------------------------
@@ -125,13 +164,11 @@ def main_sequence():
     # control Sequence Variables
     max_heating_time = 300
     control_step = step_class()  #
-    process_times = dt_three_class()  # start,hold start,stop time for process
-    process_inputs = aio_eight_class()
+
     trigger_inputs = io_eight_class()
     process_outputs = io_eight_class()
     aPVO = [{} for x in range(settings.IOLINK_PVO_MAX)]  # List to hold JSONS ?
-    hold_temperature = 72
-    hold_seconds = 600
+
     xFirstRead = True
     # -----------------------------------------
     while signal_handler.can_run():
@@ -164,11 +201,31 @@ def main_sequence():
 
             Read_Inputs_Physical(process_inputs, aPVO, xFirstRead)
             Read_Inputs_Software(trigger_inputs)
-            xFirstRead = False
+            xFirstRead = False  # always log the first read
             udtMainStep = MainStepType.check_event_triggers
+
         # ----------------------   Step 5  ---------------------
         elif udtMainStep == MainStepType.check_event_triggers:
+            if xNewStep:
+                xWriteReport = False
+                if control_step.step == 10:  # new batch starting step of control
+                    my_report_type = reportType.batch_start
+                    xWriteReport = True
+
+                if (
+                    (control_step.step == 40)
+                    or (control_step.step == 990)
+                    or (control_step.step == 991)
+                ):  # batch stop
+                    my_report_type = reportType.batch_stop
+                    xWriteReport = True
+
+                if xWriteReport:
+                    sjData = make_report(my_report_type, control_step)
+                    sqliteDB.log_PDO_to_DB(sjData, my_report_type, 1.00)
+
             udtMainStep = MainStepType.check_timed_triggers
+
         # ----------------------   Step 6  ---------------------
         elif udtMainStep == MainStepType.check_timed_triggers:
             # check log interval setting so we log data at set interval

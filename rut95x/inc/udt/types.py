@@ -11,6 +11,12 @@ class valueType(Enum):
     real = 5
     longReal = 6
 
+# enum that defines the value type of the json variable
+class reportType(Enum):
+    alarm = 1
+    batch_start = 2
+    batch_stop = 3
+
 class MainStepType(Enum):
     init =0
     load_config =2

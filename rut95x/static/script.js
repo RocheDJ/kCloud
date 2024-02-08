@@ -23,7 +23,8 @@ function UpdateDataTableValues() {
 
 function UpdateTrendChart() {
   //https://www.chartjs.org/docs/latest/getting-started/usage.html
-
+  const host = window.location.host;
+ 
   const pvoKey = document.getElementById("pvo_title").value// "Temperature";
   const chart_type = document.getElementById("chart_type").value// "line";
   var startDate = document.getElementById("myStartDate").value; //'2024-02-05 20:18:44';
@@ -35,7 +36,7 @@ function UpdateTrendChart() {
   stopDate = stopDate.replace("T", " ");
   chart_type 
   const apiUrl =
-    "http://127.0.0.1:8080/data/read?pvoKey=" +
+    "http://"+ host + "/data/read?pvoKey=" +
     pvoKey +
     "&StartDate=" +
     startDate +
@@ -91,7 +92,9 @@ function UpdateTrendChart() {
 
 // --------------------------------------------------------------------------------
 function Update_Overview() {
-  const apiUrl = "http://127.0.0.1:8080/list/read";
+  const currentUrl = window.location.href;
+  
+  const apiUrl = currentUrl +"/list/read";
   fetch(apiUrl)
     .then((response) => {
       if (!response.ok) {
@@ -144,8 +147,10 @@ function Stop_Batch() {
 }
 //-----------------------------------------------------------------------------
 function Call_Trigger_API(index, value) {
-  const apiUrl =
-    "http://127.0.0.1:8080/trigger/set?index=" + index + "&value=" + value;
+
+  const currentUrl = window.location.href;
+
+  const apiUrl = currentUrl +"trigger/set?index=" + index + "&value=" + value;
   const data = {
     name: "Not Used",
   };
@@ -178,6 +183,11 @@ function Call_Trigger_API(index, value) {
 }
 //-----------------------------------------------------------------------------
 function Call_GetTrendData_API(pvoKey, startDate, stopDate) {
+  const host = window.location.host;
+  const pathname = window.location.pathname;
+  const search = window.location.search;
+  const hash = window.location.hash;
+
   const apiUrl =
     "http://127.0.0.1:8080/data/read?pvoKey=" +
     pvoKey +

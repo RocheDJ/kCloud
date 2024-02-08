@@ -1,4 +1,9 @@
-#!/usr/bin/python3
+#!/bin/python3
+# --------------------------------------------------------------------------------------------------------------------
+# Author: David Roche
+# Date: January 2024
+# Description : IO Link API calls
+# -------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------
 # ./inc/IOLink.py
 # -------------------------------------------------------------------------------------------------------------------
@@ -8,18 +13,27 @@
 # Port 3 - Agitator output feedback
 # Port 4 - Heater output feedback
 # -------------------------------------------------------------------------------------------------------------------
-
+# ------------------------------------------  Import Decelerations -------------------------------------------------
+# Python Libs
+# -------------------------------------------------------------------------------------------
 import requests
 import settings
 
+# -------------------------------------------------------------------------------------------
+# local Libs
+# -------------------------------------------------------------------------------------------
 from inc.udt import types
 
 # ------------------------------------------    Constants      ------------------------------------------------------
 IOLINK_TOUT = settings.IOLINK_TOUT
-
+iNode1 = settings.IOLINK_NODE_1
 # -------------------------------------------------------------------------------------------------------------------
-# define the data for the io link ports
-#   ref https://stackoverflow.com/questions/6198372/most-pythonic-way-to-provide-global-configuration-variables-in-config-py
+# define the data for the io link ports  using lambda functions
+# ref https://stackoverflow.com/questions/6198372/most-pythonic-way-to-provide-global-configuration-variables-in-config-py
+# -------------------------------------------------------------------------------------------------------------------
+# Pvo_Config is a function(lambda function) that takes any number of arguments and returns one expression
+# a nicely formatted JSON array.
+# -------------------------------------------------------------------------------------------------------------------
 Pvo_Config = lambda Node, Port, Sensor, Description, Unit, Datatype: {
     "Node": Node,
     "Port": Port,
@@ -29,7 +43,7 @@ Pvo_Config = lambda Node, Port, Sensor, Description, Unit, Datatype: {
     "Datatype": Datatype,
 }
 
-iNode1 = settings.IOLINK_NODE_1
+# an array 0 to 5 of JSONs made from the lambda function Pvo_Config
 IOLINK_PVO = {
     0: Pvo_Config(iNode1, 1, "LR2750", "Level", "mm", types.valueType.real),
     1: Pvo_Config(iNode1, 2, "LDL100", "Conductivity", "uS", types.valueType.real),
