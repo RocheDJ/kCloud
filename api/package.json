@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "cors": "^2.8.5",
+    "mysql2": "^3.6.0"
+  }
+}

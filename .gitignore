@@ -157,3 +157,10 @@ cython_debug/
 *.pyproj
 rut95x/PyIO.pyproj.user
 rut95x/PyIO.pyproj.user
+
+# API stuff
+# Dependency directories
+api/node_modules/
+api/jspm_packages/
+api/.env
+api/package-lock.json
