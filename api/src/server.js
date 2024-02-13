@@ -3,21 +3,31 @@ const swaggerUI = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 const cors = require("cors");
 const user_api= require('./routes/users-api')
+const pvo_api= require('./routes/pvo-api')
 const app = express();
 const bodyParser = require("body-parser");
+
+// add parsing the body requests here or the body will be empty
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
+
 
 // Serve Swagger documentation
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 //api routes
+app.use('/user',user_api);
+app.use('/pvo',pvo_api);
 
 
 app.use(
-    '/users',
-    user_api,
-    cors(),
-    express.json(),
-    bodyParser.urlencoded({ extended: true }));
+    cors()
+    );
+
+// error handling general
+process.on('uncaughtException', error => console.error('Uncaught exception: ', error));//
+process.on('unhandledRejection', error => console.error('Unhandled rejection: ', error));//
+// start the server
 app.listen(3000, () => {
 console.log('Server is running on port 3000');
 });
