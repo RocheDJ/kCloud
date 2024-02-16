@@ -1,0 +1,69 @@
+components:
+    schemas:
+       UserCredentials:
+        type: object
+        properties:
+          email:
+            type: string
+            description: The user's email address.
+            example: John@Doe.ie
+          password:
+            type: string
+            description: The user's password.
+            example: xxxxxxxxxxxx
+       NewUser:
+        allOf:
+          - type: object
+            properties:
+              firstName:
+                type: string
+                description: The user's first name.
+                example: John
+              lastName:
+                type: string
+                description: The user's last name.
+                example: Doe
+              mobile:
+                type: string
+                description: The user's mobile number.
+                example: +3538600000000
+              role:
+                type: integer
+                description: The user's role.
+                example: 0
+              groupID:
+                type: string
+                description: Future Use.
+                example: Unassigned
+          - $ref: '#/components/schemas/UserCredentials'
+       User:
+        allOf:
+          - type: object
+            properties:
+              id:
+                type: integer
+                description: The user ID.
+                example: 0
+          - $ref: '#/components/schemas/UserCredentials'
+ 
+       securitySchemes:
+         bearerAuth:            # arbitrary name for the security scheme
+           type: http
+           scheme: bearer
+           bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+ 
+ 
+       ValidUser:
+        type: object
+        properties:
+         success:
+            type: boolean
+            description: true or false
+         token:
+            - $ref: '#/components/schemas/bearerAuth'
+         id:
+            type: integer
+            description: The user ID.
+ 
+ 
+ 

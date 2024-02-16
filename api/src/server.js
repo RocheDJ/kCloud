@@ -2,8 +2,10 @@ const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 const cors = require("cors");
-const user_api= require('./routes/users-api')
-const pvo_api= require('./routes/pvo-api')
+const user_api= require('./routes/user-api');
+const pvo_api= require('./routes/pvo-api');
+const pdo_api= require('./routes/pdo-api');
+const cdo_api= require('./routes/cdo-api');
 const app = express();
 const bodyParser = require("body-parser");
 
@@ -18,7 +20,8 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 //api routes
 app.use('/user',user_api);
 app.use('/pvo',pvo_api);
-
+app.use('/pdo',pdo_api);
+app.use('/cdo',cdo_api);
 
 app.use(
     cors()

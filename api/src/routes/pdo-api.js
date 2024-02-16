@@ -2,45 +2,42 @@
 /**
  * @swagger
  * tags:
- *  name: P.V.O. 
- *  description: API endpoint for (Process Variable Object) 
+ *  name: P.D.O.
+ *  description: API endpoint for Process Data Objects
  *
  */
 const express = require("express");
 const app = express();
-const {writePVOData} = require('../models/db')
+const {writePDOData} = require('../models/db')
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
  * components:
  *   schemas:
- *     PVO:
+ *     PDO:
  *      type: object
  *      properties:
  *          InstallationID:
  *                type: string
  *                description: The source id.
  *                example: Swagger1001
- *          NodeID:
- *                 type: integer
- *                 description: IO link Node number.
- *                 example: 106    
- *          PortID:
- *                 type: integer
- *                 description: IO link Port number.
- *                 example: 1
  *          EventDate:
  *                 type: string
- *                 description: IO link Port number.
+ *                 description: UTC Date Time Stamp of Event.
  *                 example: 2024-02-05 12:55:46
+ *          StructureID:
+ *                 type: integer
+ *                 description: Report Type alarm batch start,batch stop.
+ *                 example: 1    
+ *          Version:
+ *                 type: float
+ *                 description: Report version.
+ *                 example: 1.01
+ *         
  *          jData:
  *                 type: json
- *                 description: Process Variable Object Data.
- *                 example: {"title": "Temperature", "unit": "C", "valueType": 5, "value": 22.4}
- *          error:
- *                 type: string
- *                 description: Error Description.
- *                 example: No errors
+ *                 description: Report data as JSON.
+ *                 example: {"Batch_Start": "2024-02-08 18:13:14.960776", "Hold_Start": "2024-02-08 18:13:03.201827", "Batch_Stop": "2024-02-08 18:13:03.201827", "Temperature": "23.6", "Stop_Volume": "1000", "Batch_Duration": "72", "Batch_Code": "1"}
  *
  *     SQLReturn:
  *      type: object
@@ -74,20 +71,20 @@ const {writePVOData} = require('../models/db')
 //---------------------------------------------------- API Calls -----------------------------
 /**
  * @swagger
- * /pvo:
+ * /PDO:
  *   post:
  *     tags:
- *      - P.V.O.
- *     summary: Add a Process Variable to the Database.
+ *      - P.D.O.
+ *     summary: Add a Process Report to the Database.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *              $ref: '#/components/schemas/PVO'
+ *              $ref: '#/components/schemas/PDO'
  *     responses:
  *       200:
- *          description: PVO ADDED
+ *          description: PDO ADDED
  *          content:
  *           application/json:
  *             schema:
@@ -97,8 +94,9 @@ app.post("/", async function (req, res){
     const webReq = req;
     const data = webReq.body;
     try {
-        await writePVOData(data.InstallationID, data.NodeID, data.PortID, data.EventDate, data.jData).then(
+        await writePDOData(data.InstallationID,data.EventDate,data.StructureID,data.Version,data.jData).then(
             (response) => {
+               
                 res.send(response);
             },
             (response) => {

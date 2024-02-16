@@ -17,8 +17,22 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://127.0.0.1:3000',
-      description: 'Development server',
+      url: "http://127.0.0.1:3000",
+      description: "Development server",
+    },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  },
+  security: [
+    {
+      bearerAuth: [],
     },
   ],
 };

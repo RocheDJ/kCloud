@@ -1,0 +1,26 @@
+components:
+    schemas:
+      CDO:
+       type: object
+       properties:
+           InstallationID:
+                 type: string
+                 description: Destination Installation ID.
+                 example: 1001a
+           requestDate:
+                  type: string
+                  description: UTC Date Time Stamp of Event.
+                  example: 2024-02-05 12:55:46
+           Type:
+                  type: integer
+                  description: command request type.
+                  example: 1    
+           Version:
+                  type: float
+                  description: Command version.
+                  example: 1.01
+          
+           jData:
+                  type: json
+                  description: Command data as JSON.
+                  example: {"output": "trigger", "index": 1, "value": 1}
