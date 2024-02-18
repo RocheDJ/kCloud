@@ -65,6 +65,23 @@ dfn[title] {
   cursor: help;
 }
 
+.button_small {
+  background-color: #04aa6d; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 0.75vw;
+  margin: 5% 5%;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  width: 100%;
+}
+
+
 .button {
   background-color: #04aa6d; /* Green */
   border: none;
@@ -74,11 +91,21 @@ dfn[title] {
   text-decoration: none;
   font-weight: bold;
   display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
+  font-size: 1.25vw;
+  margin: 15% 15%;
   transition-duration: 0.4s;
   cursor: pointer;
   width: 100%;
+}
+.button_blue {
+  background-color: #eee;
+  color: black;
+  border: 2px solid #0501ff;
+  border-radius: 12px
+}
+.button_red:hover {
+  background-color: #0501ff;
+  color: #eee;
 }
 
 .button_green {
@@ -207,9 +234,15 @@ nav ul {
   padding: 20px 30px;
   margin-bottom: 0.25%;
   margin-top: 0.25%;
-  background: #078b8b;
+  background-color: #5B5C5E; /* For browsers that do not support gradients */
+  background-image: linear-gradient(#5B5C5E, #484848);
   color: #fff;
   
+}
+
+#pageHeadder strong {
+  color: #fff;
+  font-size:3vw;
 }
 
 main {
@@ -223,15 +256,9 @@ aside {
   border: 2px solid #777474;
   background-color: #5B5C5E; /* For browsers that do not support gradients */
   background-image: linear-gradient(#5B5C5E, #484848);
+  
 }
 
-aside_left {
-  width: 20%;
-  border: 2px solid #777474;
-  min-height: 400px;
-  background-color: #5B5C5E; /* For browsers that do not support gradients */
-  background-image: linear-gradient(#5B5C5E, #484848);
-}
 
 article {
     background-color: #5B5C5E; /* For browsers that do not support gradients */
@@ -260,6 +287,7 @@ article h2 {
   max-width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   
 }
 
@@ -309,12 +337,6 @@ aside > div {
   min-height: 100px;
 }
 
-aside_left > div {
-  margin: 10px auto;
-  background: #078b8b;
-  min-height: 20px;
-  color: #fff;
-}
 
 #logo {
   display: inline-block;
@@ -323,6 +345,7 @@ aside_left > div {
   margin-right: 75px;
   color: #fff;
 }
+
 #logo img {
   width: 25%;
   vertical-align: middle;

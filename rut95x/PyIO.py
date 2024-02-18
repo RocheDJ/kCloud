@@ -29,7 +29,7 @@ from inc.udt.dbClass import dbClass
 from inc.udt.status import status_class
 from web_server import runWebServer
 from inc.Control import Control_Sequence
-from web_post import runWebPost
+from web_client import run_web_client
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 main_status = status_class("")
@@ -47,7 +47,7 @@ def startWEBServer(iPort, sStatus):
 
 # --start the web interface to run as a separate process
 def startPostClient():
-    runWebPost()
+    run_web_client()
 
 # --start the web interface to run as a separate process
 def log_status():
@@ -158,7 +158,7 @@ def main_sequence():
     fStepInterval = 0.500  # 100 ms
     # start web server as separate process
     pWebServer = Process(target=startWEBServer, args=(8080, xDebugOn))
-
+    fErrorInterval = 5.00
     # start Post client as separate process
     pPostClient = Process(target=startPostClient)
 
@@ -183,28 +183,29 @@ def main_sequence():
         if udtMainStep == MainStepType.init:
             sqliteDB.create_PVO_Live(iMaxPVO)  # create the local tables
             if xDebugOn:
-                main_status.status = "Main Sequence  :  Init: "
+                main_status.status = "Main App  :  Init: "
             udtMainStep = MainStepType.load_config
         # ----------------------   Step 1  ---------------------
         elif udtMainStep == MainStepType.load_config:
             if xDebugOn:
-                main_status.status = "Main Sequence  :  Load Config: "
+                main_status.status = "Main App  :  Load Config: "
             udtMainStep = MainStepType.start_web_client
         # ----------------------   Step 2  ---------------------
         elif udtMainStep == MainStepType.start_web_client:
             if xDebugOn:
-                main_status.status = "Main Sequence  :  Start Web Client: "
+                main_status.status = "Main App  :  Start Web Client: "
             pPostClient.start()
             udtMainStep = MainStepType.start_web_server
         # ----------------------   Step 3  ---------------------
         elif udtMainStep == MainStepType.start_web_server:
             if xDebugOn:
-                main_status.status = "Main Sequence  :  Start Web Server: "
+                main_status.status = "Main App  :  Start Web Server: "
             pWebServer.start()
             udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 4  ---------------------
         elif udtMainStep == MainStepType.read_inputs:
             if xNewStep:
+                main_status.status = "Main App  :   "
                 dtCycleStart = datetime.now()
 
             Read_Inputs_Physical(process_inputs, aPVO, xFirstRead)
@@ -279,15 +280,16 @@ def main_sequence():
 
             main_status.cycle_time = dtCycleTime
             log_status()  # log status to updates
+            
             udtMainStep = MainStepType.read_inputs
 
         # ----------------------   Step 999  -------------------
         elif udtMainStep == MainStepType.error:
             if xDebugOn:
-                main_status.status = "Main Sequence  :  ERROR : "
+                main_status.status = "Main App  :  ERROR : "
 
             log_status()
-            sleep(fStepInterval)  # wait 100 ms
+            sleep(fErrorInterval)  # wait 100 ms
             udtMainStep = MainStepType.init
 
         # ----------------------   Catch All  -----------------

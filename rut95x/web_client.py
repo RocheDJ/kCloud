@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 # ------------------------------------------------------------------------------------------------------------------
 # # Author: David Roche
-# Date: January 2024
-# Description : Control Code for Pasto
+# Date: February 2024
+# Description : Web API Client
 # ------------------------------------------------------------------------------------------------------------------
-# ./web_post.py
+# ./web_client.py
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 # ------------------------------------------------------------------------------------------------------------------
@@ -93,9 +93,49 @@ def update_pdo_status(id,code):
     except Exception as error:
         if settings.DEBUG:
             web_post_status.status = "Post App  :  update_pdo_status Error : " + str(error)
-                      
+# ------------------------------------------------------------------------------------------------------------
+def get_cdo():
+    try:
+
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        sApiUrl =settings.API_POST_ENDPOINT + "CDO/"+ settings.INSTALLATION_ID
+        
+        response = requests.get(url=sApiUrl)
+        responseCode = response.status_code
+        if (responseCode == 200):  # request received ok
+            oJson = response.json()
+            return oJson
+        else:
+            web_post_status.status = "Post App  :  post_pdo response Error : %s" % responseCode
+            return []
+    except Exception as error:
+        if settings.DEBUG:
+            web_post_status.status = "Post App  :  post_pdo Error : " + str(error)
+            return []
+# ------------------------------------------------------------------------------------------------------------
+def put_cdo(sCommandID, iCode):
+    try:
+
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        sApiUrl =settings.API_POST_ENDPOINT + "CDO/"+ str(sCommandID) + "/" + str(iCode)
+        
+        response = requests.put(url=sApiUrl)
+        responseCode = response.status_code
+        if (responseCode == 200):  # request received ok
+            oJson = response.json()
+            return oJson
+        else:
+            web_post_status.status = "Post App  :  post_pdo response Error : %s" % responseCode
+            return []
+    except Exception as error:
+        if settings.DEBUG:
+            web_post_status.status = "Post App  :  post_pdo Error : " + str(error)
+            return []
+# ------------------------------------------------------------------------------------------------------------
+def call_set_trigger(iIndex,iValue):
+     sqliteDB.set_triggers(iIndex,iValue)
 # --------------------------------------------Main sequence --------------------------------------------------
-def post_Sequence():
+def web_client_sequence():
     udtPostStep = PostStepType(PostStepType.init)
     udtPostStepOld = udtPostStep
     xNewStep = 0
@@ -106,6 +146,9 @@ def post_Sequence():
     iRowsToPost = 0
     iRowsPosted = 0
     iPostResponseCode = 0
+    aCommandReceived =[]
+    iRemoteCommandAckCode=999
+    iRemoteCommandID =0
     while True:
         try:
             # ----------------------   Step 0  ---------------------
@@ -161,7 +204,7 @@ def post_Sequence():
                 if (iRowsToPost >0):
                     udtPostStep = PostStepType.post_local_data_pdo
                 else:
-                    udtPostStep = PostStepType.wait
+                    udtPostStep = PostStepType.read_remote_command
             # ----------- POST DATA to API SERVER--------------------
             elif udtPostStep == PostStepType.post_local_data_pdo:
                 if xNewStep :    
@@ -169,16 +212,41 @@ def post_Sequence():
             
                 udtPostStep = PostStepType.ack_local_data_pdo
 
-             # ------------ Put API Response In DB--------------------
+            # ------------ Put API Response In DB--------------------
             elif udtPostStep == PostStepType.ack_local_data_pdo:
                 if xNewStep :
                     update_pdo_status(aDataRows[iRowsPosted]['_id'],iPostResponseCode)
                     iRowsPosted = iRowsPosted +1  
 
                 if iRowsPosted>= iRowsToPost :
-                    udtPostStep = PostStepType.wait
+                    udtPostStep = PostStepType.read_remote_command
                 else:
                     udtPostStep = PostStepType.post_local_data_pdo
+            # ------------ check web server for commands ------------
+            elif udtPostStep == PostStepType.read_remote_command:
+                if xNewStep :
+                    aCommandReceived = []
+                    aCommandReceived = get_cdo()
+                if len(aCommandReceived)>1:
+                    udtPostStep = PostStepType.process_remote_command
+                else:
+                    udtPostStep = PostStepType.wait
+            # ------------ Process the CDO              ------------
+            elif udtPostStep == PostStepType.process_remote_command:    
+                if (aCommandReceived['jData']['output'] =='trigger'):
+                    iRemoteCommandID = aCommandReceived['id']
+                    iIndex = aCommandReceived['jData']['index']
+                    iValue = aCommandReceived['jData']['value']
+                    call_set_trigger(iIndex,iValue)
+                    iRemoteCommandAckCode = 303
+                else:
+                    iRemoteCommandAckCode =999
+      
+                udtPostStep = PostStepType.ack_remote_command
+            # ------------- post and ack command ------------------
+            elif udtPostStep == PostStepType.ack_remote_command:
+                put_cdo(iRemoteCommandID,iRemoteCommandAckCode)
+                udtPostStep = PostStepType.wait
             # ------------ Idle and Wait ---------------------
             elif udtPostStep == PostStepType.wait:   
                 sleep(fWaitInterval) 
@@ -206,13 +274,12 @@ def post_Sequence():
 
     # end of while tidy up app
 
-
-print("Closing POST Client")
+print("Closing Web Client")
 
 
 # ------------------------------------------ POST Client     -------------------------------------------------
-def runWebPost():
+def run_web_client():
     try:
-        post_Sequence()
+        web_client_sequence()
     except Exception as error:
         web_post_status.status = "Post App  :  post_Sequence Error : " + str(error)

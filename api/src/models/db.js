@@ -3,7 +3,7 @@ const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const nodeDate = require("date-and-time");
 const saltRounds = 10;
-
+const CDO_Status = require("./inc/types");
 //--------------------------------------------------------------------------------------------
 let dbConnection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -220,7 +220,7 @@ async function writeCDO(requestData) {
         }
         
         sRequestDate = nodeDate.format(new Date(), 'YYYY-MM-DD hh:mm:ss');
-        iStatus = 101 ; // 101 is new command waiting on read from installations
+        iStatus = CDO_Status.CommandNew;
         cdo_JSON =JSON.stringify(requestData.jData)
         var myQuery = "INSERT cdo (InstallationID,RequestDate,requestType,Version,jData,userID,status) VALUES ( '"
             + requestData.InstallationID + "\' ,\'"  + sRequestDate + "\' ," + requestData.requestType + ", " + requestData.Version
@@ -278,7 +278,7 @@ async function readCDO(sInstallationID,iStatus) {
                     };
                     resolve(retVal);
                 }
-                else if (result[0].status > 0) {
+                else if (result.length > 0) {
                     retVal = result[0];
                     resolve(retVal);
                 } else {
@@ -293,4 +293,54 @@ async function readCDO(sInstallationID,iStatus) {
 }
 
 //--------------------------------------------------------------------------------------------
-module.exports = {writePVOData,writePDOData,addUser,getUserByEmail,writeCDO,readCDO}
+async function updateCDO(sCommandID,cdoOK) {
+    return new Promise(async function (resolve, reject) {
+        var disconnected = await new Promise(resolve => {
+            dbConnection.ping(err => {
+                resolve(err);
+            });
+        });
+        if (disconnected) {
+            dbConnection = mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER_NAME,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            });
+        }
+        if (cdoOK==true) {
+            iStatus = CDO_Status.CommandACK;
+        }else{
+            iStatus = CDO_Status.CommandErr;
+        }
+
+        var myQuery = "update cdo set status = " + iStatus + " WHERE id='" + sCommandID + "\';"
+  
+        await dbConnection.execute(
+            myQuery,
+            (err, result) => {
+                if (err) {
+                    retVal = {
+                        err: err
+                    };
+                    resolve(retVal);
+                }
+                else if (result.affectedRows > 0) {
+                    retVal = {
+                        id: sCommandID,
+                        row : result.affectedRows,
+                    };
+                    resolve(retVal);
+                } else {
+                    retVal = {
+                        err: 'ID Not found'
+                    };
+                    resolve(retVal);
+                };
+            }
+        );
+    })
+}
+
+//--------------------------------------------------------------------------------------------
+module.exports = {writePVOData,writePDOData,addUser,getUserByEmail,writeCDO,readCDO,updateCDO}

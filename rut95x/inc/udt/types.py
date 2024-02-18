@@ -42,7 +42,10 @@ class PostStepType(Enum):
     read_local_data_pdo=6
     post_local_data_pdo=7
     ack_local_data_pdo=8
-    wait=10
+    read_remote_command=9
+    process_remote_command=10
+    ack_remote_command=11
+    wait=12
     error=999
     
 

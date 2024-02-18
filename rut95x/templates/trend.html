@@ -60,8 +60,8 @@
                           </select>
                     </div>
                     <div>
-                        <button class="button button_green" type="button" onclick="UpdateTrendChart()">
-                            Update Trend
+                        <button class="button_small button_blue" type="button" onclick="UpdateTrendChart()">
+                            Update
                         </button>
                     </div>
 
@@ -84,10 +84,10 @@
         <aside>
             <nav>
                 <div class ="flex_layout_buttons">
-                    <button class="button button_green">START Batch</button>
-                    <button class="button button_red">STOP Batch</button>
-                    <button class="button button_green">START Agitator</button>
-                    <button class="button button_red">STOP Agitator</button>
+                    <button class="button button_green" onclick="FixedChartRange(1)">Today</button>
+                    <button class="button button_green" onclick="FixedChartRange(2)">Yesterday</button>
+                    <button class="button button_green" onclick="FixedChartRange(3)">This Week</button>
+                    <button class="button button_green" onclick="FixedChartRange(4)">This Month</button>
                 </div>
             </nav>
         </aside>

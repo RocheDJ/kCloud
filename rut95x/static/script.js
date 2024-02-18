@@ -24,9 +24,9 @@ function UpdateDataTableValues() {
 function UpdateTrendChart() {
   //https://www.chartjs.org/docs/latest/getting-started/usage.html
   const host = window.location.host;
- 
-  const pvoKey = document.getElementById("pvo_title").value// "Temperature";
-  const chart_type = document.getElementById("chart_type").value// "line";
+
+  const pvoKey = document.getElementById("pvo_title").value; // "Temperature";
+  const chart_type = document.getElementById("chart_type").value; // "line";
   var startDate = document.getElementById("myStartDate").value; //'2024-02-05 20:18:44';
   var stopDate = document.getElementById("myStopDate").value;
   //const xValues = [100,200,300,400,500,600,700,800,900,1000]; //for testing
@@ -34,9 +34,11 @@ function UpdateTrendChart() {
 
   startDate = startDate.replace("T", " ");
   stopDate = stopDate.replace("T", " ");
-  chart_type 
+  chart_type;
   const apiUrl =
-    "http://"+ host + "/data/read?pvoKey=" +
+    "http://" +
+    host +
+    "/data/read?pvoKey=" +
     pvoKey +
     "&StartDate=" +
     startDate +
@@ -89,12 +91,45 @@ function UpdateTrendChart() {
       console.log("Error:", error);
     });
 }
+// --------------------------------------------------------------------------------
+function FixedChartRange(index) {
+  var currentTime = new Date();
+  
+  //2024-02-05T20:25:33
+  switch (index) {
+    case 1:
+      // today
+      var sDate = currentTime.toISOString().slice(0, 10);
+      document.getElementById("myStartDate").value = sDate + "T00:00:00";
+      document.getElementById("myStopDate").value = sDate + "T23:59:59";
+      break;
+    case 2:
+      // yesterday
+      currentTime.setDate(currentTime.getDate()-1)
+      var sDate = currentTime.toISOString().slice(0, 10);
+      document.getElementById("myStartDate").value = sDate + "T00:00:00";
+      document.getElementById("myStopDate").value = sDate + "T23:59:59";
+      break;
+    case 3:
+        // this week
+        currentTime.setDate(currentTime.getDate()-7)
+        var sDate = currentTime.toISOString().slice(0, 10);
+        document.getElementById("myStartDate").value = sDate + "T00:00:00";
+        currentTime.setDate(currentTime.getDate()+7)
+        sDate = currentTime.toISOString().slice(0, 10);
+        document.getElementById("myStopDate").value = sDate + "T23:59:59";
+        break;
+    default:
+    // code block
+  }
+  UpdateTrendChart()
+}
 
 // --------------------------------------------------------------------------------
 function Update_Overview() {
   const currentUrl = window.location.href;
-  
-  const apiUrl = currentUrl +"/list/read";
+
+  const apiUrl = currentUrl + "/list/read";
   fetch(apiUrl)
     .then((response) => {
       if (!response.ok) {
@@ -147,10 +182,9 @@ function Stop_Batch() {
 }
 //-----------------------------------------------------------------------------
 function Call_Trigger_API(index, value) {
-
   const currentUrl = window.location.href;
 
-  const apiUrl = currentUrl +"trigger/set?index=" + index + "&value=" + value;
+  const apiUrl = currentUrl + "trigger/set?index=" + index + "&value=" + value;
   const data = {
     name: "Not Used",
   };
