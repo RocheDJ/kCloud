@@ -32,6 +32,19 @@ class MainStepType(Enum):
     
 
 
+class PostStepType(Enum):
+    init =0
+    load_config =1
+    login=2
+    read_local_data_pvo=3
+    post_local_data_pvo=4
+    ack_local_data_pvo=5
+    read_local_data_pdo=6
+    post_local_data_pdo=7
+    ack_local_data_pdo=8
+    wait=10
+    error=999
+    
 
 #PVO data type 
 # title = what the process variable is called

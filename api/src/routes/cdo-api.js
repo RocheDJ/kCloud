@@ -8,13 +8,13 @@
  */
 const express = require("express");
 const app = express();
-const {writeCDOData} = require('../models/db')
+const {writeCDO,readCDO} = require('../models/db')
 //-----------------------------------Define the schemas for swagger ---------------------------
 /** 
  * @swagger
  * components:
  *   schemas:
- *     CDO:
+ *     CDOCommand:
  *      type: object
  *      properties:
  *          InstallationID:
@@ -41,6 +41,15 @@ const {writeCDOData} = require('../models/db')
  *                type: integer
  *                description: requesting user ID.
  *                example: 1001
+ *     CDO:
+ *          allOf:
+ *                - type: object
+ *                  properties:
+ *                   status:
+ *                      type: integer
+ *                      description: Status of the command 0 =null, 101= waiting on read,202 = read by installation, 303=ack by installation.
+ *                      example: 0
+ *                - $ref: '#/components/schemas/CDOCommand'
  *          
 */
 
@@ -57,7 +66,7 @@ const {writeCDOData} = require('../models/db')
  *       content:
  *         application/json:
  *           schema:
- *              $ref: '#/components/schemas/CDO'
+ *              $ref: '#/components/schemas/CDOCommand'
  *     responses:
  *       200:
  *         description: CDO ADDED
@@ -72,7 +81,7 @@ app.post("/", async function (req, res){
     const webReq = req;
     const data = webReq.body;
     try {
-        await writeCDOData(data.jData).then(
+        await writeCDO(data).then(
             (response) => {
                 res.send(response);
             },
@@ -97,11 +106,11 @@ app.post("/", async function (req, res){
  *     parameters:
  *       - in: path
  *         name: id
- *         example: 1234
+ *         example: 1001a
  *         required: true
- *         description: Numeric ID of the installation.
+ *         description: ID of the installation.
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *          description: Most recent command for that installation
@@ -110,11 +119,12 @@ app.post("/", async function (req, res){
  *             schema:
  *              $ref: '#/components/schemas/CDO'  
 */
- app.get("/", async function (req, res){
+ app.get("/:id", async function (req, res){
     const webReq = req;
-    const data = webReq.body;
+    const myId = req.params.id;
+    const iStatus = 101;// just get un-read ones
     try {
-        await writeCDOData(data.jData).then(
+        await readCDO(myId,iStatus).then(
             (response) => {
                 res.send(response);
             },

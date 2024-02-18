@@ -105,7 +105,7 @@ class dbClass:
                 + str(utcTime)
                 + "','"
                 + jData
-                + "')"
+                + "',0)"
             )
 
             c.execute(myQuery)
@@ -234,12 +234,13 @@ class dbClass:
             c = conn.cursor()
             rows = c.execute("SELECT * FROM pvo WHERE Status <> '200'")
             rows = c.fetchall()
-            count = len(rows)
+            columns = [col[0] for col in c.description]
+            data = [dict(zip(columns, row)) for row in rows]
             self.CloseConn()
-            return rows
+            return data
         except Exception as error:
             self.errorString = "read_outStanding_PVO Error " + str(error)
-            return nullcontext
+            return []
 
     # ----------------------------------------------------------------------------------------------------------------------
     def read_outStanding_PDO(self):
@@ -251,12 +252,13 @@ class dbClass:
             c = conn.cursor()
             rows = c.execute("SELECT * FROM pdo WHERE Status <> '200'")
             rows = c.fetchall()
-            count = len(rows)
+            columns = [col[0] for col in c.description]
+            data = [dict(zip(columns, row)) for row in rows]
             self.CloseConn()
-            return rows
+            return data
         except Exception as error:
             self.errorString = "read_outStanding_PDO Error " + str(error)
-            return nullcontext
+            return []
 
     # ----------------------------------------------------------------------------------------------------------------------
     def create_PVO_Live(self, pvoIndexMax):

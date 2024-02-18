@@ -25,3 +25,5 @@ IOLINK_PVO_MAX = config("IOLINK_PVO_MAX", default=6,cast=int)
 PVO_LOG_INTERVAL_RUN = config("PVO_LOG_INTERVAL", default=10.0, cast=float)
 # log data locally every 60 seconds when batch is idle
 PVO_LOG_INTERVAL_IDLE = config("PVO_LOG_INTERVAL_IDLE", default=60.0, cast=float)
+
+API_POST_ENDPOINT = config('API_POST_EndPoint')

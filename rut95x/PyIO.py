@@ -29,7 +29,7 @@ from inc.udt.dbClass import dbClass
 from inc.udt.status import status_class
 from web_server import runWebServer
 from inc.Control import Control_Sequence
-
+from web_post import runWebPost
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 main_status = status_class("")
@@ -45,6 +45,9 @@ hold_seconds = 600
 def startWEBServer(iPort, sStatus):
     runWebServer(iPort, sStatus)
 
+# --start the web interface to run as a separate process
+def startPostClient():
+    runWebPost()
 
 # --start the web interface to run as a separate process
 def log_status():
@@ -155,6 +158,10 @@ def main_sequence():
     fStepInterval = 0.500  # 100 ms
     # start web server as separate process
     pWebServer = Process(target=startWEBServer, args=(8080, xDebugOn))
+
+    # start Post client as separate process
+    pPostClient = Process(target=startPostClient)
+
     # variables to calculate cycle time
     dtCycleStart = datetime.now()
     dtCycleStop = datetime.now()
@@ -187,6 +194,7 @@ def main_sequence():
         elif udtMainStep == MainStepType.start_web_client:
             if xDebugOn:
                 main_status.status = "Main Sequence  :  Start Web Client: "
+            pPostClient.start()
             udtMainStep = MainStepType.start_web_server
         # ----------------------   Step 3  ---------------------
         elif udtMainStep == MainStepType.start_web_server:
@@ -293,7 +301,11 @@ def main_sequence():
             xNewStep = 1
             udtMainStepOld = udtMainStep
 
+
     # end of while tidy up app
+    print("Closing Post client")
+    pPostClient.terminate()  # stop the web server process
+    pPostClient.join()  # Wait for it to stop
     print("Closing Local Web Server")
     pWebServer.terminate()  # stop the web server process
     pWebServer.join()  # Wait for it to stop

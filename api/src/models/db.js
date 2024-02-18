@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mysql = require("mysql2");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const nodeDate = require("date-and-time");
 const saltRounds = 10;
 
 //--------------------------------------------------------------------------------------------
@@ -44,7 +45,7 @@ async function writePVOData(InstillationID, Node, Port, EventDate,Data) {
                         err: err
                     };
                 }
-                if (result.affectedRows > 0) {
+                else if (result.affectedRows > 0) {
                     retVal = {
                         LastUpdate: result,
                         Message: "Write ok"
@@ -98,7 +99,7 @@ async function writePDOData(InstillationID,EventDate,Type,Version,Data) {
                         err: err
                     };
                 }
-                if (result.affectedRows > 0) {
+                else if (result.affectedRows > 0) {
                     retVal = {
                         LastUpdate: result,
                         Message: "Write ok"
@@ -147,7 +148,7 @@ async function addUser(userData) {
                         err: err
                     };
                 }
-                if (result.affectedRows > 0) {
+                else if (result.affectedRows > 0) {
                     retVal = {
                         LastUpdate: result,
                         Message: "Write ok"
@@ -188,7 +189,7 @@ async function getUserByEmail( userEmail) {
                         err: err
                     };
                 }
-                if (result[0].email) { // we have a valid username    
+                else if (result[0].email) { // we have a valid username    
                     retVal = result[0];
                     resolve(retVal);
                 } else {
@@ -202,4 +203,94 @@ async function getUserByEmail( userEmail) {
     })
 }
 //--------------------------------------------------------------------------------------------
-module.exports = {writePVOData,writePDOData,addUser,getUserByEmail}
+async function writeCDO(requestData) {
+    return new Promise(async function (resolve, reject) {
+        var disconnected = await new Promise(resolve => {
+            dbConnection.ping(err => {
+                resolve(err);
+            });
+        });
+        if (disconnected) {
+            dbConnection = mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER_NAME,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            });
+        }
+        
+        sRequestDate = nodeDate.format(new Date(), 'YYYY-MM-DD hh:mm:ss');
+        iStatus = 101 ; // 101 is new command waiting on read from installations
+        cdo_JSON =JSON.stringify(requestData.jData)
+        var myQuery = "INSERT cdo (InstallationID,RequestDate,requestType,Version,jData,userID,status) VALUES ( '"
+            + requestData.InstallationID + "\' ,\'"  + sRequestDate + "\' ," + requestData.requestType + ", " + requestData.Version
+            + ", \'" + cdo_JSON +"\',\'" + requestData.userID + "\'," + iStatus + ");"
+       
+        await dbConnection.execute(
+            myQuery,
+            (err, result) => {
+                if (err) {
+                    retVal = {
+                        err: err
+                    };
+                    resolve(retVal);
+                }
+                else if (result.affectedRows > 0) {
+                    retVal = {
+                        id: result.insertId,
+                    };
+                    resolve(retVal);
+                } else {
+                    retVal = {
+                        err: 'Unknown ID'
+                    };
+                    resolve(retVal);
+                };
+            }
+        );
+    })
+}
+
+//--------------------------------------------------------------------------------------------
+async function readCDO(sInstallationID,iStatus) {
+    return new Promise(async function (resolve, reject) {
+        var disconnected = await new Promise(resolve => {
+            dbConnection.ping(err => {
+                resolve(err);
+            });
+        });
+        if (disconnected) {
+            dbConnection = mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER_NAME,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            });
+        }
+        var myQuery = "SELECT * FROM cdo WHERE InstallationID='" + sInstallationID + "\' and status = " + iStatus +" order by RequestDate desc;"
+  
+        await dbConnection.execute(
+            myQuery,
+            (err, result) => {
+                if (err) {
+                    retVal = {
+                        err: err
+                    };
+                    resolve(retVal);
+                }
+                else if (result[0].status > 0) {
+                    retVal = result[0];
+                    resolve(retVal);
+                } else {
+                    retVal = {
+                        err: 'InstallationID ID Not found'
+                    };
+                    resolve(retVal);
+                };
+            }
+        );
+    })
+}
+
+//--------------------------------------------------------------------------------------------
+module.exports = {writePVOData,writePDOData,addUser,getUserByEmail,writeCDO,readCDO}
