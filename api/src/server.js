@@ -6,6 +6,7 @@ const user_api= require('./routes/user-api');
 const pvo_api= require('./routes/pvo-api');
 const pdo_api= require('./routes/pdo-api');
 const cdo_api= require('./routes/cdo-api');
+const installation_api= require('./routes/installation-api');
 const app = express();
 const bodyParser = require("body-parser");
 
@@ -22,6 +23,7 @@ app.use('/user',user_api);
 app.use('/pvo',pvo_api);
 app.use('/pdo',pdo_api);
 app.use('/cdo',cdo_api);
+app.use('/installation',installation_api);
 
 app.use(
     cors()

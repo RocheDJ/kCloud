@@ -18,8 +18,12 @@ const swaggerDefinition = {
   servers: [
     {
       url: "http://127.0.0.1:3000",
-      description: "Development server",
+      description: "Local  Host",
     },
+    {
+      url: "http://34.240.177.253:3000",
+      description: "Development server",
+    }
   ],
   components: {
     securitySchemes: {
