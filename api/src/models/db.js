@@ -67,14 +67,14 @@ async function writePVOData(InstillationID, Node, Port, EventDate, Data) {
             LastUpdate: result,
             Message: "Write ok",
           };
-         // console.log(
-         //"+" +
-         //     ts +
-         //     "  Data Written for  " +
-         //     InstillationID +
-         //     " with  event date " +
-         //     EventDate
-        //  );
+          // console.log(
+          //"+" +
+          //     ts +
+          //     "  Data Written for  " +
+          //     InstillationID +
+          //     " with  event date " +
+          //     EventDate
+          //  );
           resolve(retVal);
         } else {
           retVal = {
@@ -181,7 +181,7 @@ async function addUser(userData) {
         database: process.env.DB_NAME,
       });
     }
-    const sGroupId = "Unassigned"; //
+    const sGroupId = 0; //
     const iRole = 0; // normal user
     const hash = await bcrypt.hash(userData.password, saltRounds);
     var myQuery =
@@ -208,14 +208,90 @@ async function addUser(userData) {
         };
         reject(err);
       } else if (result.affectedRows > 0) {
+        userData.id= result.insertId;
         retVal = {
           LastUpdate: result,
           Message: "Write ok",
+          User :  userData,
         };
         resolve(retVal);
       } else {
         retVal = {
           err: "Unknown ID",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+async function deleteAllUsers() {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery = "delete from user;";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.affectedRows > 0) {
+        retVal = {
+          LastUpdate: result,
+          Message: "Delete ok",
+        };
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Unknown",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+//--------------------------------------------------------------------------------------------
+async function getUserById(userId) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery = "SELECT * FROM user WHERE id=" + userId + ";";
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if ((result.length > 0) ) {
+        // we have a valid username
+        retVal = result[0];
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Unknown Email",
         };
         resolve(retVal);
       }
@@ -245,9 +321,44 @@ async function getUserByEmail(userEmail) {
           err: err,
         };
         reject(err);
-      } else if (result[0].email) {
+      } else if ((result.length > 0) ) {
         // we have a valid username
         retVal = result[0];
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Unknown Email",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+//--------------------------------------------------------------------------------------------
+async function getUsers() {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery = "SELECT * FROM user;";
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
         resolve(retVal);
       } else {
         retVal = {
@@ -407,94 +518,94 @@ async function updateCDO(sCommandID, cdoOK) {
 
 //--------------------------------------------------------------------------------------------
 async function writeInstallation(requestData) {
-    return new Promise(async function (resolve, reject) {
-      var disconnected = await new Promise((resolve) => {
-        dbConnection.ping((err) => {
-          resolve(err);
-        });
-      });
-      if (disconnected) {
-        dbConnection = mysql.createConnection({
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER_NAME,
-          password: process.env.DB_PASSWORD,
-          database: process.env.DB_NAME,
-        });
-      }
-  
-      sRequestDate = nodeDate.format(new Date(), "YYYY-MM-DD hh:mm:ss");
-      iStatus = CDO_Status.CommandNew;
-      cdo_JSON = JSON.stringify(requestData.jData);
-      var myQuery =
-        "INSERT installation (UserID,GroupID,Description) VALUES ( " +
-        requestData.UserID +
-        " ," +
-        requestData.GroupID +
-        " ,'" +
-        requestData.Description +
-        "');";
-  
-      await dbConnection.execute(myQuery, (err, result) => {
-        if (err) {
-          retVal = {
-            err: err,
-          };
-          reject(err);
-        } else if (result.affectedRows > 0) {
-          retVal = {
-            id: result.insertId,
-          };
-          resolve(retVal);
-        } else {
-          retVal = {
-            err: "Woops",
-          };
-          resolve(retVal);
-        }
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
       });
     });
-  }
-  
-  //--------------------------------------------------------------------------------------------
-  async function readInstallation(sInstallationID) {
-    return new Promise(async function (resolve, reject) {
-      var disconnected = await new Promise((resolve) => {
-        dbConnection.ping((err) => {
-          resolve(err);
-        });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
       });
-      if (disconnected) {
-        dbConnection = mysql.createConnection({
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER_NAME,
-          password: process.env.DB_PASSWORD,
-          database: process.env.DB_NAME,
-        });
+    }
+
+    sRequestDate = nodeDate.format(new Date(), "YYYY-MM-DD hh:mm:ss");
+    iStatus = CDO_Status.CommandNew;
+    cdo_JSON = JSON.stringify(requestData.jData);
+    var myQuery =
+      "INSERT installation (UserID,GroupID,Description) VALUES ( " +
+      requestData.UserID +
+      " ," +
+      requestData.GroupID +
+      " ,'" +
+      requestData.Description +
+      "');";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.affectedRows > 0) {
+        retVal = {
+          id: result.insertId,
+        };
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Woops",
+        };
+        resolve(retVal);
       }
-      var myQuery =
-        "SELECT * FROM installation WHERE id=" +
-        sInstallationID +
-        " order by id desc;";
-  
-      await dbConnection.execute(myQuery, (err, result) => {
-        if (err) {
-          retVal = {
-            err: err,
-          };
-          reject(err);
-        } else if (result.length > 0) {
-          retVal = result[0];
-          resolve(retVal);
-        } else {
-          retVal = {
-            err: "InstallationID ID Not found",
-          };
-          resolve(retVal);
-        }
+    });
+  });
+}
+
+//--------------------------------------------------------------------------------------------
+async function readInstallation(sInstallationID) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
       });
     });
-  }
-  
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery =
+      "SELECT * FROM installation WHERE id=" +
+      sInstallationID +
+      " order by id desc;";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result[0];
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "InstallationID ID Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+
 //--------------------------------------------------------------------------------------------
 module.exports = {
   writePVOData,
@@ -505,5 +616,8 @@ module.exports = {
   readCDO,
   updateCDO,
   readInstallation,
-  writeInstallation
+  writeInstallation,
+  getUsers,
+  deleteAllUsers,
+  getUserById,
 };

@@ -3,13 +3,19 @@
  * @swagger
  * tags:
  *  name: User
- *  description: User management and authorization 
+ *  description: User management and authorization
  *
  */
-
+require("dotenv").config();
 const express = require("express");
 const app = express();
-const { addUser, getUserByEmail } = require("../models/db");
+const {
+  addUser,
+  getUserByEmail,
+  getUsers,
+  deleteAllUsers,getUserById
+
+} = require("../models/db");
 const bcrypt = require("bcrypt");
 //const { createToken } = require( "../../node_modules/jwt-utils");
 const jwt = require("jsonwebtoken");
@@ -65,7 +71,7 @@ const jwt = require("jsonwebtoken");
  *               type: integer
  *               description: The user ID.
  *               example: 0
- *         - $ref: '#/components/schemas/UserCredentials'
+ *         - $ref: '#/components/schemas/NewUser'
  *
  *      securitySchemes:
  *        bearerAuth:            # arbitrary name for the security scheme
@@ -92,7 +98,7 @@ const jwt = require("jsonwebtoken");
 
 /**
  * @swagger
- * /users:
+ * /user:
  *   get:
  *     tags:
  *      - User
@@ -111,28 +117,28 @@ const jwt = require("jsonwebtoken");
  *                   items:
  *                      $ref: '#/components/schemas/User'
  */
-app.get("/", function (req, res) {
+app.get("/", async function (req, res) {
   //...
   try {
-    res.send([
-      {
-        id: 1234,
-        name: "John J Doe",
+    await getUsers().then(
+      (response) => {
+        JData = JSON.stringify(response);
+        res.send(JData);
       },
-      {
-        id: 1234,
-        name: "John J Doe",
-      },
-    ]);
+      (response) => {
+        console.log(" Then Failure:" + response);
+        res.send(response);
+      }
+    );
   } catch (error) {
-    res.status(500).end(error);
+    res.status(500).send(error);
   }
 });
 
 //--------------------------------------------------------------------------------------------
 /**
  * @swagger
- /users/{id}:
+ /user/{id}:
  *   get:
  *     tags:
  *      - User
@@ -155,23 +161,27 @@ app.get("/", function (req, res) {
  *                $ref: '#/components/schemas/User'
  */
 
-app.get("/:id", function (req, res) {
+app.get("/:id", async function (req, res) {
   //...
+  const webReq = req;
+  const UserId = webReq.params.id;
   try {
-    const myId = req.params.id;
-    if (myId == 1234) {
-      res.send({
-        id: 1234,
-        name: "John J Doe",
-      });
-    } else {
-      res.send({
-        id: Number(myId),
-        name: "JD Test",
-      });
-    }
+    await getUserById(UserId).then(
+      (response) => {
+          if (response.err){
+            response.data.message = "No User with this id"
+            res.status(204).send(response);
+          }else{
+            res.status(200).send(response);
+          }
+      },
+      (response) => {
+        console.log(" Then Failure:" + response);
+        res.send(response);
+      }
+    );
   } catch (error) {
-    res.status(500).end(error);
+    res.status(500).send(error);
   }
 });
 
@@ -205,7 +215,7 @@ app.post("/", async function (req, res) {
       (response) => {
         const sMessage = response.Message;
         if (sMessage == "Write ok") {
-          res.status(201).send(response);
+          res.status(201).send(response.User);
         } else {
           res.send(response);
         }
@@ -249,28 +259,38 @@ app.post("/authenticate", async function (req, res) {
     await getUserByEmail(UserCredentialsIn.email).then(
       (response) => {
         const UserCredentials = response;
-        bcrypt.compare(
-          UserCredentialsIn.password,
-          UserCredentials.password,
-          (err, data) => {
-            //if error than throw error
-            if (err) throw err;
-
-            if (data) {
-              res.status(201).send({
-                success: true,
-                token: "this will be token",
-                id: UserCredentials._id,
-              });
-            } else {
-              res.status(401).send({
-                success: false,
-                token: "",
-                id: 0,
-              });
+        if (UserCredentials.password){
+          bcrypt.compare(
+            UserCredentialsIn.password,
+            UserCredentials.password,
+            (err, data) => {
+              //if error than throw error
+              if (err) throw err;
+  
+              if (data) {
+                const token = jwt.sign({ userId: UserCredentials.email }, process.env.JWT_SECRET, {
+                  expiresIn: "1h",
+                });
+                res.status(200).json({ token });
+              } else {
+                res.status(401).send({
+                  success: false,
+                  token: "",
+                  id: 0,
+                });
+              }
             }
+          );
+        } else {
+          {
+            res.status(401).send({
+              success: false,
+              token: "",
+              id: 0,
+            });
           }
-        );
+        }
+      
       },
       (response) => {
         res.status(401).send({
@@ -288,7 +308,7 @@ app.post("/authenticate", async function (req, res) {
 //--------------------------------------------------------------------------------------------
 /**
  * @swagger
- * /users:
+ * /user:
  *   put:
  *     tags:
  *      - User
@@ -311,4 +331,38 @@ app.put("/:id", function (req, res) {
   // ...
 });
 
+//--------------------------------------------------------------------------------------------
+/**
+ * @swagger
+ * /user:
+ *   delete:
+ *     tags:
+ *      - User
+ *     summary: Delete All users.
+ *
+ *     responses:
+ *       200:
+ *         description: Updated
+ */
+app.delete("/", async function (req, res) {
+  const webReq = req;
+  try {
+    await deleteAllUsers().then(
+      (response) => {
+        const sMessage = response.Message;
+        if (sMessage == "Delete ok") {
+          res.status(201).send(response);
+        } else {
+          res.send(response);
+        }
+      },
+      (response) => {
+        console.log(" Then Failure:" + response);
+        res.send(response);
+      }
+    );
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 module.exports = app;

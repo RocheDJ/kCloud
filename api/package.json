@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "./node_modules/mocha/bin/_mocha --ui tdd test/**/*.js -exit"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -14,5 +15,19 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "axios": "^1.6.7",
+    "chai": "^4.4.1",
+    "eslint": "^8.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
+    "mocha": "^10.3.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
