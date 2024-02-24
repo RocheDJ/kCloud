@@ -10,8 +10,8 @@
 from datetime import datetime
 from os import kill
 from time import sleep
-from multiprocessing import Process
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process,shared_memory
+
 
 # User Defined Libs
 import settings
@@ -30,6 +30,8 @@ from inc.udt.status import status_class
 from web_server import runWebServer
 from inc.Control import Control_Sequence
 from web_client import run_web_client
+
+
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 main_status = status_class("")
@@ -38,6 +40,8 @@ process_inputs = aio_eight_class()
 process_times = dt_three_class()  # start,hold start,stop time for process
 hold_temperature = 72
 hold_seconds = 600
+# create a shared memory
+shared_mem_status = shared_memory.SharedMemory(create=True, size=150)
 # ------------------------------------------ Methods                -------------------------------------------------
 
 
@@ -51,10 +55,13 @@ def startPostClient():
 
 # --start the web interface to run as a separate process
 def log_status():
-    sqliteDB.update_status(1, main_status.status, main_status.cycle_time)
-    sqliteDB.update_status(2, "ToDo: Web Server Status ", 999.9)
-
-
+    dtNow =datetime.now()
+    sDateTime= dtNow.strftime("%Y-%m-%d, %H:%M:%S") 
+    sString = sDateTime + ';' + main_status.status + ";" +  str(main_status.cycle_time)+ ";"
+    bString = sString.encode('utf-8')
+    iLen = len(bString)
+    shared_mem_status.buf[:iLen] = bString
+   
 # --- Read IO link Data from Network -------------
 def Read_Inputs_Physical(aInputs, aPvoList, xFirstRead):
     try:
@@ -157,7 +164,7 @@ def main_sequence():
     iMaxPVO = 6
     fStepInterval = 0.500  # 100 ms
     # start web server as separate process
-    pWebServer = Process(target=startWEBServer, args=(8080, xDebugOn))
+    pWebServer = Process(target=startWEBServer, args=(8080, shared_mem_status))
     fErrorInterval = 5.00
     # start Post client as separate process
     pPostClient = Process(target=startPostClient)
@@ -280,7 +287,7 @@ def main_sequence():
 
             main_status.cycle_time = dtCycleTime
             log_status()  # log status to updates
-            
+
             udtMainStep = MainStepType.read_inputs
 
         # ----------------------   Step 999  -------------------
@@ -303,7 +310,6 @@ def main_sequence():
             xNewStep = 1
             udtMainStepOld = udtMainStep
 
-
     # end of while tidy up app
     print("Closing Post client")
     pPostClient.terminate()  # stop the web server process
@@ -311,6 +317,7 @@ def main_sequence():
     print("Closing Local Web Server")
     pWebServer.terminate()  # stop the web server process
     pWebServer.join()  # Wait for it to stop
+    shared_mem_status.close()
     print("Application Halted")
 
 

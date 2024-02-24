@@ -76,14 +76,11 @@
           <th>Status</th>
           <th>Cycle Time (s)</th>
         </tr>
-        {% for row in rows %}
         <tr>
-          <td hidden>{{row["id"]}}</td>
-          <td>{{row["EventDate"]}}</td>
-          <td>{{row["Status"]}}</td>
-          <td>{{row["CycleTime"]}}</td>
+          <td>{{EventDate}}</td>
+          <td>{{Status}}</td>
+          <td>{{CycleTime}}</td>
         </tr>
-        {% endfor %}
       </table>
 
       <div>

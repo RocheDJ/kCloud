@@ -9,7 +9,7 @@
 # Python Libs
 from flask import Flask, request, render_template  # use flash for rendering web pages
 from flask_cors import CORS
-from multiprocessing.sharedctypes import Value
+from multiprocessing import shared_memory
 # -------------------------------------------------------------------------------------------
 # local Libs
 # -------------------------------------------------------------------------------------------
@@ -58,8 +58,12 @@ def testPVOValues():  # read the updates list of PVO values from the Database
 # local index page
 @app.route("/")
 def home():
-    myRows = webServerDB.read_status()
-    return render_template("index.html", rows=myRows)
+    sStatus = bytes(sm_main_status.buf[:150]).decode('utf-8')
+    aStatus = sStatus.split(";")
+    sEventDate = aStatus[0]
+    sStatus = aStatus[1]
+    sCycleTime = aStatus[2]
+    return render_template("index.html", EventDate = sEventDate, Status = sStatus, CycleTime=sCycleTime)
 
 
 # -------------------------------------------------------------------------------------------------------------------
@@ -118,9 +122,10 @@ def trigger_set():
 
 
 # ------------------------------------------ Web Server              -------------------------------------------------
-def runWebServer(ServerPort, xDebugMode):
-    try:
-        webServerDB = dbClass()
+def runWebServer(ServerPort, smStatus): # smStatus is shared memory
+    try: 
+        global sm_main_status
+        sm_main_status = smStatus
         web_server_status.status = "Web Server  :  Running on port : " + str(ServerPort)
         app.run(host="0.0.0.0", port=ServerPort)
 

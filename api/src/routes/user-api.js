@@ -8,13 +8,14 @@
  */
 require("dotenv").config();
 const express = require("express");
+const verifyToken = require("../middleware/verifyToken");
 const app = express();
 const {
   addUser,
   getUserByEmail,
   getUsers,
-  deleteAllUsers,getUserById
-
+  deleteAllUsers,
+  getUserById,
 } = require("../models/db");
 const bcrypt = require("bcrypt");
 //const { createToken } = require( "../../node_modules/jwt-utils");
@@ -103,7 +104,7 @@ const jwt = require("jsonwebtoken");
  *     tags:
  *      - User
  *     summary: Retrieve a list of users.
- *     description: Retrieve a list of users.
+ *     description: Retrieve a list of users
  *     responses:
  *       200:
  *         description: A list of users.
@@ -117,7 +118,7 @@ const jwt = require("jsonwebtoken");
  *                   items:
  *                      $ref: '#/components/schemas/User'
  */
-app.get("/", async function (req, res) {
+app.get("/", verifyToken, async function (req, res) {
   //...
   try {
     await getUsers().then(
@@ -161,19 +162,19 @@ app.get("/", async function (req, res) {
  *                $ref: '#/components/schemas/User'
  */
 
-app.get("/:id", async function (req, res) {
+app.get("/:id",verifyToken, async function (req, res) {
   //...
   const webReq = req;
   const UserId = webReq.params.id;
   try {
     await getUserById(UserId).then(
       (response) => {
-          if (response.err){
-            response.data.message = "No User with this id"
-            res.status(204).send(response);
-          }else{
-            res.status(200).send(response);
-          }
+        if (response.err) {
+          response.message = "No User with this id";
+          res.status(204).send(response);
+        } else {
+          res.status(200).send(response);
+        }
       },
       (response) => {
         console.log(" Then Failure:" + response);
@@ -259,18 +260,25 @@ app.post("/authenticate", async function (req, res) {
     await getUserByEmail(UserCredentialsIn.email).then(
       (response) => {
         const UserCredentials = response;
-        if (UserCredentials.password){
+        if (UserCredentials.password) {
           bcrypt.compare(
             UserCredentialsIn.password,
             UserCredentials.password,
             (err, data) => {
               //if error than throw error
               if (err) throw err;
-  
+
               if (data) {
-                const token = jwt.sign({ userId: UserCredentials.email }, process.env.JWT_SECRET, {
-                  expiresIn: "1h",
-                });
+                const token = jwt.sign(
+                  {
+                    id: UserCredentials.id,
+                    email: UserCredentials.email,
+                  },
+                  process.env.JWT_SECRET,
+                  {
+                    expiresIn: "1h",
+                  }
+                );
                 res.status(200).json({ token });
               } else {
                 res.status(401).send({
@@ -290,7 +298,6 @@ app.post("/authenticate", async function (req, res) {
             });
           }
         }
-      
       },
       (response) => {
         res.status(401).send({
@@ -344,7 +351,7 @@ app.put("/:id", function (req, res) {
  *       200:
  *         description: Updated
  */
-app.delete("/", async function (req, res) {
+app.delete("/", verifyToken,async function (req, res) {
   const webReq = req;
   try {
     await deleteAllUsers().then(

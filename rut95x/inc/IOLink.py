@@ -9,7 +9,7 @@
 # -------------------------------------------------------------------------------------------------------------------
 # IOLink read data from an 4 Port IO link Master AL1350 with the following configuration
 # Port 1 - LR2750 - level in mm
-# Port 2 - LDL100 - Tempriture and conductivity
+# Port 2 - LDL100 - Temperature and conductivity
 # Port 3 - Agitator output feedback
 # Port 4 - Heater output feedback
 # -------------------------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ def IOLinkDecodeValues(SensorType_In, ProcessData_In, Unit_In):
         return conductivity, temperature
 
     if SensorType_In == "DI":
-        # note for digital input neet to set mode on IOlink master first
+        # note for digital input need to set mode on IOlink master first
         #    http://172.17.17.106/iolinkmaster/port[3]/mode/getdata
 
         iWord0 = ProcessData_In  # convert the Value to an integer

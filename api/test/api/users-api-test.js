@@ -6,6 +6,8 @@ const users = new Array(testUsers.length);
 suite("User API tests", () => { 
     setup(async () => {
       await kCloudService.clearAuth();
+      await kCloudService.createUser(maggie);
+      await kCloudService.authenticate(maggieCredentials); // create a jwt for test user
       await kCloudService.deleteAllUsers();
       await kCloudService.createUser(maggie);
       await kCloudService.authenticate(maggieCredentials); // create a jwt for test user

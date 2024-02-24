@@ -9,7 +9,6 @@
 # Python Libs
 # -------------------------------------------------------------------------------------------
 
-
 from contextlib import nullcontext
 import sqlite3
 import uuid
@@ -17,9 +16,11 @@ import settings
 import datetime
 import json
 
- # ----------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------
 class dbClass:
     """Class to interface to an SQlite Database"""
+
     # ----------------------------------------------------------------------------------------
     def __init__(self):
         self.dbPath = str(settings.BASE_DIR) + "/data/" + settings.SQLITE_DB
@@ -485,25 +486,6 @@ class dbClass:
         except Exception as error:
             self.errorString = "read_PVO_specific Error " + str(error)
             return 999
-
-    # --------------------------------------------------------------------------------------------
-    def read_status(self):
-        try:
-            # define the query
-            myQuery = (
-                "select * from status where EventDate not null order by EventDate desc"
-            )
-            # open db and connect
-            self.OpenConn()
-            self.db.row_factory = sqlite3.Row
-            c = self.db.cursor()
-            c.execute(myQuery)
-            rows = c.fetchall()
-            # We can also close the connection if we are done with it.
-            self.CloseConn()
-            return rows
-        except Exception as error:
-            self.errorString = "read_status Error " + str(error)
 
     # --------------------------------------------------------------------------------------------
     # read the triggers table from the db and reset the values
