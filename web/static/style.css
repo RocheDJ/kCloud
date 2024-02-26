@@ -1,0 +1,6 @@
+.container_1 { 
+    margin:0 ;
+    flex-grow: 1; 
+    position: static; 
+    width:  1980px;
+} 

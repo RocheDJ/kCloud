@@ -162,7 +162,7 @@ app.get("/", verifyToken, async function (req, res) {
  *                $ref: '#/components/schemas/User'
  */
 
-app.get("/:id",verifyToken, async function (req, res) {
+app.get("/:id", verifyToken, async function (req, res) {
   //...
   const webReq = req;
   const UserId = webReq.params.id;
@@ -279,7 +279,13 @@ app.post("/authenticate", async function (req, res) {
                     expiresIn: "1h",
                   }
                 );
-                res.status(200).json({ token });
+                res
+                  .status(200)
+                  .json({
+                    success: true,
+                    token: token,
+                    id: UserCredentials.id,
+                  });
               } else {
                 res.status(401).send({
                   success: false,
@@ -351,7 +357,7 @@ app.put("/:id", function (req, res) {
  *       200:
  *         description: Updated
  */
-app.delete("/", verifyToken,async function (req, res) {
+app.delete("/", verifyToken, async function (req, res) {
   const webReq = req;
   try {
     await deleteAllUsers().then(

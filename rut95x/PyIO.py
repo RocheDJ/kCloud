@@ -162,7 +162,7 @@ def main_sequence():
     xNewStep = 0
     xDebugOn = settings.DEBUG
     iMaxPVO = 6
-    fStepInterval = 0.500  # 100 ms
+    fStepInterval = 0.100  # 100 ms
     # start web server as separate process
     pWebServer = Process(target=startWEBServer, args=(8080, shared_mem_status))
     fErrorInterval = 5.00
@@ -278,12 +278,15 @@ def main_sequence():
                 dtCycleStop = datetime.now()
                 delta_time = datetime.now() - dtCycleStart
                 fSeconds = float(delta_time.total_seconds())
-                dtCycleTime = fSeconds
 
             # Do we have any time left oer to sleep
             if fSeconds < fStepInterval:
                 fSleep = fStepInterval - fSeconds
                 sleep(fSleep)
+            # cycle time recalculated to include sleep
+            delta_time = datetime.now() - dtCycleStart
+            fSeconds = float(delta_time.total_seconds())
+            dtCycleTime = fSeconds
 
             main_status.cycle_time = dtCycleTime
             log_status()  # log status to updates

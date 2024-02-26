@@ -164,3 +164,18 @@ api/node_modules/
 api/jspm_packages/
 api/.env
 api/package-lock.json
+
+# WEB stuff
+# Dependency directories
+web/node_modules/
+web/jspm_packages/
+web/.env
+web/package-lock.json
+web/.eslintrc.cjs
+web/.DS_Store
+web//build
+web//.svelte-kit
+web//package
+web/!.env.example
+web/vite.config.js.timestamp-*
+web/vite.config.ts.timestamp-*

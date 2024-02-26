@@ -119,6 +119,15 @@ function FixedChartRange(index) {
         sDate = currentTime.toISOString().slice(0, 10);
         document.getElementById("myStopDate").value = sDate + "T23:59:59";
         break;
+    case 4:
+          // this month
+          currentTime.setDate(currentTime.getDate()-30)
+          var sDate = currentTime.toISOString().slice(0, 10);
+          document.getElementById("myStartDate").value = sDate + "T00:00:00";
+          currentTime.setDate(currentTime.getDate()+30)
+          sDate = currentTime.toISOString().slice(0, 10);
+          document.getElementById("myStopDate").value = sDate + "T23:59:59";
+          break;
     default:
     // code block
   }
