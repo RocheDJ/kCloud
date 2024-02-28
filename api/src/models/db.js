@@ -11,7 +11,11 @@ let dbConnection = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
-
+// ---------
+// ref -----https://stackoverflow.com/questions/8834126/how-to-efficiently-check-if-variable-is-array-or-object-in-nodejs-v8
+let isObject = function (a) {
+  return !!a && a.constructor === Object;
+};
 //--------------------------------------------------------------------------------------------
 async function writePVOData(InstillationID, Node, Port, EventDate, Data) {
   let ts = Date.now();
@@ -38,7 +42,17 @@ async function writePVOData(InstillationID, Node, Port, EventDate, Data) {
       });
     }
     try {
-      pvo_JSON = JSON.stringify(Data);
+      if (isObject(Data)) {
+        // check if it an actual JSON object ie from Python etc
+        pvo_JSON = JSON.stringify(Data);
+      } else {
+        // check if it a string e.g from PLC as it cant cope with nested JSON 
+        // Sanitize the data by replacing any ' with "
+        sData = Data.replaceAll("'", '"');
+        _JSON = JSON.parse(sData);
+        pvo_JSON = JSON.stringify(_JSON);
+      }
+
       var retVal = null;
       var myQuery =
         "INSERT pvo (InstallationID,NodeID,PortID,EventDate,jData) VALUES ( " +
@@ -208,11 +222,11 @@ async function addUser(userData) {
         };
         reject(err);
       } else if (result.affectedRows > 0) {
-        userData.id= result.insertId;
+        userData.id = result.insertId;
         retVal = {
           LastUpdate: result,
           Message: "Write ok",
-          User :  userData,
+          User: userData,
         };
         resolve(retVal);
       } else {
@@ -285,7 +299,7 @@ async function getUserById(userId) {
           err: err,
         };
         reject(err);
-      } else if ((result.length > 0) ) {
+      } else if (result.length > 0) {
         // we have a valid username
         retVal = result[0];
         resolve(retVal);
@@ -321,7 +335,7 @@ async function getUserByEmail(userEmail) {
           err: err,
         };
         reject(err);
-      } else if ((result.length > 0) ) {
+      } else if (result.length > 0) {
         // we have a valid username
         retVal = result[0];
         resolve(retVal);
