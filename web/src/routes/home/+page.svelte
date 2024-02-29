@@ -2,22 +2,16 @@
 	import TopMenu from '$lib/TopMenu.svelte';
 	import StatusTable from '$lib/StatusTable.svelte';
 	import Panel from '$lib/Panel.svelte';
+	import SideMenu from '$lib/SideMenu.svelte';
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />
 
 <div class="box">
 	<div class="columns">
+		<!-- Left Hand side System Navigation -->
 		<div class="column is-one-quarter">
-			<div class="box">
-				<h1 class="title">Units</h1>
-				<Panel Description={'Power Meters'} Items={['Line 1', 'Line 2', 'Line 3', 'Total']} />
-
-				<Panel
-					Description={'Pasto 1'}
-					Items={['Volume', 'Temperature', 'Conductivity', 'Reports']}
-				/>
-			</div>
+			<SideMenu />
 		</div>
 
 		<div class="column is-three-quarters">

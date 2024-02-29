@@ -1,8 +1,19 @@
 <script>
 	import TopMenu from '$lib/TopMenu.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
-	import TileItem_1 from '$lib/TileItem_1.svelte';
-	import Control from '../pasteurizer/inc/Control.svelte';
+	
+	import Tab1 from './inc/Tab1.svelte';
+	import Tab2 from './inc/Tab2.svelte';
+	import Tab3 from './inc/Tab3.svelte';
+	import Tabs from './inc/Tabs.svelte';
+
+	// List of tab items with labels, values and assigned components
+	let items = [
+		{ label: 'Overview', value: 1, component: Tab1 },
+		{ label: 'Trend', value: 2, component: Tab2 },
+		{ label: 'Data', value: 3, component: Tab3 }
+	];
+
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />
@@ -17,24 +28,8 @@
 			<div class="box">
 				<h1 class="title">Pasteurizer</h1>
 			</div>
-			<div class="columns">
-				<!-- Machine image-->
-				<div class="column is-half">
-					<div class="box">
-						<img src="/Pasto_1.png" alt="pasto" />
-					</div>
-				</div>
-				<!-- Machine Values-->
-				<div class="column is-half">
-					<div class="box">
-						<TileItem_1 Title={'Volume'} Value={1000} Unit={'Ltr'} />
-						<TileItem_1 Title={'Temperature'} Value={4.3} Unit={'Deg C'} />
-						<TileItem_1 Title={'Agitator'} Value={0} Unit={'0/1'} />
-					</div>
-				</div>
-			</div>
-            <!-- Machine control -->
-			<Control />
+			<Tabs {items} />
 		</div>
+		
 	</div>
 </div>
