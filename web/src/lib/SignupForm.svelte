@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { kcloudService } from "../services/kcloud-service";
+    import { kCloudUserService } from "../services/kcloud-user-service;
 
     let firstName = '';
     let lastName = '';
@@ -11,7 +11,7 @@
     
     async function signup() {
         console.log(`attempting to sign up email: ${email}`);
-        let success = await kcloudService.signup(firstName, lastName, email, password,mobile);
+        let success = await kCloudUserService.signup(firstName, lastName, email, password,mobile);
         if (success) {
             goto("/");
         } else {

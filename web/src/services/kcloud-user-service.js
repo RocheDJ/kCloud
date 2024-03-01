@@ -1,7 +1,7 @@
 import axios from "axios";
 import { user } from "../stores";
 
-export const kcloudService = {
+export const kCloudUserService = {
    // baseUrl: "http://34.240.177.253:3000",
    baseUrl: "http://127.0.0.1:3000",
 
@@ -16,9 +16,12 @@ export const kcloudService = {
             if (response.data.success) {
                 user.set({
                     email: email,
-                    token: response.data.token
+                    token: response.data.token,
+                    id :response.data.id,
                 });
-                localStorage.kCloud = JSON.stringify({ email: email, token: response.data.token });
+                localStorage.kCloudUser = JSON.stringify({ email: email, 
+                                                        token: response.data.token,
+                                                        id:response.data.id });
                 return true;
             }
             return false;
@@ -32,9 +35,10 @@ export const kcloudService = {
         user.set({
             email: "",
             token: "",
+            id:"",
           });
         axios.defaults.headers.common["Authorization"] = "";
-        localStorage.removeItem("kCloud");
+        localStorage.removeItem("kCloudUser");
     },
 
     /**
@@ -60,14 +64,27 @@ export const kcloudService = {
         }
     },
     reload() {
-        const donationCredentials = localStorage.donation;
-        if (donationCredentials) {
-            const savedUser = JSON.parse(donationCredentials);
+        const kCloudCredentials = localStorage.getItem("kCloudCredentials");
+        if (kCloudCredentials) {
+            const savedUser = JSON.parse(kCloudCredentials);
             user.set({
                 email: savedUser.email,
-                token: savedUser.token
+                token: savedUser.token,
+                id: savedUser.id
             });
             axios.defaults.headers.common["Authorization"] = "Bearer " + savedUser.token;
         }
+    },
+ 
+    /**
+     * @param {any} userId
+     */
+    async getInstallations(userId) {
+    try {
+        const response = await axios.get(this.baseUrl + "/Installation/user/"+userId);
+        return response.data;
+    } catch (error) {
+        return [];
     }
+}    
 };

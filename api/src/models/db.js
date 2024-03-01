@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const nodeDate = require("date-and-time");
@@ -621,6 +621,126 @@ async function readInstallation(sInstallationID) {
 }
 
 //--------------------------------------------------------------------------------------------
+async function readInstallationByUser(iUserID) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery =
+      "SELECT * FROM installation WHERE UserID=" +
+      iUserID +
+      " order by Description desc;";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "InstallationID ID Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+
+//-----------------------------------------------------------------------------------------------------
+async function readPVO(sInstallationID) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery =
+      "SELECT * FROM pvo WHERE InstallationID=" +
+      sInstallationID +
+      " order by EventDate desc limit 20;";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "InstallationID Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+
+//-----------------------------------------------------------------------------------------------------
+async function readPVO_Titles(sInstallationID) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery =
+      "SELECT DISTINCT json_extract(jData, '$.title') AS Title FROM kcloud.pvo where InstallationID =" +
+      sInstallationID +
+      " order by Title desc;";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "InstallationID Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+
+//--------------------------------------------------------------------------------------------
 module.exports = {
   writePVOData,
   writePDOData,
@@ -634,4 +754,6 @@ module.exports = {
   getUsers,
   deleteAllUsers,
   getUserById,
+  readPVO,
+  readPVO_Titles,readInstallationByUser,
 };

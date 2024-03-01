@@ -8,7 +8,7 @@
  */
 const express = require("express");
 const app = express();
-const {writePVOData} = require('../models/db')
+const {writePVOData,readPVO,readPVO_Titles} = require('../models/db')
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -68,10 +68,19 @@ const {writePVOData} = require('../models/db')
  *                 type: string
  *                 description: Response String.
  *                 example: Write OK
+ *     PVOTitleReturn:
+ *      type: object
+ *      properties:
+ *          data:
+ *                 type: string
+ *                 description: Response Title.
+ *                 example: Level
  */           
 //--------------------------------------------------------------------------------------------
 
 //---------------------------------------------------- API Calls -----------------------------
+
+//----------------------------------------------- PVO Write To DB -----------------------------
 /**
  * @swagger
  * /pvo:
@@ -108,6 +117,116 @@ app.post("/", async function (req, res){
         );
     } catch (error) {
         res.status(500).send(error);
+    }
+  });
+
+
+//----------------------------------------------- PVO read Latest From ID -----------------------------
+/**
+ * @swagger
+ * /pvo/{id}:
+ *   get:
+ *     tags:
+ *      - P.V.O.
+ *     summary: Read Latest PVOs for a given ID.
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        example: 1234
+ *        required: true
+ *        description: Numeric ID of the installation to retrieve.
+ *        schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A list of PVO Data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/components/schemas/SQLReturn'
+ */
+app.get("/:id", async function (req, res) {
+    //...
+    const webReq = req;
+    const InstallationId = webReq.params.id;
+    try {
+      await readPVO(InstallationId).then(
+        (response) => {
+          if (response.err) {
+            response.data=[];
+            res.status(200).send(response);
+          } else {
+            response.data=response;
+            res.status(200).send(response);
+          }
+        },
+        (response) => {
+          console.log(" Then Failure:" + response);
+          res.send(response);
+        }
+      );
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  });
+
+//----------------------------------------------- PVO read Latest From ID -----------------------------
+/**
+ * @swagger
+ * /pvo/title/{id}:
+ *   get:
+ *     tags:
+ *      - P.V.O.
+ *     summary: Read all PVO value types being uploaded for an installation.
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        example: 1234
+ *        required: true
+ *        description: Numeric ID of the installation to retrieve.
+ *        schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A list of PVO Titles.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/components/schemas/PVOTitleReturn'
+ */
+
+ app.get("/title/:id", async function (req, res) {
+    //...
+    const webReq = req;
+    const InstallationId = webReq.params.id;
+    try {
+      await readPVO_Titles(InstallationId).then(
+        (response) => {
+          if (response.err) {
+            response.data=[];
+            res.status(200).send(response);
+          } else {
+            
+            res.status(200).send(response);
+          }
+        },
+        (response) => {
+          console.log(" Then Failure:" + response);
+          res.send(response);
+        }
+      );
+    } catch (error) {
+      res.status(500).send(error);
     }
   });
 

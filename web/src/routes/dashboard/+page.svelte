@@ -1,6 +1,7 @@
-<script>
+<script >
 	import TopMenu from '$lib/TopMenu.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
+	
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />

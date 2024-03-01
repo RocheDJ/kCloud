@@ -1,8 +1,19 @@
-<script>
+<script lang="ts">
 	import TopMenu from '$lib/TopMenu.svelte';
 	import StatusTable from '$lib/StatusTable.svelte';
-	import Panel from '$lib/Panel.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
+	import { kCloudUserService } from '../../services/kcloud-user-service';
+	import { onMount } from 'svelte';
+
+	const kCloudCredentials : any = localStorage.getItem("kCloudUser");
+	const userData = JSON.parse(kCloudCredentials);
+	let userID = userData.id;
+
+	let userInstallationsList = [];
+	// on page loading get the list of installations for the user
+	onMount(async () => {
+		userInstallationsList = await kCloudUserService.getInstallations(userID);
+	});
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />

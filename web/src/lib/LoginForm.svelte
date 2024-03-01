@@ -1,6 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
-    import { kcloudService } from "../services/kcloud-service";
+    import { kCloudUserService } from "../services/kcloud-user-service";
 
     let email = "";
     let password = "";
@@ -8,7 +8,7 @@
 
     async function login() {
         console.log(`attempting to log in email: ${email} with password: ${password}`);
-        let success = await kcloudService.login(email, password);
+        let success = await kCloudUserService.login(email, password);
         if (success) {
             goto("/dashboard");
         } else {

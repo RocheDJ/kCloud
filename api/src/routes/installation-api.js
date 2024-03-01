@@ -8,7 +8,7 @@
  */
 const express = require("express");
 const app = express();
-const { writeInstallation,readInstallation} = require("../models/db");
+const { writeInstallation,readInstallation,readInstallationByUser} = require("../models/db");
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -110,7 +110,7 @@ app.post("/", async function (req, res) {
  *           type: integer
  *     responses:
  *       200:
- *          description: Most recent command for that installation
+ *          description: Data Fro that instialtion
  *          content:
  *           application/json:
  *             schema:
@@ -121,6 +121,49 @@ app.get("/:id", async function (req, res) {
   const myId = req.params.id;
   try {
     await readInstallation(myId).then(
+      (response) => {
+        res.send(response);
+      },
+      (response) => {
+        console.log(" Then Failure:" + response);
+        res.send(response);
+      }
+    );
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
+//---------------------------------------------------- API Calls -----------------------------
+/**
+ * @swagger
+ * /Installation/user/{id}:
+ *   get:
+ *     tags:
+ *      - Installation
+ *     summary: READ the details of all installations for given user.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         example: 1001
+ *         required: true
+ *         description: ID of the User.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *          description: Most recent command for that installation
+ *          content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/InstallationData'
+ */
+ app.get("/user/:id", async function (req, res) {
+  const webReq = req;
+  const myId = req.params.id;
+  try {
+    await readInstallationByUser(myId).then(
       (response) => {
         res.send(response);
       },

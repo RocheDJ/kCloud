@@ -1,0 +1,16 @@
+[Unit]
+# kcloud autostart script place in /etc/systemd/system
+Description=Service for starting kCloud API
+After=syslog.target network.target
+
+[Service]
+EnvironmentFile=/home/ubuntu/kcloud/.env
+Type=simple
+User=ubuntu
+ExecStart=/home/ubuntu/.nvm/versions/node/v20.11.1/bin/node /home/ubuntu/kcloud/src/server.js
+
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
