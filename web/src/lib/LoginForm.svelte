@@ -10,7 +10,7 @@
         console.log(`attempting to log in email: ${email} with password: ${password}`);
         let success = await kCloudUserService.login(email, password);
         if (success) {
-            goto("/dashboard");
+            goto("/home");
         } else {
             email = "";
             password = "";

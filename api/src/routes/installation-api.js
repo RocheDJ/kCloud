@@ -33,6 +33,10 @@ const { writeInstallation,readInstallation,readInstallationByUser} = require("..
  *                type: string
  *                description: Site name and or Description.
  *                example: Kilderry Test Site
+ *          Type:
+ *                type: string
+ *                description: One word Description of Installation.
+ *                example: Pasteurizer
  *     NewInstallation:
  *      type: object
  *      properties:

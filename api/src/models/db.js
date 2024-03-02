@@ -613,6 +613,7 @@ async function readInstallation(sInstallationID) {
       } else {
         retVal = {
           err: "InstallationID ID Not found",
+          data: [],
         };
         resolve(retVal);
       }
@@ -740,6 +741,45 @@ async function readPVO_Titles(sInstallationID) {
   });
 }
 
+//-----------------------------------------------------------------------------------------------------
+async function readPVO_Single(sInstallationID,sTitle) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER_NAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      });
+    }
+    var myQuery =
+      "SELECT  EventDate ,json_extract(jData, '$.title') AS Title, json_extract(jData, '$.value') AS Value ,json_extract(jData, '$.unit')  AS Unit " + 
+      "FROM kcloud.pvo where InstallationID =" +  sInstallationID +
+      " AND json_extract(jData, '$.title') =\'" +sTitle +
+      "\' order by EventDate DESC LIMIT 1;"
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Data Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
 //--------------------------------------------------------------------------------------------
 module.exports = {
   writePVOData,
@@ -755,5 +795,5 @@ module.exports = {
   deleteAllUsers,
   getUserById,
   readPVO,
-  readPVO_Titles,readInstallationByUser,
+  readPVO_Titles,readInstallationByUser,readPVO_Single,
 };

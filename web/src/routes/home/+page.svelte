@@ -28,7 +28,7 @@
 		<div class="column is-three-quarters">
 			<div class="box">
 				<h1 class="title">Status</h1>
-				<StatusTable></StatusTable>
+				<StatusTable StatusTableData = {userInstallationsList} ></StatusTable>
 			</div>
 		</div>
 	</div>

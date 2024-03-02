@@ -1,6 +1,6 @@
 <script>
 	import { goto } from "$app/navigation";
-    import { kcloudService } from "../../services/kcloud-service";
+    import { kCloudUserService } from "../../services/kcloud-user-service";
     kcloudService.logout();
     goto("/");
 </script>

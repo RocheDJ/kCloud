@@ -8,7 +8,7 @@
  */
 const express = require("express");
 const app = express();
-const {writePVOData,readPVO,readPVO_Titles} = require('../models/db')
+const {writePVOData,readPVO,readPVO_Titles,readPVO_Single} = require('../models/db')
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -75,6 +75,26 @@ const {writePVOData,readPVO,readPVO_Titles} = require('../models/db')
  *                 type: string
  *                 description: Response Title.
  *                 example: Level
+ *     PVOReturn:
+ *      type: object
+ *      properties:
+ *          EventDate:
+ *                type: string
+ *                description: The source id.
+ *                example: 024-02-05 12:55:46
+ *          Title:
+ *                 type: string
+ *                 description: .
+ *                 example: Temperature    
+ *          Value:
+ *                 type: number
+ *                 description: .
+ *                 example: 15.4
+ *          Unit:
+ *                 type: string
+ *                 description: .
+ *                 example: 2024-02-05 12:55:46
+ *       
  */           
 //--------------------------------------------------------------------------------------------
 
@@ -121,7 +141,7 @@ app.post("/", async function (req, res){
   });
 
 
-//----------------------------------------------- PVO read Latest From ID -----------------------------
+//----------------------------------------------- PVO read All PVO for ID -----------------------------
 /**
  * @swagger
  * /pvo/{id}:
@@ -175,7 +195,7 @@ app.get("/:id", async function (req, res) {
     }
   });
 
-//----------------------------------------------- PVO read Latest From ID -----------------------------
+//----------------------------------------------- PVO read title for Given ID -----------------------------
 /**
  * @swagger
  * /pvo/title/{id}:
@@ -230,4 +250,66 @@ app.get("/:id", async function (req, res) {
     }
   });
 
+
+//-------------------------------------- PVORead PVO Value given Title and ID -----------------------------
+/**
+ * @swagger
+ * /pvo/{id}/{title}:
+ *   get:
+ *     tags:
+ *      - P.V.O.
+ *     summary: Read Latest PVO data for a given ID and title.
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        example: 1234
+ *        required: true
+ *        description: Numeric ID of the installation to retrieve.
+ *        schema:
+ *           type: integer
+ *      - in: path
+ *        name: title
+ *        example: Temperature
+ *        required: true
+ *        description: Title of Data to read.
+ *        schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of PVO Data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/components/schemas/PVOReturn'
+ */
+app.get("/:id/:title", async function (req, res) {
+    //...
+    const webReq = req;
+    const InstallationId = webReq.params.id;
+    const TitleId = webReq.params.title;
+    try {
+      await readPVO_Single(InstallationId,TitleId).then(
+        (response) => {
+          if (response.err) {
+            response.data=[];
+            res.status(200).send(response);
+          } else {
+            response.data=response[0];
+            res.status(200).send(response);
+          }
+        },
+        (response) => {
+          console.log(" Then Failure:" + response);
+          res.send(response);
+        }
+      );
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  });
 module.exports = app;

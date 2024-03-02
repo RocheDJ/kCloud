@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let userInstallationsList =[1,2];
+	export let StatusTableData :any =[];
 </script>
 
 <div class="table-container">
@@ -7,26 +7,17 @@
 		<thead>
 			<tr>
 				<th><abbr title="Installation ID">ID</abbr></th>
-				<th><abbr title="Description">Disc</abbr></th>
-				<th><abbr title="Last Update">Up-Date</abbr></th>
+				<th><abbr title="Description of Unit">Description</abbr></th>
+				<th><abbr title="Last Update Last Data Write from system">Last Update</abbr></th>
 				<th><abbr title="Communication Status">Status</abbr></th>
-				<th><abbr title="Error">Err</abbr></th>
 			</tr>
 		</thead>
-		<tfoot>
-			<tr>
-				<th><abbr title="Installation ID">ID</abbr></th>
-				<th><abbr title="Description">Disc</abbr></th>
-				<th><abbr title="Last Update">Up-Date</abbr></th>
-				<th><abbr title="Communication Status">Status</abbr></th>
-			</tr>
-		</tfoot>
 		<tbody>
-			{#each userInstallationsList as Installation}
+			{#each StatusTableData as TableRow}
 				<tr>
-					<th>{Installation.id}</th>
-					<td>{Installation.Description}</td>
-					<td>{Installation.Updated}</td>
+					<th>{TableRow.id}</th>
+					<td>{TableRow.Description}</td>
+					<td>{TableRow.Updated}</td>
 					<td>TBD</td>
 				</tr>
 			{/each}
