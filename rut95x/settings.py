@@ -10,7 +10,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 INSTALLATION_ID = config("INSTALLATION_ID", default="Not Set")
 
-IOLINK_TOUT = config("IOLINK_TOUT", default=0.5, cast=float)
+IOLINK_TOUT = config("IOLINK_TOUT", default=1.0, cast=float)
 
 UPLOAD_CYCLIC_SEC = config("UPLOAD_CYCLIC_SEC", default=60.0, cast=float)
 

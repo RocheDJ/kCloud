@@ -1,7 +1,7 @@
 <script lang="ts">
 	import TopMenu from '$lib/TopMenu.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
-	
+	import {SelectedInstallation } from '../../../stores';
 	import Tab1 from './inc/Tab1.svelte';
 	import Tab2 from './inc/Tab2.svelte';
 	import Tab3 from './inc/Tab3.svelte';
@@ -10,15 +10,20 @@
 	const skCloudInstallations: any = localStorage.getItem('kCloudInstallations');
 	let kCloudInstallations :any =[];
 	kCloudInstallations = JSON.parse(skCloudInstallations);
-
+	let mySelectedInstallation :any={};
 	// List of tab items with labels, values and assigned components
 	let items = [
 		{ label: 'Overview', value: 1, component: Tab1 },
 		{ label: 'Trend', value: 2, component: Tab2 },
 		{ label: 'Data', value: 3, component: Tab3 }
 	];
+// what happens when there is a change in selected titles
+	SelectedInstallation.subscribe((value) => {
+		mySelectedInstallation = value;
+		console.log('tab1 change Titles_ ' + mySelectedInstallation.description);
+	});
 
-
+	//const SelectedInstallation = JSON.parse(aSelectedInstallation);
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />
@@ -31,7 +36,7 @@
 		<!-- Right Hand system Display-->
 		<div class="column is-three-quarters">
 			<div class="box">
-				<h1 class="title">Pasteurizer</h1>
+				<h1 class="title">{mySelectedInstallation.description}</h1>
 			</div>
 			<Tabs {items} />
 		</div>

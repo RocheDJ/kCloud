@@ -172,6 +172,7 @@ def IOLinkDecodeValues(SensorType_In, ProcessData_In, Unit_In):
             rRatio = iDataValue / fFullMM
             rVolume = fFullVolume * rRatio
             volume = round(rVolume, 1)
+            level = iDataValue
         else:
             if iDataValue == 8189:
                 level = fFullMM  # full

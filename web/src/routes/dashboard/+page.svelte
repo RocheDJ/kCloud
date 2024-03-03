@@ -4,6 +4,7 @@
 	const kCloudInstallations: any = localStorage.getItem('kCloudInstallations');
 	let InstallationData :any =[];
 	InstallationData = JSON.parse(kCloudInstallations);
+
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />

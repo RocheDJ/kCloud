@@ -79,7 +79,7 @@ const { writeCDO, readCDO, updateCDO } = require("../models/db");
  */
 app.post("/", async function (req, res) {
   const webReq = req;
-  const data = webReq.body;
+  const data = webReq.body.CDO;
   try {
     await writeCDO(data).then(
       (response) => {

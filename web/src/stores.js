@@ -6,7 +6,22 @@ export const user = writable({
   id: "",
 });
 
+export const lastCDO = writable({
+  requestDate: "",
+  InstallationID: "",
+  jData: {},
+  cdoID:"",
+});
+
 // Selected title 
 export const Titles_ = writable(
   [{}]
+);
+
+// Selected Instillation 
+export const SelectedInstallation = writable(
+  {
+    id: 0,
+    description: "",
+  }
 );

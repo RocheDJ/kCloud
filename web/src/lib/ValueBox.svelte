@@ -14,8 +14,21 @@
 	];
 
 	// on  loading get the list of titles for the Installation
-	onMount(async () => {
+	//onMount(async () => {
+	//	PVOData = await kCloudUserService.getPVOValue(InstallationId, Title);
+	//});
+
+	const LoadData = async () => {
 		PVOData = await kCloudUserService.getPVOValue(InstallationId, Title);
+	}
+	onMount(() => {
+		LoadData();
+		const interval = setInterval(() => {
+			console.log('ValueBox  ' + Title + ' Refresh');
+			LoadData();
+		}, 5000);
+		
+		return () => clearInterval(interval);
 	});
 </script>
 

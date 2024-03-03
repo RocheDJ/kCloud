@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { kCloudUserService } from "../services/kcloud-user-service;
+    import { kCloudUserService } from "../services/kcloud-user-service";
 
     let firstName = '';
     let lastName = '';

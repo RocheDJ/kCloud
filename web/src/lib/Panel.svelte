@@ -7,7 +7,8 @@
 	import { kCloudUserService } from '../services/kcloud-user-service';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { Titles_ } from '../stores';
+	import { Titles_, SelectedInstallation } from '../stores';
+
 	// -----------------------------------------------------------------------
 	//local variables
 	let PVOTitleList = [];
@@ -18,7 +19,7 @@
 		PVOTitleList = await kCloudUserService.getPVOTitles(InstallationId);
 		// load the selected PVO title
 		//read all teh titles for that selected installation
-		const StorageID = 'Titles_' + InstallationId
+		const StorageID = 'Titles_' + InstallationId;
 		const aSelectedTitles = localStorage.getItem(StorageID);
 		PVOTitleData = JSON.parse(aSelectedTitles);
 	});
@@ -41,36 +42,33 @@
 				break;
 		}
 		//set the selected ID data
-		const SelectedInstallation = {
+		const SelectedInstallationData = {
 			id: InstallationId,
 			description: Description
 		};
-		localStorage.setItem('SelectedInstallation', JSON.stringify(SelectedInstallation));
+		SelectedInstallation.set(SelectedInstallationData);
 		// open the page
 		goto(route);
-		console.log(' Reload ' +route);
+		console.log(' Reload ' + route);
 	}
 	// -----------------------------------------------------------------------
 	// What happens when we click on the check box
 	function handleChange(event: any) {
 		const Title = event.currentTarget.value;
 		const Shown = event.currentTarget.checked;
-		PVOTitleData
+		PVOTitleData;
 		console.log(Title + ' Checked = ' + Shown + ' index =' + event.currentTarget.id);
-		const iIndex : number = event.currentTarget.id;
-		console.log(Title + ' Selected = '+ PVOTitleData[iIndex].Title);
+		const iIndex: number = event.currentTarget.id;
+		console.log(Title + ' Selected = ' + PVOTitleData[iIndex].Title);
 		// change what data is shown
 		PVOTitleData[iIndex].Enabled = Shown;
 		const StorageID = 'Titles_' + InstallationId;
 		// save it bact to local storage
-		localStorage.setItem(StorageID, JSON.stringify(PVOTitleData));	
+		localStorage.setItem(StorageID, JSON.stringify(PVOTitleData));
 		// reload the page
 		//showTypeHome(InstallationType);
-		Titles_.update((TitleData)=>PVOTitleData);
+		Titles_.update((TitleData) => PVOTitleData);
 	}
-
-
-	
 </script>
 
 <nav class="panel">
@@ -83,12 +81,18 @@
 	</p>
 	<div id={Description} class="is-collapsible is-active">
 		<!-- Wrapper Div to be able to collapse/expand Panel's content -->
-		{#each PVOTitleList as PVOTitle,iIndex}
+		{#each PVOTitleList as PVOTitle, iIndex}
 			<label class="panel-block">
 				<span class="panel-icon">
 					<i class="fas fa-chart-bar" aria-hidden="true"></i>
 				</span>
-				<input type="checkbox" id={iIndex.toString()}  Value={PVOTitle.Title} checked on:change={handleChange} />
+				<input
+					type="checkbox"
+					id={iIndex.toString()}
+					Value={PVOTitle.Title}
+					checked
+					on:change={handleChange}
+				/>
 				{PVOTitle.Title}
 			</label>
 		{/each}

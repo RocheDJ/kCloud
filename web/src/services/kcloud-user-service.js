@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { user } from '../stores';
+import { user,lastCDO } from '../stores';
 
 export const kCloudUserService = {
 	// baseUrl: "http://34.240.177.253:3000",
@@ -134,5 +134,30 @@ export const kCloudUserService = {
 		} catch (error) {
 			return [];
 		}
-	}
+	},
+
+
+	/**
+	 * @param {any} CDO
+	 */
+	 async postCommand(CDO) {
+		try {
+			
+			const response = await axios.post(`${this.baseUrl}/CDO`, {CDO});
+			axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
+			if (response.data.id>0) {
+				lastCDO.set({
+					requestDate: CDO.requestDate,
+					InstallationID: response.data.token,
+					jData:CDO.jData,
+					cdoID:response.data.id
+				});
+				return response;
+			}
+			return {};
+		} catch (error) {
+			console.log(error);
+			return {};
+		}
+	},
 };
