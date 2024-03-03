@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import TopMenu from '$lib/TopMenu.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
 	
@@ -14,6 +14,10 @@
 		{ label: 'Min Max Avg', value: 1, component: Tab1 },
 		{ label: 'Data', value: 2, component: Tab2 }
 	];
+
+	const kCloudInstallations: any = localStorage.getItem('kCloudInstallations');
+	let InstallationData :any =[];
+	InstallationData = JSON.parse(kCloudInstallations);
 </script>
 
 
@@ -22,7 +26,7 @@
 <div class="box">
 	<div class="columns">
 		<div class="column is-one-quarter">
-			<SideMenu/>
+			<SideMenu PanelData={InstallationData}/>
 	</div>
 
 		<div class="column is-three-quarters">

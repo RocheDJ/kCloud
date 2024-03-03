@@ -98,8 +98,23 @@ export const kCloudUserService = {
 		try {
 			const response = await axios.get(this.baseUrl + '/pvo/title/' + InstallationID);
 			const PVOTitles = response.data;
-			const StorageID = 'Titles_'+InstallationID;
-			localStorage.setItem(StorageID, JSON.stringify(PVOTitles));	
+			try {
+				let aTitleData = [];
+				let Data = {};
+				PVOTitles.forEach(function (item, index) {
+					Data = {
+						id:index,
+						Title: item.Title,
+						Enabled: true,
+					};
+					aTitleData.push(Data);
+				  });
+				const StorageID_Enable = 'Titles_' + InstallationID;
+				localStorage.setItem(StorageID_Enable, JSON.stringify(aTitleData));
+			} catch (error) {
+				console.log("getPVOTitles "+error)
+			}
+
 			return PVOTitles;
 		} catch (error) {
 			return [];
@@ -109,12 +124,12 @@ export const kCloudUserService = {
 	 * @param {any} InstallationID
 	 * @param {any} TitleID
 	 */
-	 async getPVOValue(InstallationID,TitleID) {
+	async getPVOValue(InstallationID, TitleID) {
 		try {
 			const response = await axios.get(this.baseUrl + '/pvo/' + InstallationID + '/' + TitleID);
-			const PVOValue = response.data;	
-			const StorageID = 'PVO_'+InstallationID + '_' + TitleID;
-			localStorage.setItem(StorageID, JSON.stringify(PVOValue));	
+			const PVOValue = response.data;
+			const StorageID = 'PVO_' + InstallationID + '_' + TitleID;
+			localStorage.setItem(StorageID, JSON.stringify(PVOValue));
 			return PVOValue;
 		} catch (error) {
 			return [];

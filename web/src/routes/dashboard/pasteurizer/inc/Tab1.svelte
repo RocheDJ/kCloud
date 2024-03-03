@@ -3,33 +3,49 @@
 	import { kCloudUserService } from '../../../../services/kcloud-user-service';
 	import Control from './Control.svelte';
 	import { onMount } from 'svelte';
+	import { Titles_ } from '../../../../stores';
+
+	//read the selected instilation
 	const aSelectedInstallation = localStorage.getItem('SelectedInstallation');
 	const SelectedInstallation = JSON.parse(aSelectedInstallation);
-	const StorageID = 'Titles_' + SelectedInstallation.id;
-	const aSelectedTitles = localStorage.getItem(StorageID);
-	const SelectedTitles = JSON.parse(aSelectedTitles);
 
+	//read all teh titles for that selected installation
+	//const StorageID = 'Titles_' + SelectedInstallation.id;
+	//const aSelectedTitles = localStorage.getItem(StorageID);
+	let SelectedTitles = [];//JSON.parse(aSelectedTitles);
 
 	let PVOData = [];
 
 	const LoadData = async () => {
-        PVOData.length=0;
+		PVOData.length = 0;
 		for (let i = 0; i < SelectedTitles.length; i++) {
-            const readPVOData = await kCloudUserService.getPVOValue(SelectedInstallation.id, SelectedTitles[i].Title);
-            const DisplayDate = readPVOData[0].EventDate;
-            const data = {
-				Title: SelectedTitles[i].Title,
-                Value: readPVOData[0].Value,
-                Unit: readPVOData[0].Unit,
-                EventDate:DisplayDate,
-			};
-            PVOData.push(data);
-			//console.log(' Title for ' + i + '=' + data.Title + ' value =' + data.Value);
+			if (SelectedTitles[i].Enabled) {
+				const readPVOData = await kCloudUserService.getPVOValue(
+					SelectedInstallation.id,
+					SelectedTitles[i].Title
+				);
+				const DisplayDate = readPVOData[0].EventDate;
+				const data = {
+					Title: SelectedTitles[i].Title,
+					Value: readPVOData[0].Value,
+					Unit: readPVOData[0].Unit,
+					EventDate: DisplayDate
+				};
+				PVOData.push(data);
+			}
+			console.log(
+				' Tab 1 ' + i + '=' + SelectedTitles[i].Title + ' Enable =' + SelectedTitles[i].Enabled
+			);
 		}
 	};
 
 	onMount(async () => {
 		LoadData();
+	});
+	// what happens when there is a change in selected titles
+	Titles_.subscribe((value) => {
+		SelectedTitles = value;
+		console.log('tab1 change Titles_ ' + SelectedTitles[0].Enabled);
 	});
 </script>
 
@@ -43,9 +59,9 @@
 	<!-- Machine Values-->
 	<div class="column is-half">
 		{#each SelectedTitles as Title}
-			
-				<ValueBox InstallationId={SelectedInstallation.id} Title={Title.Title}/>
-			
+			{#if Title.Enabled == true}
+				<ValueBox InstallationId={SelectedInstallation.id} Title={Title.Title} />
+			{/if}
 		{/each}
 	</div>
 </div>

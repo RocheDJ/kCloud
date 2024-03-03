@@ -5,3 +5,8 @@ export const user = writable({
   token: "",
   id: "",
 });
+
+// Selected title 
+export const Titles_ = writable(
+  [{}]
+);
