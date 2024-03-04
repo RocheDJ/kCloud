@@ -6,9 +6,11 @@
  *  description: User management and authorization
  *
  */
-require("dotenv").config();
 const express = require("express");
 const verifyToken = require("../middleware/verifyToken");
+const AppSettings = require('../middleware/settings');
+Settings = AppSettings;
+
 const app = express();
 const {
   addUser,
@@ -274,7 +276,7 @@ app.post("/authenticate", async function (req, res) {
                     id: UserCredentials.id,
                     email: UserCredentials.email,
                   },
-                  process.env.JWT_SECRET,
+                  Settings.AppSettings.JWT_SECRET(),
                   {
                     expiresIn: "1h",
                   }

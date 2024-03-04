@@ -36,11 +36,7 @@
 	{#each items as item}
 		<AccordionItem key={item.key}>
 			<div slot="header" class="header">
-				{item.title}
-
-
-
-                
+				{item.title}      
 			</div>
 			<p slot="body" class="body">
 				<span class="panel-icon">

@@ -163,6 +163,7 @@ api/node_modules/
 api/jspm_packages/
 api/.env
 api/package-lock.json
+api/settings.json
 
 # WEB stuff
 # Dependency directories
@@ -178,3 +179,4 @@ web//package
 web/!.env.example
 web/vite.config.js.timestamp-*
 web/vite.config.ts.timestamp-*
+api/src/middleware/settings.js

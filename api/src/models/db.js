@@ -1,16 +1,29 @@
-// require("dotenv").config();
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const nodeDate = require("date-and-time");
 const saltRounds = 10;
 const CDO_Status = require("./inc/types");
+
+const AppSettings = require("../middleware/settings");
+Settings = AppSettings;
 //--------------------------------------------------------------------------------------------
-let dbConnection = mysql.createConnection({
+/*let dbConnection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER_NAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
+*/
+
+const ConnectionData = {
+  host: Settings.AppSettings.DB_HOST(),
+  user: Settings.AppSettings.DB_USER_NAME(),
+  password: Settings.AppSettings.DB_PASSWORD(),
+  database: Settings.AppSettings.DB_NAME(),
+};
+
+let dbConnection = mysql.createConnection(ConnectionData);
+
 // ---------
 // ref -----https://stackoverflow.com/questions/8834126/how-to-efficiently-check-if-variable-is-array-or-object-in-nodejs-v8
 let isObject = function (a) {
@@ -34,19 +47,14 @@ async function writePVOData(InstillationID, Node, Port, EventDate, Data) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     try {
       if (isObject(Data)) {
         // check if it an actual JSON object ie from Python etc
         pvo_JSON = JSON.stringify(Data);
       } else {
-        // check if it a string e.g from PLC as it cant cope with nested JSON 
+        // check if it a string e.g from PLC as it cant cope with nested JSON
         // Sanitize the data by replacing any ' with "
         sData = Data.replaceAll("'", '"');
         _JSON = JSON.parse(sData);
@@ -124,12 +132,7 @@ async function writePDOData(InstillationID, EventDate, Type, Version, Data) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
 
     //const kpi = JSON.parse("{"+dataValues+"}")
@@ -188,12 +191,7 @@ async function addUser(userData) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     const sGroupId = 0; //
     const iRole = 0; // normal user
@@ -246,12 +244,7 @@ async function deleteAllUsers() {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery = "delete from user;";
 
@@ -285,12 +278,7 @@ async function getUserById(userId) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery = "SELECT * FROM user WHERE id=" + userId + ";";
     await dbConnection.execute(myQuery, (err, result) => {
@@ -321,12 +309,7 @@ async function getUserByEmail(userEmail) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery = "SELECT * FROM user WHERE email='" + userEmail + "';";
     await dbConnection.execute(myQuery, (err, result) => {
@@ -357,12 +340,7 @@ async function getUsers() {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery = "SELECT * FROM user;";
     await dbConnection.execute(myQuery, (err, result) => {
@@ -392,12 +370,7 @@ async function writeCDO(requestData) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
 
     sRequestDate = nodeDate.format(new Date(), "YYYY-MM-DD hh:mm:ss");
@@ -450,12 +423,7 @@ async function readCDO(sInstallationID, iStatus) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery =
       "SELECT * FROM cdo WHERE InstallationID=" +
@@ -492,12 +460,7 @@ async function updateCDO(sCommandID, cdoOK) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     if (cdoOK == true) {
       iStatus = CDO_Status.CommandACK;
@@ -539,12 +502,7 @@ async function writeInstallation(requestData) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
 
     sRequestDate = nodeDate.format(new Date(), "YYYY-MM-DD hh:mm:ss");
@@ -589,12 +547,7 @@ async function readInstallation(sInstallationID) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery =
       "SELECT * FROM installation WHERE id=" +
@@ -630,12 +583,7 @@ async function readInstallationByUser(iUserID) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery =
       "SELECT * FROM installation WHERE UserID=" +
@@ -670,12 +618,7 @@ async function readPVO(sInstallationID) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery =
       "SELECT * FROM pvo WHERE InstallationID=" +
@@ -710,12 +653,7 @@ async function readPVO_Titles(sInstallationID) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery =
       "SELECT DISTINCT json_extract(jData, '$.title') AS Title FROM kcloud.pvo where InstallationID =" +
@@ -742,7 +680,7 @@ async function readPVO_Titles(sInstallationID) {
 }
 
 //-----------------------------------------------------------------------------------------------------
-async function readPVO_Single(sInstallationID,sTitle) {
+async function readPVO_Single(sInstallationID, sTitle) {
   return new Promise(async function (resolve, reject) {
     var disconnected = await new Promise((resolve) => {
       dbConnection.ping((err) => {
@@ -750,18 +688,15 @@ async function readPVO_Single(sInstallationID,sTitle) {
       });
     });
     if (disconnected) {
-      dbConnection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER_NAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-      });
+      dbConnection = mysql.createConnection(ConnectionData);
     }
     var myQuery =
-      "SELECT  EventDate ,json_extract(jData, '$.title') AS Title, json_extract(jData, '$.value') AS Value ,json_extract(jData, '$.unit')  AS Unit " + 
-      "FROM kcloud.pvo where InstallationID =" +  sInstallationID +
-      " AND json_extract(jData, '$.title') =\'" +sTitle +
-      "\' order by EventDate DESC LIMIT 1;"
+      "SELECT  EventDate ,json_extract(jData, '$.title') AS Title, json_extract(jData, '$.value') AS Value ,json_extract(jData, '$.unit')  AS Unit " +
+      "FROM kcloud.pvo where InstallationID =" +
+      sInstallationID +
+      " AND json_extract(jData, '$.title') ='" +
+      sTitle +
+      "' order by EventDate DESC LIMIT 1;";
     await dbConnection.execute(myQuery, (err, result) => {
       if (err) {
         retVal = {
@@ -795,5 +730,7 @@ module.exports = {
   deleteAllUsers,
   getUserById,
   readPVO,
-  readPVO_Titles,readInstallationByUser,readPVO_Single,
+  readPVO_Titles,
+  readInstallationByUser,
+  readPVO_Single,
 };

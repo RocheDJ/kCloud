@@ -1,7 +1,9 @@
 require("dotenv").config();
 const axios = require("axios");
-const serviceUrl = process.env.TEST_SERVICE_URL;
 
+const AppSettings = require("../../src/middleware/settings");
+Settings = AppSettings;
+const serviceUrl = Settings.AppSettings.TEST_SERVICE_URL();
 const kCloudService = {
   kCloudURL: serviceUrl,
   // ------------------------- Users --------------------------------------

@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { Titles_, SelectedInstallation } from '../stores';
-
+	import { AccordionItem } from 'svelte-collapsible';
 	// -----------------------------------------------------------------------
 	//local variables
 	let PVOTitleList = [];
@@ -72,29 +72,46 @@
 </script>
 
 <nav class="panel">
-	<p class="panel-heading">
-		<span class="panel-icon">
-			<i class="fas fa-industry"></i>
-		</span>
-		<!-- svelte-ignore missing-declaration -->
-		<a data-action="collapse" on:click={showTypeHome(InstallationType)}>{Description}</a>
-	</p>
-	<div id={Description} class="is-collapsible is-active">
-		<!-- Wrapper Div to be able to collapse/expand Panel's content -->
-		{#each PVOTitleList as PVOTitle, iIndex}
-			<label class="panel-block">
+	<AccordionItem key={Description}>
+		<div slot="header" class="panel-heading-djr">
+			<p>
 				<span class="panel-icon">
-					<i class="fas fa-chart-bar" aria-hidden="true"></i>
+					<i class="fas fa-industry"></i>
 				</span>
-				<input
-					type="checkbox"
-					id={iIndex.toString()}
-					Value={PVOTitle.Title}
-					checked
-					on:change={handleChange}
-				/>
-				{PVOTitle.Title}
-			</label>
-		{/each}
-	</div>
+				<!-- svelte-ignore missing-declaration -->
+				<a  data-action="collapse" on:click={showTypeHome(InstallationType)}>{Description}</a>
+			</p>
+		</div>
+		<div slot="body">
+			<div id={Description} class="is-collapsible is-active">
+				<!-- Wrapper Div to be able to collapse/expand Panel's content -->
+				{#each PVOTitleList as PVOTitle, iIndex}
+					<label class="panel-block">
+						<span class="panel-icon">
+							<i class="fas fa-chart-bar" aria-hidden="true"></i>
+						</span>
+						<input
+							type="checkbox"
+							id={iIndex.toString()}
+							Value={PVOTitle.Title}
+							checked
+							on:change={handleChange}
+						/>
+						{PVOTitle.Title}
+					</label>
+				{/each}
+			</div>
+		</div>
+	</AccordionItem>
 </nav>
+
+<style>
+    .panel-heading-djr {
+    border-radius: 6px 6px 0 0;
+    color: #363636;
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1.25;
+    padding: 0.75em 1em;
+}
+</style>
