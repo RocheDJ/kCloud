@@ -51,7 +51,6 @@
 	// what happens when there is a change in selected titles
 	Titles_.subscribe((value) => {
 		SelectedTitles = value;
-		console.log('tab1 change Titles_ ' + SelectedTitles[0].Enabled);
 	});
 </script>
 

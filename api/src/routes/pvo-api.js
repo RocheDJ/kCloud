@@ -8,7 +8,7 @@
  */
 const express = require("express");
 const app = express();
-const {writePVOData,readPVO,readPVO_Titles,readPVO_Single} = require('../models/db')
+const {writePVOData,readPVO,readPVO_Titles,readPVO_Single,readPVO_Specific} = require('../models/db')
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -80,7 +80,7 @@ const {writePVOData,readPVO,readPVO_Titles,readPVO_Single} = require('../models/
  *      properties:
  *          EventDate:
  *                type: string
- *                description: The source id.
+ *                description: The Date of the Data
  *                example: 024-02-05 12:55:46
  *          Title:
  *                 type: string
@@ -235,8 +235,7 @@ app.get("/:id", async function (req, res) {
           if (response.err) {
             response.data=[];
             res.status(200).send(response);
-          } else {
-            
+          } else { 
             res.status(200).send(response);
           }
         },
@@ -312,4 +311,87 @@ app.get("/:id/:title", async function (req, res) {
       res.status(500).send(error);
     }
   });
+
+
+
+
+//---------------------------------- PVO read values between dates title for Given ID and title  ----
+/**
+ * @swagger
+ * /pvo/{id}/{title}/{start}/{stop}:
+ *   get:
+ *     tags:
+ *      - P.V.O.
+ *     summary: Read all PVO value types between dates for Given ID and title .
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        example: 1234
+ *        required: true
+ *        description: Numeric ID of the installation to retrieve.
+ *        schema:
+ *           type: integer
+ *      - in: path
+ *        name: title
+ *        example: Temperature
+ *        required: true
+ *        description: Title of Data to read.
+ *        schema:
+ *           type: string
+ *      - in: path
+ *        name: start
+ *        example: 2024-03-06 18:00:00
+ *        required: true
+ *        description: Start Date and time of desired data array.
+ *        schema:
+ *           type: string
+ *      - in: path
+ *        name: stop
+ *        example: 2024-03-06 18:59:59
+ *        required: true
+ *        description: Stop Date and time of desired data array.
+ *        schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of PVO data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/components/schemas/PVOReturn'
+ */
+
+ app.get("/:id/:title/:start/:stop", async function (req, res) {
+  //...
+  const webReq = req;
+  const InstallationId = webReq.params.id;
+  const TitleId = webReq.params.title;
+  const dtStart = webReq.params.start;
+  const dtStop  = webReq.params.stop;
+  try {
+    await readPVO_Specific(InstallationId,TitleId,dtStart,dtStop).then(
+      (response) => {
+        if (response.err) {
+          response.data=[];
+          res.status(200).send(response);
+        } else { 
+          res.status(200).send(response);
+        }
+      },
+      (response) => {
+        console.log(" Then Failure:" + response);
+        res.send(response);
+      }
+    );
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
 module.exports = app;

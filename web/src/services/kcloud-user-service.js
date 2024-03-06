@@ -109,12 +109,11 @@ export const kCloudUserService = {
 					};
 					aTitleData.push(Data);
 				  });
-				const StorageID_Enable = 'Titles_' + InstallationID;
+				const StorageID_Enable = 'Titles_' + JSON.stringify(InstallationID);
 				localStorage.setItem(StorageID_Enable, JSON.stringify(aTitleData));
 			} catch (error) {
 				console.log("getPVOTitles "+error)
 			}
-
 			return PVOTitles;
 		} catch (error) {
 			return [];
@@ -158,6 +157,24 @@ export const kCloudUserService = {
 		} catch (error) {
 			console.log(error);
 			return {};
+		}
+	},
+
+
+// ------------------------------ //----------------- PVO read values between dates title for Given ID and title  ----
+	/**
+	 * @param {any} InstallationID
+	 * @param {any} TitleID
+	 * @param {any} StartDate
+	 * @param {any} EndDate
+	 */
+	 async getPVOValueSpecific(InstallationID, TitleID,StartDate,EndDate) {
+		try {
+			const response = await axios.get(this.baseUrl + '/pvo/' + InstallationID + '/' + TitleID+'/' + StartDate+'/' + EndDate);
+			const PVOValues = response.data;
+			return PVOValues;
+		} catch (error) {
+			return [];
 		}
 	},
 };

@@ -671,7 +671,8 @@ async function readPVO_Titles(sInstallationID) {
         resolve(retVal);
       } else {
         retVal = {
-          err: "InstallationID Not found",
+          data: [],
+          err: "No titles found for this installation",
         };
         resolve(retVal);
       }
@@ -715,6 +716,52 @@ async function readPVO_Single(sInstallationID, sTitle) {
     });
   });
 }
+//-----------------------------------------------------------------------------------------------------
+async function readPVO_Specific(
+  sInstallationID,
+  pdoVariableKey,
+  dtStart,
+  dtEnd
+) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection(ConnectionData);
+    }
+    //SELECT json_extract(jData, '$.title') as Title,
+    //  json_extract(JData, '$.value') as Value,EventDate 
+    //  FROM pvo  WHERE (EventDate BETWEEN '2024-03-04 22:12:19' AND '2024-03-05 20:01:34') 
+    //  AND ( json_extract(jData, '$.title') ='Temperature');
+    var myQuery =
+      "SELECT installationid,json_extract(jData, '$.title') as Title," 
+      +"json_extract(JData, '$.value') as Value,EventDate "
+      + "FROM pvo WHERE (EventDate BETWEEN '" + dtStart +"' AND '" + dtEnd + "')"
+      + " AND (json_extract(jData, '$.title') = '" + pdoVariableKey +"') AND (installationid = " + sInstallationID +
+      ");";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Data Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+
 //--------------------------------------------------------------------------------------------
 module.exports = {
   writePVOData,
@@ -733,4 +780,5 @@ module.exports = {
   readPVO_Titles,
   readInstallationByUser,
   readPVO_Single,
+  readPVO_Specific,
 };
