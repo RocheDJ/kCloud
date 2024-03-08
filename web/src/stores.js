@@ -25,3 +25,11 @@ export const SelectedInstallation = writable(
     description: "",
   }
 );
+
+// export
+export const SelectedChartInfo=writable(null);
+
+// ChartData 
+export const SelectedData= writable(
+  [{}]
+);

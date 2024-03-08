@@ -4,25 +4,29 @@
 	import Chart from 'svelte-frappe-charts';
 
 	let data = {
-		labels: ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'],
+		labels: ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat','Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'],
 		yMarkers: [{ label: 'Target', value: 16, options: { labelPos: 'left' } }],
 		datasets: [
 			{
 				name: 'Line 1',
 				chartType: ChartType,
-				values: [10, 12, 3, 9, 8, 15, 9]
+				values: [10, 12, 3, 9, 8, 15, 9,10, 12, 3, 9, 8, 15, 9],
+				isNavigable:1 
 			},
 			{
 				name: 'Line 2',
 				chartType: ChartType,
-				values: [12, 10, 13, 19, 8, 11, 12]
+				values: [12, 10, 13, 19, 8, 11, 12,12, 10, 13, 19, 8, 11, 12],
+				isNavigable:1 
 			},
 			{
 				name: 'Line 3',
 				chartType: ChartType,
-				values: [9, 8, 10, 11, 5, 14, 13]
+				values: [9, 8, 10, 11, 5, 14, 13,12, 10, 13, 19, 8, 11, 12],
+				isNavigable:1 
 			}
-		]
+		],
+		
 	};
 	
 	//type: "axis-mixed", // or 'bar', 'line', 'pie', 'percentage'
