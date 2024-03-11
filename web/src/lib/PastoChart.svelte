@@ -1,18 +1,20 @@
+<!-- Chart For Pasteurizer - Frappe Charts
+	\\src\lib\PastoChart
+-->
 <script lang="ts">
 	//---------------------- import variables-----------
 	import Chart from 'svelte-frappe-charts';
 	import { SelectedData } from '../stores';
-	import { onMount } from 'svelte';
-	export let PVOTitle = 'Temperature';
+	//---------------------- settable variables-----------
 
 	let chartType = 'line';
 	// https://frappe.io/charts/docs/reference/configuration#axisoptions
 	let enableNavigation = true;
 	let selected;
-	let ChartHeight = 350;
+	let ChartHeight = 450;
 	let showValuesOverPoints = true;
 	let xAxisIsSeries = 1;
-
+	let chartRef;
 	//------------------------------------------------------------
 	let PVOChartData = {
 		labels: [],
@@ -24,6 +26,9 @@
 		]
 	};
 
+	//------------------------------------------------------------
+	const onExport = () => chartRef.exportChart();
+	//------------------------------------------------------------
 	const onDataSelect = (event) => {
 		console.log('Data select event fired!', event);
 		selected = event;
@@ -44,17 +49,13 @@
 			PVOChartData.datasets[0].values[i] = 0;
 			PVOChartData.datasets[0].values[i] = PVO.Value;
 		});
-		PVOChartData;
+		chartRef.update(PVOChartData);
 	}
 
 	async function refreshChart(PVOS: any[]) {
 		populateByTitle(PVOS);
 	}
 
-	//------------------------------------------------------------
-	onMount(async () => {
-		//await refreshChart();
-	});
 	//------------------------------------------------------------
 	SelectedData.subscribe(async (PVOS) => {
 		if (PVOS) {
@@ -70,5 +71,25 @@
 	isNavigable={enableNavigation}
 	valuesOverPoints={showValuesOverPoints}
 	xIsSeries={xAxisIsSeries}
-	title={PVOTitle}
+	bind:this={chartRef}
 />
+
+<button style="font-size:24px" title="Export Chart to SVG image file."
+	>Export <i class="fas fa-image" on:click={onExport}></i></button
+>
+
+<!-- Overide the default frappe CSS for teh data point -->
+<style>
+	.graph-svg-tip {
+		position: absolute;
+		z-index: 99999;
+		padding: 10px;
+		font-size: 12px;
+		color: #067df3;
+		text-align: center;
+		background: #00947e;
+		border-radius: 3px;
+	}
+	
+	
+</style>

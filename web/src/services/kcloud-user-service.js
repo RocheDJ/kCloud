@@ -1,10 +1,15 @@
+/**
+ * API Service for WEB application
+ * /source/services/kcloud-user-services.js
+ */
 import axios from 'axios';
-import { user,lastCDO } from '../stores';
+import { user, lastCDO } from '../stores';
 
 export const kCloudUserService = {
 	// baseUrl: "http://34.240.177.253:3000",
 	baseUrl: 'http://127.0.0.1:3000',
 
+	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} email
 	 * @param {any} password
@@ -32,7 +37,7 @@ export const kCloudUserService = {
 			return false;
 		}
 	},
-
+	//------------------------------------------------------------------------------------------------
 	async logout() {
 		user.set({
 			email: '',
@@ -42,7 +47,7 @@ export const kCloudUserService = {
 		axios.defaults.headers.common['Authorization'] = '';
 		localStorage.clear();
 	},
-
+	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} firstName
 	 * @param {any} lastName
@@ -65,6 +70,7 @@ export const kCloudUserService = {
 			return false;
 		}
 	},
+	//------------------------------------------------------------------------------------------------
 	reload() {
 		const kCloudCredentials = localStorage.getItem('kCloudCredentials');
 		if (kCloudCredentials) {
@@ -77,7 +83,7 @@ export const kCloudUserService = {
 			axios.defaults.headers.common['Authorization'] = 'Bearer ' + savedUser.token;
 		}
 	},
-
+	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} userId
 	 */
@@ -91,34 +97,41 @@ export const kCloudUserService = {
 			return [];
 		}
 	},
+	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} InstallationID
 	 */
 	async getPVOTitles(InstallationID) {
+		let PVOTitles = [];
 		try {
-			const response = await axios.get(this.baseUrl + '/pvo/title/' + InstallationID);
-			const PVOTitles = response.data;
-			try {
-				let aTitleData = [];
-				let Data = {};
-				PVOTitles.forEach(function (item, index) {
-					Data = {
-						id:index,
-						Title: item.Title,
-						Enabled: true,
-					};
-					aTitleData.push(Data);
-				  });
-				const StorageID_Enable = 'Titles_' + JSON.stringify(InstallationID);
-				localStorage.setItem(StorageID_Enable, JSON.stringify(aTitleData));
-			} catch (error) {
-				console.log("getPVOTitles "+error)
+			const response = await axios.get(this.baseUrl + '/pvo/title/' + InstallationID, {
+				timeout: 1000
+			});
+			if (response) {
+				try {
+					let aTitleData = [];
+					let Data = {};
+					response.data.forEach(function (item, index) {
+						Data = {
+							id: index,
+							Title: item.Title,
+							Enabled: true
+						};
+						aTitleData.push(Data);
+					});
+					const StorageID_Enable = 'Titles_' + JSON.stringify(InstallationID);
+					localStorage.setItem(StorageID_Enable, JSON.stringify(aTitleData));
+					PVOTitles=aTitleData;
+				} catch (error) {
+					console.log('getPVOTitles ' + error);
+				}
 			}
 			return PVOTitles;
 		} catch (error) {
 			return [];
 		}
 	},
+	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} InstallationID
 	 * @param {any} TitleID
@@ -134,22 +147,20 @@ export const kCloudUserService = {
 			return [];
 		}
 	},
-
-
+	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} CDO
 	 */
-	 async postCommand(CDO) {
+	async postCommand(CDO) {
 		try {
-			
-			const response = await axios.post(`${this.baseUrl}/CDO`, {CDO});
+			const response = await axios.post(`${this.baseUrl}/CDO`, { CDO });
 			axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
-			if (response.data.id>0) {
+			if (response.data.id > 0) {
 				lastCDO.set({
 					requestDate: CDO.requestDate,
 					InstallationID: response.data.token,
-					jData:CDO.jData,
-					cdoID:response.data.id
+					jData: CDO.jData,
+					cdoID: response.data.id
 				});
 				return response;
 			}
@@ -159,22 +170,23 @@ export const kCloudUserService = {
 			return {};
 		}
 	},
-
-
-// ------------------------------ //----------------- PVO read values between dates title for Given ID and title  ----
+	//----------------- PVO read values between dates title for Given ID and title  ----
 	/**
 	 * @param {any} InstallationID
 	 * @param {any} TitleID
 	 * @param {any} StartDate
 	 * @param {any} EndDate
 	 */
-	 async getPVOValueSpecific(InstallationID, TitleID,StartDate,EndDate) {
+	async getPVOValueSpecific(InstallationID, TitleID, StartDate, EndDate) {
 		try {
-			const response = await axios.get(this.baseUrl + '/pvo/' + InstallationID + '/' + TitleID+'/' + StartDate+'/' + EndDate);
+			const response = await axios.get(
+				this.baseUrl + '/pvo/' + InstallationID + '/' + TitleID + '/' + StartDate + '/' + EndDate,
+				{ timeout: 1000 }
+			);
 			const PVOValues = response.data;
 			return PVOValues;
 		} catch (error) {
 			return [];
 		}
-	},
+	}
 };

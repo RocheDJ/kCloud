@@ -1,9 +1,12 @@
+<!-- Date Time Range selection
+	\\src\lib\DateTimeRange
+-->
 <script>
 	// external properties
 
 	//import files
 	import SveltyPicker from 'svelty-picker';
-	import { SelectedChartInfo } from '../stores';
+	import { SelectedDateRange } from '../stores';
 	import { onMount } from 'svelte';
 
 	// -----------------------------------------------------------------------
@@ -13,29 +16,30 @@
 	let autocommit = true;
 	let format = 'yyyy-mm-dd hh:ii:ss';
 	let minuteIncrement = 1;
-	
+
 	let inputClasses = 'input is-primary';
 	let value = '';
-	let initialDate;
-	let SelectedRange= {
-			StartDate: '2024-03-01 18:00:00',
-			EndDate: '2024-03-01 18:00:00',
-			IntervalInMin: 0
-		}
+	let manualInput = true;
+	let SelectedRange = {
+		StartDate: '2024-03-01 18:00:00',
+		EndDate: '2024-03-01 18:00:00',
+		IntervalInMin: 1
+	};
 
 	// -----------------------------------------------------------------------
-	function SetNewDates() {
-		localStorage.setItem('ChartRange', JSON.stringify(SelectedRange));
-		SelectedChartInfo.set(SelectedRange);
+	function UpdateDates() {
+		//localStorage.setItem('ChartRange', JSON.stringify(SelectedRange));
+		SelectedDateRange.set(SelectedRange);
 	}
 	// -----------------------------------------------------------------------
 
-	function onChange() {
-		SelectedRange= {
-			StartDate: detail[0],
-			EndDate: detail[1],
+	function onChange(event) {
+		SelectedRange = {
+			StartDate: event.detail[0],
+			EndDate: event.detail[1],
 			IntervalInMin: 60
 		};
+		UpdateDates();
 	}
 	// -----------------------------------------------------------------------
 	function buttonClick(index) {
@@ -77,13 +81,19 @@
 			default:
 			// code block
 		}
-		
-	value = [dtStart, dtStop];
+
+		value = [dtStart, dtStop];
+		SelectedRange = {
+			StartDate: dtStart,
+			EndDate: dtStop,
+			IntervalInMin: 60
+		};
+		UpdateDates();
 	}
 	// -----------------------------------------------------------------------
 	onMount(async () => {
 		try {
-			const ChartRange = JSON.parse(localStorage.getItem('ChartRange'));
+			const ChartRange = await JSON.parse(localStorage.getItem('ChartRange'));
 			value = [ChartRange.StartDate, ChartRange.EndDate];
 		} catch (error) {
 			console.log('On Mount DTRangeError ' + error);
@@ -92,23 +102,42 @@
 </script>
 
 <div class="columns">
-	<div class="column is-half">
+	<div class="column is-one-third">
 		<SveltyPicker
 			{inputClasses}
 			{format}
 			{isRange}
 			{minuteIncrement}
-
+			manualInput = {manualInput}
 			bind:value
 			on:change={onChange}
 		/>
 		<i class="fas fa-calendar"> - Select date and time range </i>
 	</div>
-	<div class="column is-half">
-		<button class="button is-primary" on:click={() => buttonClick(1)}>Today</button>
-		<button class="button is-info" on:click={() => buttonClick(2)}>Yesterday</button>
-		<button class="button is-success" on:click={() => buttonClick(3)}>This Week</button>
-		<button class="button is-warning" on:click={() => buttonClick(4)}>This Month</button>
-		<button class="button is-danger" on:click={() => SetNewDates()}>Update</button>
+	<div class="column is-two-thirds">
+		<div class="columns">
+			<div class="column">
+				<div class="select is-primary">
+					<select>
+					  <option>Select Aggregation</option>
+					  <option>None (RawData)</option>
+					  <option>Hourly (Average)</option>
+					  <option>Daily (Average)</option>
+					</select>
+				  </div>
+			</div>	
+			<div class="column">
+				<button class="button is-primary" on:click={() => buttonClick(1)}>Today</button>
+			</div>
+			<div class="column">
+				<button class="button is-info" on:click={() => buttonClick(2)}>Yesterday</button>
+			</div>
+			<div class="column">
+				<button class="button is-success" on:click={() => buttonClick(3)}>This Week</button>
+			</div>
+			<div class="column">
+				<button class="button is-warning" on:click={() => buttonClick(4)}>This Month</button>
+			</div>
+		</div>
 	</div>
 </div>

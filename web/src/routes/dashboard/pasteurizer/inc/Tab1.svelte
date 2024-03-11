@@ -4,10 +4,6 @@
 	import Control from './Control.svelte';
 	import { onMount } from 'svelte';
 	import { Titles_, SelectedInstallation } from '../../../../stores';
-
-	//read all teh titles for that selected installation
-	//const StorageID = 'Titles_' + SelectedInstallation.id;
-	//const aSelectedTitles = localStorage.getItem(StorageID);
 	let SelectedTitles = []; //JSON.parse(aSelectedTitles);
 	let mySelectedInstallation;
 	let PVOData = [];
@@ -29,18 +25,12 @@
 				};
 				PVOData.push(data);
 			}
-			//console.log(
-			//	' Tab 1 ' + i + '=' + SelectedTitles[i].Title + ' Enable =' + SelectedTitles[i].Enabled
-			//);
 		}
 	};
-	
-	
-	
-	onMount(async () => {
-		LoadData();
-	});
 
+	onMount(async () => {
+		await LoadData();
+	});
 
 	// what happens when there is a change in selected unit
 	SelectedInstallation.subscribe((value) => {
@@ -49,27 +39,46 @@
 	});
 
 	// what happens when there is a change in selected titles
-	Titles_.subscribe((value) => {
-		SelectedTitles = value;
+	Titles_.subscribe(async (value) => {
+		if (value) {
+			SelectedTitles = value;
+		}
 	});
 </script>
 
-<div class="columns">
-	<!-- Machine image-->
-	<div class="column is-half">
-		<div class="box">
-			<img src="/Pasto_1.png" alt="pasto" />
-		</div>
-	</div>
-	<!-- Machine Values-->
-	<div class="column is-half">
-		{#each SelectedTitles as Title}
-			{#if Title.Enabled == true}
-				<ValueBox InstallationId={mySelectedInstallation.id} Title={Title.Title} />
-			{/if}
-		{/each}
-	</div>
-</div>
 
 <!-- Machine control -->
 <Control InstallationID={mySelectedInstallation.id} />
+<div class="box">
+	<div class="columns" >
+		<!-- Machine image-->
+		<div class="column is-half">
+			<div class="box">
+				<img src="/Pasto_1.png" alt="pasto" />
+			</div>
+		</div>
+		<!-- Machine Values-->
+		<div class="column is-half">
+			<section class="column" id="Variables">
+				{#each SelectedTitles as Title}
+					{#if Title.Enabled == true}
+						<ValueBox InstallationId={mySelectedInstallation.id} Title={Title.Title} />
+					{/if}
+				{/each}
+			</section>
+		</div>
+	</div>
+	
+
+</div>
+<!-- Simple CSS fro Scrolling through Variables-->
+<style>
+
+	#Variables {
+		height: 60%;
+		display: flex;
+		overflow-y: auto;
+		flex-direction: column;
+	}
+	
+</style>

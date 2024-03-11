@@ -1,3 +1,6 @@
+<!-- Installation Navigation Panel holts Installation description and PVO titles
+	\\src\lib\Panel.svelte
+-->
 <script lang="ts">
 	// external properties
 	export let Description = 'Test Description';
@@ -12,17 +15,30 @@
 	// -----------------------------------------------------------------------
 	//local variables
 	let PVOTitleList = [];
-	let PVOTitleData = [];
+
+	const LoadPVOTitleList = async () => {
+		document.body.style.cursor = 'wait';
+		try {
+			const PVOTitlesRaw = await kCloudUserService.getPVOTitles(InstallationId);
+
+			if (PVOTitlesRaw.length == 0) {
+				alert('No PVOS Available for for ' +Description);
+			} else {
+				PVOTitleList = PVOTitlesRaw;
+			}
+		} catch (error) {
+			console.log('Panel  LoadPVOTitleList error ' + error);
+		}
+
+		document.body.style.cursor = 'default';
+	};
 	// -----------------------------------------------------------------------
 	// on  loading get the list of titles for the Installation
+
 	onMount(async () => {
-		PVOTitleList = await kCloudUserService.getPVOTitles(InstallationId);
-		// load the selected PVO title
-		//read all teh titles for that selected installation
-		const StorageID = 'Titles_' + InstallationId;
-		const aSelectedTitles = localStorage.getItem(StorageID);
-		PVOTitleData = JSON.parse(aSelectedTitles);
+		await LoadPVOTitleList();
 	});
+
 	// -----------------------------------------------------------------------
 	// decode the link for each system
 	function showTypeHome(installationType: string) {
@@ -56,18 +72,21 @@
 	function handleChange(event: any) {
 		const Title = event.currentTarget.value;
 		const Shown = event.currentTarget.checked;
-		PVOTitleData;
-		console.log(Title + ' Checked = ' + Shown + ' index =' + event.currentTarget.id);
-		const iIndex: number = event.currentTarget.id;
-		console.log(Title + ' Selected = ' + PVOTitleData[iIndex].Title);
-		// change what data is shown
-		PVOTitleData[iIndex].Enabled = Shown;
-		const StorageID = 'Titles_' + InstallationId;
-		// save it bact to local storage
-		localStorage.setItem(StorageID, JSON.stringify(PVOTitleData));
-		// reload the page
-		//showTypeHome(InstallationType);
-		Titles_.update((TitleData) => PVOTitleData);
+		try {
+			console.log(Title + ' Checked = ' + Shown + ' index =' + event.currentTarget.id);
+			const iIndex: number = event.currentTarget.id;
+			console.log(Title + ' Selected = ' + PVOTitleList[iIndex].Title);
+			// change what data is shown
+			PVOTitleList[iIndex].Enabled = Shown;
+			const StorageID = 'Titles_' + InstallationId;
+			// save it back to local storage
+			localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
+			// reload the page
+			//showTypeHome(InstallationType);
+			Titles_.update((TitleData) => PVOTitleList);
+		} catch (error) {
+			console.log('Panel  handleChange error ' + error);
+		}
 	}
 </script>
 
@@ -79,7 +98,7 @@
 					<i class="fas fa-industry"></i>
 				</span>
 				<!-- svelte-ignore missing-declaration -->
-				<a  data-action="collapse" on:click={showTypeHome(InstallationType)}>{Description}</a>
+				<a data-action="collapse" on:click={showTypeHome(InstallationType)}>{Description}</a>
 			</p>
 		</div>
 		<div slot="body">
@@ -106,12 +125,12 @@
 </nav>
 
 <style>
-    .panel-heading-djr {
-    border-radius: 6px 6px 0 0;
-    color: #363636;
-    font-size: 1.25em;
-    font-weight: 700;
-    line-height: 1.25;
-    padding: 0.75em 1em;
-}
+	.panel-heading-djr {
+		border-radius: 6px 6px 0 0;
+		color: #363636;
+		font-size: 1.25em;
+		font-weight: 700;
+		line-height: 1.25;
+		padding: 0.75em 1em;
+	}
 </style>

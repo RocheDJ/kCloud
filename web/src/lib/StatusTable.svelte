@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let StatusTableData :any =[];
+	import { ConvertDT }from '../utils/ConvertDT';
 
 	function CheckIfOnline(LastUpdate :any){
 		try {
@@ -36,7 +37,7 @@
 				<tr>
 					<th>{TableRow.id}</th>
 					<td>{TableRow.Description}</td>
-					<td>{TableRow.Updated}</td>
+					<td>{ConvertDT(TableRow.Updated)}</td>
 					{#if CheckIfOnline(TableRow.Updated) =="On-Line" }
 						<td class="has-text-success">ON-Line</td>
 					{:else}

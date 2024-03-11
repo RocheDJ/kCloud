@@ -27,7 +27,7 @@ export const SelectedInstallation = writable(
 );
 
 // export
-export const SelectedChartInfo=writable(null);
+export const SelectedDateRange=writable(null);
 
 // ChartData 
 export const SelectedData= writable(

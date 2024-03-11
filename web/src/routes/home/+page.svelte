@@ -3,16 +3,26 @@
 	import StatusTable from '$lib/StatusTable.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
 	import { kCloudUserService } from '../../services/kcloud-user-service';
-	import { beforeUpdate } from 'svelte';
-
-	const kCloudCredentials : any = localStorage.getItem("kCloudUser");
-	const userData = JSON.parse(kCloudCredentials);
-	let userID = userData.id;
+	import {  onMount } from 'svelte';
+	
+	let kCloudCredentials : any ;//= localStorage.getItem("kCloudUser");
+	let userID;
 
 	let kCloudInstallations = [];
+
+	const LoadUserData = async () => {
+		if (localStorage){
+			kCloudCredentials = localStorage.getItem("kCloudUser");
+			const userData = JSON.parse(kCloudCredentials);
+			userID = userData.id;
+			kCloudInstallations = await kCloudUserService.getInstallations(userID);
+		}
+		
+	};
+
 	// on page loading get the list of installations for the user
-	beforeUpdate(async () => {
-		kCloudInstallations = await kCloudUserService.getInstallations(userID);
+	onMount(async () => {
+		await LoadUserData();
 	});
 </script>
 
