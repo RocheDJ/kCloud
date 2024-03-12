@@ -28,6 +28,19 @@
 
 	//------------------------------------------------------------
 	const onExport = () => chartRef.exportChart();
+
+	//------------------------------------------------------------
+	function ClearPVOChartData(){
+	 PVOChartData = {
+		labels: [],
+		datasets: [
+			{
+				name: '',
+				values: []
+			}
+		]
+	};
+	}
 	//------------------------------------------------------------
 	const onDataSelect = (event) => {
 		console.log('Data select event fired!', event);
@@ -36,6 +49,7 @@
 
 	//-------------------------------------------------------
 	function populateByTitle(PVOS: any[]) {
+		ClearPVOChartData();
 		// load the labels and set value to 0 for all
 		PVOChartData.labels = [];
 		PVOS.forEach((PVO) => {
@@ -49,7 +63,6 @@
 			PVOChartData.datasets[0].values[i] = 0;
 			PVOChartData.datasets[0].values[i] = PVO.Value;
 		});
-		chartRef.update(PVOChartData);
 	}
 
 	async function refreshChart(PVOS: any[]) {
@@ -79,6 +92,7 @@
 >
 
 <!-- Overide the default frappe CSS for teh data point -->
+
 <style>
 	.graph-svg-tip {
 		position: absolute;
@@ -90,6 +104,4 @@
 		background: #00947e;
 		border-radius: 3px;
 	}
-	
-	
 </style>

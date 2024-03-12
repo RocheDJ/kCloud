@@ -14,9 +14,7 @@ export const lastCDO = writable({
 });
 
 // Selected title 
-export const Titles_ = writable(
-  [{}]
-);
+export const Titles_ = writable(null);
 
 // Selected Instillation 
 export const SelectedInstallation = writable(
@@ -29,7 +27,5 @@ export const SelectedInstallation = writable(
 // export
 export const SelectedDateRange=writable(null);
 
-// ChartData 
-export const SelectedData= writable(
-  [{}]
-);
+// Data 
+export const SelectedData= writable(null);

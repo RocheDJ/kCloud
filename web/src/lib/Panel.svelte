@@ -28,9 +28,11 @@
 			}
 		} catch (error) {
 			console.log('Panel  LoadPVOTitleList error ' + error);
+		} finally{
+			document.body.style.cursor = 'default';
 		}
 
-		document.body.style.cursor = 'default';
+		
 	};
 	// -----------------------------------------------------------------------
 	// on  loading get the list of titles for the Installation
@@ -81,8 +83,6 @@
 			const StorageID = 'Titles_' + InstallationId;
 			// save it back to local storage
 			localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
-			// reload the page
-			//showTypeHome(InstallationType);
 			Titles_.update((TitleData) => PVOTitleList);
 		} catch (error) {
 			console.log('Panel  handleChange error ' + error);

@@ -26,7 +26,7 @@
 	//const SelectedInstallation = JSON.parse(aSelectedInstallation);
 </script>
 
-<TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />
+<TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.24071'} />
 <div class="box">
 	<div class="columns">
 		<!-- Left Hand side System Navigation -->

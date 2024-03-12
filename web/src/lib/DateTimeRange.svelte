@@ -13,7 +13,7 @@
 	//local variables
 	let activeMode = 'datetime';
 	let isRange = true;
-	let autocommit = true;
+	let autocommit = false;
 	let format = 'yyyy-mm-dd hh:ii:ss';
 	let minuteIncrement = 1;
 
@@ -27,22 +27,22 @@
 	};
 
 	// -----------------------------------------------------------------------
-	function UpdateDates() {
-		//localStorage.setItem('ChartRange', JSON.stringify(SelectedRange));
+	async function UpdateDates() {
+		localStorage.setItem('SelectedDateRange', JSON.stringify(SelectedRange));
 		SelectedDateRange.set(SelectedRange);
 	}
 	// -----------------------------------------------------------------------
 
-	function onChange(event) {
+	async function onChange(event) {
 		SelectedRange = {
 			StartDate: event.detail[0],
 			EndDate: event.detail[1],
 			IntervalInMin: 60
 		};
-		UpdateDates();
+		await UpdateDates();
 	}
 	// -----------------------------------------------------------------------
-	function buttonClick(index) {
+	async function buttonClick(index) {
 		var currentTime = new Date();
 		var dtStart = '';
 		var dtStop = '';
@@ -88,13 +88,15 @@
 			EndDate: dtStop,
 			IntervalInMin: 60
 		};
-		UpdateDates();
+		await UpdateDates();
 	}
 	// -----------------------------------------------------------------------
 	onMount(async () => {
 		try {
-			const ChartRange = await JSON.parse(localStorage.getItem('ChartRange'));
-			value = [ChartRange.StartDate, ChartRange.EndDate];
+			if (localStorage.SelectedDateRange) {
+				const ChartRange = await JSON.parse(localStorage.getItem('SelectedDateRange'));
+				value = [ChartRange.StartDate, ChartRange.EndDate];
+			}
 		} catch (error) {
 			console.log('On Mount DTRangeError ' + error);
 		}
@@ -108,7 +110,7 @@
 			{format}
 			{isRange}
 			{minuteIncrement}
-			manualInput = {manualInput}
+			{manualInput}
 			bind:value
 			on:change={onChange}
 		/>
@@ -119,13 +121,13 @@
 			<div class="column">
 				<div class="select is-primary">
 					<select>
-					  <option>Select Aggregation</option>
-					  <option>None (RawData)</option>
-					  <option>Hourly (Average)</option>
-					  <option>Daily (Average)</option>
+						<option>Select Aggregation</option>
+						<option>None (RawData)</option>
+						<option>Hourly (Average)</option>
+						<option>Daily (Average)</option>
 					</select>
-				  </div>
-			</div>	
+				</div>
+			</div>
 			<div class="column">
 				<button class="button is-primary" on:click={() => buttonClick(1)}>Today</button>
 			</div>
