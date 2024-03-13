@@ -6,8 +6,9 @@
 	import Chart from 'svelte-frappe-charts';
 	import { SelectedData } from '../stores';
 	//---------------------- settable variables-----------
-
-	let chartType = 'line';
+	export let ChartType = 'line';
+	export let ChartUnit = '-';
+	//--------------------------------------------------------------------
 	// https://frappe.io/charts/docs/reference/configuration#axisoptions
 	let enableNavigation = true;
 	let selected;
@@ -15,6 +16,16 @@
 	let showValuesOverPoints = true;
 	let xAxisIsSeries = 1;
 	let chartRef;
+	
+	const tooltipOptions={
+		formatTooltipX: (d, i) => {
+			d => (d + '').toUpperCase();
+            return `<strong style="display: block; margin-bottom: 5px;color: #067df3">${d}</strong>`;
+        },
+    	formatTooltipY: d => d + ' '+ ChartUnit
+		
+	};
+
 	//------------------------------------------------------------
 	let PVOChartData = {
 		labels: [],
@@ -30,16 +41,16 @@
 	const onExport = () => chartRef.exportChart();
 
 	//------------------------------------------------------------
-	function ClearPVOChartData(){
-	 PVOChartData = {
-		labels: [],
-		datasets: [
-			{
-				name: '',
-				values: []
-			}
-		]
-	};
+	function ClearPVOChartData() {
+		PVOChartData = {
+			labels: [],
+			datasets: [
+				{
+					name: '',
+					values: []
+				}
+			]
+		};
 	}
 	//------------------------------------------------------------
 	const onDataSelect = (event) => {
@@ -80,28 +91,14 @@
 <Chart
 	data={PVOChartData}
 	height={ChartHeight}
-	type={chartType}
+	type={ChartType}
 	isNavigable={enableNavigation}
 	valuesOverPoints={showValuesOverPoints}
 	xIsSeries={xAxisIsSeries}
+	tooltipOptions={tooltipOptions}
 	bind:this={chartRef}
 />
 
 <button style="font-size:24px" title="Export Chart to SVG image file."
 	>Export <i class="fas fa-image" on:click={onExport}></i></button
 >
-
-<!-- Overide the default frappe CSS for teh data point -->
-
-<style>
-	.graph-svg-tip {
-		position: absolute;
-		z-index: 99999;
-		padding: 10px;
-		font-size: 12px;
-		color: #067df3;
-		text-align: center;
-		background: #00947e;
-		border-radius: 3px;
-	}
-</style>

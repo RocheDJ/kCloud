@@ -20,26 +20,37 @@
 	let inputClasses = 'input is-primary';
 	let value = '';
 	let manualInput = true;
+	let selectedInterval = 'hourly';
+	let IntervalOptions = ['none', 'hourly', 'daily'];
 	let SelectedRange = {
 		StartDate: '2024-03-01 18:00:00',
 		EndDate: '2024-03-01 18:00:00',
-		IntervalInMin: 1
+		Interval: selectedInterval
 	};
 
 	// -----------------------------------------------------------------------
-	async function UpdateDates() {
+	async function UpdateDatesAndInterval() {
 		localStorage.setItem('SelectedDateRange', JSON.stringify(SelectedRange));
 		SelectedDateRange.set(SelectedRange);
 	}
 	// -----------------------------------------------------------------------
 
-	async function onChange(event) {
+	async function onChangeDateTime(event) {
 		SelectedRange = {
 			StartDate: event.detail[0],
 			EndDate: event.detail[1],
-			IntervalInMin: 60
+			Interval: selectedInterval
 		};
-		await UpdateDates();
+		await UpdateDatesAndInterval();
+	}
+	// -----------------------------------------------------------------------
+	async function onChangeInterval(event) {
+		SelectedRange = {
+			StartDate: SelectedRange.StartDate,
+			EndDate: SelectedRange.EndDate,
+			Interval: selectedInterval
+		};
+		await UpdateDatesAndInterval();
 	}
 	// -----------------------------------------------------------------------
 	async function buttonClick(index) {
@@ -86,9 +97,9 @@
 		SelectedRange = {
 			StartDate: dtStart,
 			EndDate: dtStop,
-			IntervalInMin: 60
+			Interval: selectedInterval
 		};
-		await UpdateDates();
+		await UpdateDatesAndInterval();
 	}
 	// -----------------------------------------------------------------------
 	onMount(async () => {
@@ -112,7 +123,7 @@
 			{minuteIncrement}
 			{manualInput}
 			bind:value
-			on:change={onChange}
+			on:change={onChangeDateTime}
 		/>
 		<i class="fas fa-calendar"> - Select date and time range </i>
 	</div>
@@ -120,11 +131,8 @@
 		<div class="columns">
 			<div class="column">
 				<div class="select is-primary">
-					<select>
-						<option>Select Aggregation</option>
-						<option>None (RawData)</option>
-						<option>Hourly (Average)</option>
-						<option>Daily (Average)</option>
+					<select bind:value={selectedInterval} on:change={onChangeInterval}>
+						{#each IntervalOptions as value}<option {value}>{value}</option>{/each}
 					</select>
 				</div>
 			</div>

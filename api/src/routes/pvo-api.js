@@ -318,7 +318,7 @@ app.get("/:id/:title", async function (req, res) {
 //---------------------------------- PVO read values between dates title for Given ID and title  ----
 /**
  * @swagger
- * /pvo/{id}/{title}/{start}/{stop}:
+ * /pvo/{id}/{title}/{start}/{stop}/{interval}:
  *   get:
  *     tags:
  *      - P.V.O.
@@ -352,6 +352,13 @@ app.get("/:id/:title", async function (req, res) {
  *        description: Stop Date and time of desired data array.
  *        schema:
  *           type: string
+ *      - in: path
+ *        name: interval
+ *        example: hourly
+ *        required: true
+ *        description: group the data and average the result hourly or by daily.
+ *        schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: A list of PVO data.
@@ -366,15 +373,16 @@ app.get("/:id/:title", async function (req, res) {
  *                      $ref: '#/components/schemas/PVOReturn'
  */
 
- app.get("/:id/:title/:start/:stop", async function (req, res) {
+ app.get("/:id/:title/:start/:stop/:interval", async function (req, res) {
   //...
   const webReq = req;
   const InstallationId = webReq.params.id;
   const TitleId = webReq.params.title;
   const dtStart = webReq.params.start;
   const dtStop  = webReq.params.stop;
+  const sInterval= webReq.params.interval;
   try {
-    await readPVO_Specific(InstallationId,TitleId,dtStart,dtStop).then(
+    await readPVO_Specific(InstallationId,TitleId,dtStart,dtStop,sInterval).then(
       (response) => {
         if (response.err) {
           response.data=[];

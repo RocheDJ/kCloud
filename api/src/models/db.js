@@ -721,7 +721,8 @@ async function readPVO_Specific(
   sInstallationID,
   pdoVariableKey,
   dtStart,
-  dtEnd
+  dtEnd,
+  sInterval
 ) {
   return new Promise(async function (resolve, reject) {
     var disconnected = await new Promise((resolve) => {
@@ -732,16 +733,30 @@ async function readPVO_Specific(
     if (disconnected) {
       dbConnection = mysql.createConnection(ConnectionData);
     }
-    //SELECT json_extract(jData, '$.title') as Title,
-    //  json_extract(JData, '$.value') as Value,EventDate 
-    //  FROM pvo  WHERE (EventDate BETWEEN '2024-03-04 22:12:19' AND '2024-03-05 20:01:34') 
-    //  AND ( json_extract(jData, '$.title') ='Temperature');
-    var myQuery =
-      "SELECT installationid,json_extract(jData, '$.title') as Title," 
+    if (sInterval =='hourly'){
+      var myQuery =
+      "SELECT installationid,json_extract(jData, '$.title') as Title, hour(EventDate) as HH, day(EventDate) as DD, month(EventDate) as MM,json_extract(jData, '$.unit') as Unit, " 
+      +"avg(json_extract(JData, '$.value')) as AvgVal,min(json_extract(JData, '$.value')) as MinVal,max(json_extract(JData, '$.value')) as MaxVal "
+      + "FROM pvo WHERE (EventDate BETWEEN '" + dtStart +"' AND '" + dtEnd + "')"
+      + " AND (json_extract(jData, '$.title') = '" + pdoVariableKey +"') AND (installationid = " + sInstallationID +
+      ") group by MM,DD,HH ORDER  BY MM,DD,HH asc;";
+
+    }else if (sInterval =='daily') {
+      var myQuery =
+      "SELECT installationid,json_extract(jData, '$.title') as Title, day(EventDate) as DD, month(EventDate) as MM,json_extract(jData, '$.unit') as Unit, " 
+      +"avg(json_extract(JData, '$.value')) as AvgVal,min(json_extract(JData, '$.value')) as MinVal,max(json_extract(JData, '$.value')) as MaxVal "
+      + "FROM pvo WHERE (EventDate BETWEEN '" + dtStart +"' AND '" + dtEnd + "')"
+      + " AND (json_extract(jData, '$.title') = '" + pdoVariableKey +"') AND (installationid = " + sInstallationID +
+      ") group by MM,DD ORDER  BY MM,DD asc;";
+    } else {
+      var myQuery =
+      "SELECT installationid,json_extract(jData, '$.title') as Title,json_extract(jData, '$.unit') as Unit," 
       +"json_extract(JData, '$.value') as Value,EventDate "
       + "FROM pvo WHERE (EventDate BETWEEN '" + dtStart +"' AND '" + dtEnd + "')"
       + " AND (json_extract(jData, '$.title') = '" + pdoVariableKey +"') AND (installationid = " + sInstallationID +
       ");";
+    }
+    
 
     await dbConnection.execute(myQuery, (err, result) => {
       if (err) {

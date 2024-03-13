@@ -176,11 +176,12 @@ export const kCloudUserService = {
 	 * @param {any} TitleID
 	 * @param {any} StartDate
 	 * @param {any} EndDate
+	 * @param {any} Interval // hourly/daily
 	 */
-	async getPVOValueSpecific(InstallationID, TitleID, StartDate, EndDate) {
+	async getPVOValueSpecific(InstallationID, TitleID, StartDate, EndDate,Interval) {
 		try {
 			const response = await axios.get(
-				this.baseUrl + '/pvo/' + InstallationID + '/' + TitleID + '/' + StartDate + '/' + EndDate,
+				this.baseUrl + '/pvo/' + InstallationID + '/' + TitleID + '/' + StartDate + '/' + EndDate +'/'+Interval,
 				{ timeout: 1000 }
 			);
 			const PVOValues = response.data;

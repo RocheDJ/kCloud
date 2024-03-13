@@ -2,10 +2,10 @@
 	\\src\routes\dashboard\pasteurizer\inc
 -->
 <script lang="ts">
-	import { onMount,onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { SelectedInstallation, SelectedDateRange, Titles_ } from '../../../../stores';
 	import DateTimeRange from '$lib/DateTimeRange.svelte';
-	import { ConvertDT } from '../../../../utils/ConvertDT';
+	import { ConvertDT, GetMonth, roundToX, Number_to_Ordinal } from '../../../../utils/ConvertDT';
 	import { kCloudUserService } from '../../../../services/kcloud-user-service';
 	import { mkConfig, generateCsv, download, asString } from 'export-to-csv';
 	import {
@@ -24,6 +24,10 @@
 	let sStart = '2024-03-03 17:30:00';
 	let sStop = '2024-03-03 17:39:59';
 	let PVOTitle = '--';
+	let PVOColumHeader = '';
+	let MinColumHeader = '';
+	let MaxColumHeader = '';
+	let sInterval = 'none';
 	//------------------------------------------------------------------------------------------
 	let objectDatatable = functionCreateDatatable({
 		parData: [{}],
@@ -59,11 +63,12 @@
 	}
 
 	//---------------------------------------------------------------------
-	const UnSub_SelectedDateRange= SelectedDateRange.subscribe(async (DateRange) => {
+	const UnSub_SelectedDateRange = SelectedDateRange.subscribe(async (DateRange) => {
 		if (DateRange) {
 			mySelectedDateRange = DateRange;
 			sStart = mySelectedDateRange.StartDate;
 			sStop = mySelectedDateRange.EndDate;
+			sInterval = mySelectedDateRange.Interval;
 			await LoadTableData();
 		}
 	});
@@ -76,7 +81,7 @@
 
 	//------------------------------------------------------------------
 	// what happens when there is a change in selected titles
-	const UnSub_Titles_  =Titles_.subscribe(async (value) => {
+	const UnSub_Titles_ = Titles_.subscribe(async (value) => {
 		if (value) {
 			SelectedTitles = value;
 			if (SelectedTitles.length > 0) {
@@ -110,17 +115,61 @@
 					mySelectedInstallation.id,
 					PVOTitle,
 					sStart,
-					sStop
+					sStop,
+					sInterval
 				);
 				if (TableDataRaw) {
 					TableData = [{}];
 					if (TableDataRaw.err) {
-						alert('Load Table Data Error ' +TableDataRaw.err);
-					}else {
-						for (var PVO of TableDataRaw) {
-							const sDateTime = ConvertDT(PVO.EventDate);
-							PVO.EventDateString = sDateTime;
+						alert('Load Table Data Error ' + TableDataRaw.err);
+					} else {
+						// load data to chart based on interval
+						switch (sInterval) {
+							case 'hourly': {
+								for (var PVO of TableDataRaw) {
+									const sDateTime =
+										GetMonth(PVO.MM) + ' ' + Number_to_Ordinal(PVO.DD) + ' ' + PVO.HH + 'h';
+									const fValue = roundToX(PVO.AvgVal, 1);
+									PVO.EventDate = sDateTime;
+									PVO.Value = fValue;
+									PVO.MinVal = roundToX(PVO.MinVal, 1);
+									PVO.MaxVal = roundToX(PVO.MaxVal, 1);
+								}
+								PVOColumHeader = 'Hourly Average ' + PVOTitle;
+								MinColumHeader = 'Hourly Minimum  ' + PVOTitle;
+								MaxColumHeader = 'Hourly Maximum ' + PVOTitle;
+								break;
+							}
+							case 'daily': {
+								for (var PVO of TableDataRaw) {
+									const sDateTime = GetMonth(PVO.MM) + ' ' + Number_to_Ordinal(PVO.DD);
+									const fValue = roundToX(PVO.AvgVal, 1);
+									PVO.EventDate = sDateTime;
+									PVO.Value = fValue;
+									PVO.MinVal = roundToX(PVO.MinVal, 1);
+									PVO.MaxVal = roundToX(PVO.MaxVal, 1);
+								}
+								PVOColumHeader = 'Daily Average ' + PVOTitle;
+								MinColumHeader = 'Daily Minimum  ' + PVOTitle;
+								MaxColumHeader = 'Daily Maximum ' + PVOTitle;
+								break;
+							}
+							default: {
+								for (var PVO of TableDataRaw) {
+									const sDateTime = ConvertDT(PVO.EventDate);
+									const fValue = roundToX(PVO.Value, 1);
+									PVO.EventDate = sDateTime;
+									PVO.Value = fValue;
+									PVO.MinVal = roundToX(PVO.Value, 1);
+									PVO.MaxVal = roundToX(PVO.Value, 1);
+									PVOColumHeader=PVOTitle;
+									MinColumHeader = '';
+									MaxColumHeader = '';
+								}
+								break;
+							}
 						}
+
 						TableData = TableDataRaw;
 						objectDatatable = functionCreateDatatable({
 							parData: TableData,
@@ -139,18 +188,18 @@
 			document.body.style.cursor = 'default';
 		}
 	};
-	
+
 	//----------------------------------------------
 
 	onMount(async () => {
-	//	await LoadTableData();
+		//	await LoadTableData();
 	});
-//----------------------------------------------
+	//----------------------------------------------
 	onDestroy(() => {
 		UnSub_SelectedDateRange();
 		UnSub_Titles_();
 		UnSub_SelectedInstallation();
-		console.log("Tab 3 On Destroy called")
+		console.log('Tab 3 On Destroy called');
 	});
 </script>
 
@@ -175,22 +224,21 @@
 						</RowsPerPage>
 					</div>
 				</div>
-				<div class="column is-one-fifth" style="background-color:powderblue;">
+				<div class="column" style="background-color:powderblue;">
 					<button style="font-size:24px" title="Export data to CSV file." on:click={GenerateCSV}
 						>Export<i class="fas fa-file-csv"></i></button
 					>
 				</div>
 			</div>
 			<div class="columns">
-				<div class="column is-three-fifths" style="background-color:powderblue;">
+				<div class="column" style="background-color:powderblue;">
 					<Pagination bind:propDatatable={objectDatatable} propSize="medium" />
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<!--<div class="table-container is-fullwidth">-->
-	<!-- Your table content -->
+	<!-- Table content -->
 	<table class="table is-striped is-fullwidth is-scrollable">
 		<thead>
 			<tr>
@@ -198,14 +246,27 @@
 					><Sort bind:propDatatable={objectDatatable} propColumn={'EventDate'}>Date - Time</Sort
 					></th
 				>
-				<th>{PVOTitle} </th>
+				<th>{PVOColumHeader}</th>
+				{#if MinColumHeader != ''}
+					<th>{MinColumHeader}</th>
+				{/if}
+				{#if MaxColumHeader != ''}
+					<th>{MaxColumHeader}</th>
+				{/if}
+				
 			</tr>
 		</thead>
 		<tbody>
 			{#each objectDatatable.arrayData as row}
 				<tr>
-					<td>{row.EventDateString}</td>
+					<td>{row.EventDate}</td>
 					<td>{row.Value}</td>
+					{#if MinColumHeader != ''}
+						<td>{row.MinVal}</td>
+					{/if}
+					{#if MaxColumHeader != ''}
+						<td>{row.MaxVal}</td>
+					{/if}
 				</tr>
 			{/each}
 		</tbody>

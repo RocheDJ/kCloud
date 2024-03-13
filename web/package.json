@@ -1,6 +1,6 @@
 {
-  "name": "dashboard",
-  "version": "0.0.1",
+  "name": "kcloud-web",
+  "version": "0.0.24",
   "private": true,
   "scripts": {
     "dev": "vite dev",
