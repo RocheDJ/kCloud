@@ -9,7 +9,11 @@
 <div class="box" >
    <div class="columns">
       <div class="column has-text-centered">
-          <img alt="Kilderry" src="/KilDerryLogo.png" width="300" />
+        <div class="box">
+            <img alt="Kilderry" src="/29021.jpg" width="650" style="display: block;"/>
+            <a href="http://www.freepik.com">Designed by macrovector / Freepik</a>
+        </div>
+         
       </div>
       <div class="column">
           <div class="box">

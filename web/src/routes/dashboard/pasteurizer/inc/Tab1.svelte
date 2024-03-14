@@ -2,7 +2,7 @@
 	import ValueBox from '$lib/ValueBox.svelte';
 	import { kCloudUserService } from '../../../../services/kcloud-user-service';
 	import Control from './Control.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { Titles_, SelectedInstallation } from '../../../../stores';
 	let SelectedTitles = []; //JSON.parse(aSelectedTitles);
 	let mySelectedInstallation;
@@ -16,41 +16,46 @@
 					mySelectedInstallation.id,
 					SelectedTitles[i].Title
 				);
-				const DisplayDate = readPVOData[0].EventDate;
-				const data = {
-					Title: SelectedTitles[i].Title,
-					Value: readPVOData[0].Value,
-					Unit: readPVOData[0].Unit,
-					EventDate: DisplayDate
-				};
-				PVOData.push(data);
+				if (!readPVOData.err) {
+					const DisplayDate = readPVOData[0].EventDate;
+					const data = {
+						Title: SelectedTitles[i].Title,
+						Value: readPVOData[0].Value,
+						Unit: readPVOData[0].Unit,
+						EventDate: DisplayDate
+					};
+					PVOData.push(data);
+				}
 			}
 		}
 	};
 
-	onMount(async () => {
-		await LoadData();
-	});
-
 	// what happens when there is a change in selected unit
-	SelectedInstallation.subscribe((value) => {
+	const UnSub_SelectedInstallation = SelectedInstallation.subscribe((value) => {
 		mySelectedInstallation = value;
-		console.log('tab1 change Installation ' + mySelectedInstallation.description);
+		//console.log('tab1 change Installation ' + mySelectedInstallation.description);
 	});
 
 	// what happens when there is a change in selected titles
-	Titles_.subscribe(async (value) => {
+	const UnSub_Titles_ = Titles_.subscribe(async (value) => {
 		if (value) {
 			SelectedTitles = value;
 		}
 	});
-</script>
+	onMount(async () => {
+		await LoadData();
+	});
 
+	onDestroy(() => {
+		UnSub_SelectedInstallation();
+		UnSub_Titles_();
+	});
+</script>
 
 <!-- Machine control -->
 <Control InstallationID={mySelectedInstallation.id} />
 <div class="box">
-	<div class="columns" >
+	<div class="columns">
 		<!-- Machine image-->
 		<div class="column is-half">
 			<div class="box">
@@ -68,17 +73,14 @@
 			</section>
 		</div>
 	</div>
-	
-
 </div>
+
 <!-- Simple CSS fro Scrolling through Variables-->
 <style>
-
 	#Variables {
 		height: 60%;
 		display: flex;
 		overflow-y: auto;
 		flex-direction: column;
 	}
-	
 </style>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { user } from '../stores.js';
 	import SignupLogin from '$lib/SignupLogin.svelte';
 	import Logout from '$lib/Logout.svelte';

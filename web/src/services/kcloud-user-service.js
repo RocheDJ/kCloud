@@ -72,7 +72,7 @@ export const kCloudUserService = {
 	},
 	//------------------------------------------------------------------------------------------------
 	reload() {
-		const kCloudCredentials = localStorage.getItem('kCloudCredentials');
+		const kCloudCredentials = localStorage.kCloudUser;
 		if (kCloudCredentials) {
 			const savedUser = JSON.parse(kCloudCredentials);
 			user.set({

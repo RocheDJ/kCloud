@@ -1,5 +1,5 @@
-<!-- Chart For Pasteurizer - Frappe Charts
-	\\src\lib\PastoChart
+<!-- Chart For Power meters - Frappe Charts
+	\\src\lib\PowerChart
 -->
 <script lang="ts">
 	//---------------------- import variables-----------
@@ -9,6 +9,7 @@
 	//---------------------- settable variables-----------
 	export let ChartType = 'line';
 	export let ChartUnit = '-';
+	export let SelectedTitles: any[];
 	//--------------------------------------------------------------------
 	// https://frappe.io/charts/docs/reference/configuration#axisoptions
 	let enableNavigation = true;
@@ -17,25 +18,23 @@
 	let showValuesOverPoints = true;
 	let xAxisIsSeries = 1;
 	let chartRef;
-	
-	const tooltipOptions={
-		formatTooltipX: (d, i) => {
-			d => (d + '').toUpperCase();
-            return `<strong style="display: block; margin-bottom: 5px;color: #067df3">${d}</strong>`;
-        },
-    	formatTooltipY: d => d + ' '+ ChartUnit
-		
-	};
 
+	const tooltipOptions = {
+		formatTooltipX: (d, i) => {
+			(d) => (d + '').toUpperCase();
+			return `<strong style="display: block; margin-bottom: 5px;color: #067df3">${d}</strong>`;
+		},
+		formatTooltipY: (d) => d + ' ' + ChartUnit
+	};
+    //------------------------------------------------------------
+    let DataSetEntry = {
+        name: '',
+        values: []
+    }
 	//------------------------------------------------------------
 	let PVOChartData = {
 		labels: [],
-		datasets: [
-			{
-				name: '',
-				values: []
-			}
-		]
+		datasets: [DataSetEntry]
 	};
 
 	//------------------------------------------------------------
@@ -45,40 +44,38 @@
 	function ClearPVOChartData() {
 		PVOChartData = {
 			labels: [],
-			datasets: [
-				{
-					name: '',
-					values: []
-				}
-			]
+            datasets: []
 		};
 	}
-	//------------------------------------------------------------
-	const onDataSelect = (event) => {
-		console.log('Data select event fired!', event);
-		selected = event;
-	};
 
 	//-------------------------------------------------------
-	function populateByTitle(PVOS: any[]) {
+	function populateByManyTitle(PVOS: any[], Titles: any[]) {
 		ClearPVOChartData();
 		// load the labels and set value to 0 for all
 		PVOChartData.labels = [];
-		PVOS.forEach((PVO) => {
-			const DTStamp = PVO.EventDate;
-			PVOChartData.labels.push(`${DTStamp}`);
-			PVOChartData.datasets[0].values.push(0);
-			PVOChartData.datasets[0].name = PVO.Title;
-		});
+		let PVOTitleIndex = 0;
+		Titles.forEach((Title) => {
+			if (Title.Enabled) {
+                PVOChartData.datasets.push(DataSetEntry)
+				PVOS.forEach((PVO) => {
+					const DTStamp = PVO.EventDate;
+					PVOChartData.labels.push(`${DTStamp}`);
+					PVOChartData.datasets[PVOTitleIndex].values.push(0);
+					PVOChartData.datasets[PVOTitleIndex].name = PVO.Title;
+				});
 
-		PVOS.forEach(async (PVO, i) => {
-			PVOChartData.datasets[0].values[i] = 0;
-			PVOChartData.datasets[0].values[i] = PVO.Value;
+				PVOS.forEach(async (PVO, i) => {
+					PVOChartData.datasets[PVOTitleIndex].values[i] = 0;
+					PVOChartData.datasets[PVOTitleIndex].values[i] = PVO.Value;
+				});
+				PVOTitleIndex += 1;
+			};
 		});
 	}
-
+	//------------------------------------------------------------
 	async function refreshChart(PVOS: any[]) {
-		populateByTitle(PVOS);
+		populateByManyTitle(PVOS, SelectedTitles);
+        PVOChartData;
 	}
 
 	//------------------------------------------------------------
@@ -87,7 +84,7 @@
 			await refreshChart(PVOS);
 		}
 	});
-	//------------------------------------------------------------
+
 	onDestroy(() => {
 		UnSub_SelectedData();
 	});
@@ -100,7 +97,7 @@
 	isNavigable={enableNavigation}
 	valuesOverPoints={showValuesOverPoints}
 	xIsSeries={xAxisIsSeries}
-	tooltipOptions={tooltipOptions}
+	{tooltipOptions}
 	bind:this={chartRef}
 />
 

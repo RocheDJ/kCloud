@@ -1,16 +1,20 @@
+<!-- Dashboard Root page for Pasteurizer 
+	\\src\routes\dashboard\pasteurizer\
+-->
 <script lang="ts">
 	import TopMenu from '$lib/TopMenu.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
 	import {SelectedInstallation } from '../../../stores';
+	import { onDestroy,onMount } from 'svelte';
 	import Tab1 from './inc/Tab1.svelte';
 	import Tab2 from './inc/Tab2.svelte';
 	import Tab3 from './inc/Tab3.svelte';
 	import Tabs from './inc/Tabs.svelte';
 
-	const skCloudInstallations: any = localStorage.getItem('kCloudInstallations');
 	let kCloudInstallations :any =[];
-	kCloudInstallations = JSON.parse(skCloudInstallations);
+	
 	let mySelectedInstallation :any={};
+
 	// List of tab items with labels, values and assigned components
 	let items = [
 		{ label: 'Overview', value: 1, component: Tab1 },
@@ -18,12 +22,25 @@
 		{ label: 'Data', value: 3, component: Tab3 }
 	];
 // what happens when there is a change in selected titles
-	SelectedInstallation.subscribe((value) => {
+	const UnSub_SelectedInstallation =SelectedInstallation.subscribe((value) => {
 		mySelectedInstallation = value;
-		console.log('tab1 change Titles_ ' + mySelectedInstallation.description);
+		
 	});
 
-	//const SelectedInstallation = JSON.parse(aSelectedInstallation);
+	const LoadPage = async () => {
+		if (localStorage){
+			const skCloudInstallations: any = localStorage.getItem('kCloudInstallations');
+			kCloudInstallations = JSON.parse(skCloudInstallations);
+		}
+	};
+
+	onMount(async () => {
+		await LoadPage();
+	});
+
+	onDestroy(() => {
+		UnSub_SelectedInstallation();
+	});
 </script>
 
 <TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.24071'} />

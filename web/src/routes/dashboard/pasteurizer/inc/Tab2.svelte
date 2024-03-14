@@ -140,6 +140,7 @@
 		UnSub_Titles_();
 		UnSub_SelectedInstallation();
 		console.log('Tab 2 On Destroy called');
+		SelectedData.set([]);
 	});
 </script>
 
