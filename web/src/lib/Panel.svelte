@@ -15,35 +15,47 @@
 	// -----------------------------------------------------------------------
 	//local variables
 	let PVOTitleList = [];
+	let SavedTitleList = [];
 
-	const LoadPVOTitleList = async () => {
+	// load all the PVO titles from the server
+	async function LoadPVOTitleList() {
 		document.body.style.cursor = 'wait';
 		try {
 			const PVOTitlesRaw = await kCloudUserService.getPVOTitles(InstallationId);
-
 			if (PVOTitlesRaw.length == 0) {
-				alert('No PVOS Available for for ' +Description);
+				alert('No PVOS Available for for ' + Description);
 			} else {
 				PVOTitleList = PVOTitlesRaw;
 			}
 		} catch (error) {
 			console.log('Panel  LoadPVOTitleList error ' + error);
-		} finally{
+		} finally {
 			document.body.style.cursor = 'default';
 		}
+	}
 
-		
-	};
-	// -----------------------------------------------------------------------
-	// on  loading get the list of titles for the Installation
-
-	onMount(async () => {
-		await LoadPVOTitleList();
-	});
+	// Load Selected ListItems from last time and save back to trigger reload on other
+	//linked pages
+	async function LoadSavedTitles() {
+		try {
+			const StorageID = 'Titles_' + InstallationId;
+			if (localStorage) {
+				const sTitleList = localStorage.getItem(StorageID);
+				SavedTitleList = JSON.parse(sTitleList);
+				console.log('Panel LoadSavedTitles ' + SavedTitleList);
+				// save it back to local storage to trigger update on other panels
+				localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
+				$Titles_ = PVOTitleList;
+				//Titles_.update(() => PVOTitleList);
+			}
+		} catch (error) {
+			console.log('Panel LoadSavedTitles error ' + error);
+		}
+	}
 
 	// -----------------------------------------------------------------------
 	// decode the link for each system
-	function showTypeHome(installationType: string) {
+	async function showTypeHome(installationType: string) {
 		let route: string = `/dashboard`;
 		switch (installationType) {
 			case 'PowerMeter':
@@ -65,9 +77,13 @@
 			description: Description
 		};
 		SelectedInstallation.set(SelectedInstallationData);
+		//await goto(route);
+
+		console.log(' Goto ' + route);
 		// open the page
-		goto(route);
-		console.log(' Reload ' + route);
+		setTimeout(() => goto(route), 0);
+
+		LoadSavedTitles();
 	}
 	// -----------------------------------------------------------------------
 	// What happens when we click on the check box
@@ -83,11 +99,18 @@
 			const StorageID = 'Titles_' + InstallationId;
 			// save it back to local storage
 			localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
-			Titles_.update((TitleData) => PVOTitleList);
+			Titles_.update(() => PVOTitleList);
 		} catch (error) {
 			console.log('Panel  handleChange error ' + error);
 		}
 	}
+
+	// -----------------------------------------------------------------------
+	// on  loading get the list of titles for the Installation
+
+	onMount(async () => {
+		await LoadPVOTitleList();
+	});
 </script>
 
 <nav class="panel">

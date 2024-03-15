@@ -31,7 +31,9 @@
 	// -----------------------------------------------------------------------
 	async function UpdateDatesAndInterval() {
 		localStorage.setItem('SelectedDateRange', JSON.stringify(SelectedRange));
-		SelectedDateRange.set(SelectedRange);
+		//SelectedDateRange.set(SelectedRange);
+		
+		SelectedDateRange.update(() => SelectedRange);
 	}
 	// -----------------------------------------------------------------------
 

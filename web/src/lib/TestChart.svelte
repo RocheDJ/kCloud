@@ -9,19 +9,19 @@
 		datasets: [
 			{
 				name: 'Line 1',
-				chartType: ChartType,
+				type: ChartType,
 				values: [10, 12, 3, 9, 8, 15, 9,10, 12, 3, 9, 8, 15, 9],
 				isNavigable:1 
 			},
 			{
 				name: 'Line 2',
-				chartType: ChartType,
+				type: ChartType,
 				values: [12, 10, 13, 19, 8, 11, 12,12, 10, 13, 19, 8, 11, 12],
 				isNavigable:1 
 			},
 			{
 				name: 'Line 3',
-				chartType: ChartType,
+				type: ChartType,
 				values: [9, 8, 10, 11, 5, 14, 13,12, 10, 13, 19, 8, 11, 12],
 				isNavigable:1 
 			}

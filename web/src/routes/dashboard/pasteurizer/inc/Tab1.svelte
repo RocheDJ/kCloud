@@ -1,3 +1,6 @@
+<!-- Dashboard Root page for Pasteurizer 
+	\\src\routes\dashboard\pasteurizer\inc\tab1.svelte
+-->
 <script lang="ts">
 	import ValueBox from '$lib/ValueBox.svelte';
 	import { kCloudUserService } from '../../../../services/kcloud-user-service';

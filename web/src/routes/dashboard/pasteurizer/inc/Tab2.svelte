@@ -56,7 +56,8 @@
 			ChartDataRaw;
 			if (ChartDataRaw.err) {
 				alert('Load Chart Data Error ' + ChartDataRaw.err);
-				SelectedData.set([]);
+				//SelectedData.set([]);
+				$SelectedData = [];
 			} else {
 				// load data to chart based on interval
 				switch (sInterval) {
@@ -92,7 +93,8 @@
 						break;
 					}
 				}
-				SelectedData.set(ChartDataRaw);
+				//SelectedData.set(ChartDataRaw);
+				$SelectedData =ChartDataRaw;
 			}
 		} catch (error) {
 			console.log('Pasto Tab 2 LoadChartData error ' + error);
@@ -140,7 +142,7 @@
 		UnSub_Titles_();
 		UnSub_SelectedInstallation();
 		console.log('Tab 2 On Destroy called');
-		SelectedData.set([]);
+		$SelectedData =[];
 	});
 </script>
 

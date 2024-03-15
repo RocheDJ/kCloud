@@ -175,6 +175,7 @@ app.get("/:id", async function (req, res) {
     const webReq = req;
     const InstallationId = webReq.params.id;
     try {
+      console.log("GET /:id Called:");
       await readPVO(InstallationId).then(
         (response) => {
           if (response.err) {
@@ -186,7 +187,7 @@ app.get("/:id", async function (req, res) {
           }
         },
         (response) => {
-          console.log(" Then Failure:" + response);
+          console.log(" app.get Failure:" + response);
           res.send(response);
         }
       );
@@ -230,6 +231,7 @@ app.get("/:id", async function (req, res) {
     const webReq = req;
     const InstallationId = webReq.params.id;
     try {
+      console.log("GET /title/:id Called:");
       await readPVO_Titles(InstallationId).then(
         (response) => {
           if (response.err) {
@@ -240,7 +242,7 @@ app.get("/:id", async function (req, res) {
           }
         },
         (response) => {
-          console.log(" Then Failure:" + response);
+          console.log(" app.get /title/:id Failure:" + response);
           res.send(response);
         }
       );
@@ -292,6 +294,7 @@ app.get("/:id/:title", async function (req, res) {
     const InstallationId = webReq.params.id;
     const TitleId = webReq.params.title;
     try {
+      console.log("GET /:id/:title Called:");
       await readPVO_Single(InstallationId,TitleId).then(
         (response) => {
           if (response.err) {
@@ -303,7 +306,7 @@ app.get("/:id/:title", async function (req, res) {
           }
         },
         (response) => {
-          console.log(" Then Failure:" + response);
+          console.log( "get/:id/:title Failure:" + response);
           res.send(response);
         }
       );
@@ -382,6 +385,7 @@ app.get("/:id/:title", async function (req, res) {
   const dtStop  = webReq.params.stop;
   const sInterval= webReq.params.interval;
   try {
+    console.log("GET /:id/:title/:start/:stop/:interval Called:");
     await readPVO_Specific(InstallationId,TitleId,dtStart,dtStop,sInterval).then(
       (response) => {
         if (response.err) {
@@ -392,7 +396,7 @@ app.get("/:id/:title", async function (req, res) {
         }
       },
       (response) => {
-        console.log(" Then Failure:" + response);
+        console.log(" /:id/:title/:start/:stop/:interval Failure:" + response);
         res.send(response);
       }
     );

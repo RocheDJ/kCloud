@@ -4,16 +4,14 @@
 <script lang="ts">
 	//---------------------- import variables-----------
 	import Chart from 'svelte-frappe-charts';
-	import { SelectedData } from '../stores';
+	import { SelectedMultiData } from '../stores';
 	import { onDestroy } from 'svelte';
 	//---------------------- settable variables-----------
-	export let ChartType = 'line';
+	export let ChartType = "bar";
 	export let ChartUnit = '-';
-	export let SelectedTitles: any[];
 	//--------------------------------------------------------------------
 	// https://frappe.io/charts/docs/reference/configuration#axisoptions
-	let enableNavigation = true;
-	let selected;
+	let enableNavigation = false;
 	let ChartHeight = 450;
 	let showValuesOverPoints = true;
 	let xAxisIsSeries = 1;
@@ -24,74 +22,60 @@
 			(d) => (d + '').toUpperCase();
 			return `<strong style="display: block; margin-bottom: 5px;color: #067df3">${d}</strong>`;
 		},
-		formatTooltipY: (d) => d + ' ' + ChartUnit
-	};
-    //------------------------------------------------------------
-    let DataSetEntry = {
-        name: '',
-        values: []
-    }
-	//------------------------------------------------------------
-	let PVOChartData = {
-		labels: [],
-		datasets: [DataSetEntry]
+		formatTooltipY: (d) => d 
 	};
 
 	//------------------------------------------------------------
+	let PowerChartData
+
+	let dummydata = {
+    labels: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon" ],
+    datasets: [
+       { 
+		name:'set 1',
+		values: [ 300, 250, 720, 560, 370, 610, 690, 410, 370, 480, 620, 260, 170, 510, 630, 710 ] 
+	   },
+	   { 
+		name:'set 2',
+		values: [ 300, 250, 720, 560, 370, 610, 690, 410, 370, 480, 620, 260, 170, 510, 630, 710 ] 
+	   },
+	   { 
+		name:'set 3',
+		values: [ 300, 250, 720, 560, 370, 610, 690, 410, 370, 480, 620, 260, 170, 510, 630, 710 ] 
+	   },
+	   { 
+		name:'set 4',
+		values: [ 300, 250, 720, 560, 370, 610, 690, 410, 370, 480, 620, 260, 170, 510, 630, 710 ] 
+	   },
+    ],
+  };
+	//------------------------------------------------------------
+	//export chart to svg
 	const onExport = () => chartRef.exportChart();
 
-	//------------------------------------------------------------
-	function ClearPVOChartData() {
-		PVOChartData = {
-			labels: [],
-            datasets: []
-		};
-	}
+	
 
 	//-------------------------------------------------------
-	function populateByManyTitle(PVOS: any[], Titles: any[]) {
-		ClearPVOChartData();
-		// load the labels and set value to 0 for all
-		PVOChartData.labels = [];
-		let PVOTitleIndex = 0;
-		Titles.forEach((Title) => {
-			if (Title.Enabled) {
-                PVOChartData.datasets.push(DataSetEntry)
-				PVOS.forEach((PVO) => {
-					const DTStamp = PVO.EventDate;
-					PVOChartData.labels.push(`${DTStamp}`);
-					PVOChartData.datasets[PVOTitleIndex].values.push(0);
-					PVOChartData.datasets[PVOTitleIndex].name = PVO.Title;
-				});
-
-				PVOS.forEach(async (PVO, i) => {
-					PVOChartData.datasets[PVOTitleIndex].values[i] = 0;
-					PVOChartData.datasets[PVOTitleIndex].values[i] = PVO.Value;
-				});
-				PVOTitleIndex += 1;
-			};
-		});
-	}
-	//------------------------------------------------------------
-	async function refreshChart(PVOS: any[]) {
-		populateByManyTitle(PVOS, SelectedTitles);
-        PVOChartData;
+	async function refreshChart(MultiData: any[]) {
+		PowerChartData = MultiData;
+		//chartRef.update(dummydata);
+		await chartRef.update(PowerChartData);
 	}
 
 	//------------------------------------------------------------
-	const UnSub_SelectedData = SelectedData.subscribe(async (PVOS) => {
-		if (PVOS) {
-			await refreshChart(PVOS);
+	const UnSub_SelectedMultiData = SelectedMultiData.subscribe(async (MultiData) => {
+		if (MultiData) {
+			await refreshChart(MultiData);
 		}
 	});
-
+	//------------------------------------------------------------
 	onDestroy(() => {
-		UnSub_SelectedData();
+		UnSub_SelectedMultiData();
 	});
 </script>
 
 <Chart
-	data={PVOChartData}
+	data={PowerChartData}
 	height={ChartHeight}
 	type={ChartType}
 	isNavigable={enableNavigation}

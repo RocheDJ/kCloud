@@ -27,5 +27,8 @@ export const SelectedInstallation = writable(
 // export
 export const SelectedDateRange=writable(null);
 
-// Data 
+// Data for pasto chart
 export const SelectedData= writable(null);
+
+// Data for power chart
+export const SelectedMultiData= writable(null);
