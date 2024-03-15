@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { kCloudUserService } from '../services/kcloud-user-service';
+	import {ConvertDT} from '../utils/ConvertDT'
 	import { onDestroy, onMount } from 'svelte';
 	export let Title: string = '';
 	export let InstallationId: number = 0;
@@ -71,7 +72,7 @@
 	<div class="tile is-parent">
 		<article class="tile is-child box">
 			<p class="title is-4 has-background-info-dark has-text-info-light">{Title}</p>
-			<p class="subtitle is-6">Updated-{PVOData[0].EventDate}</p>
+			<p class="subtitle is-6">Updated-{ConvertDT(PVOData[0].EventDate)}</p>
 			<div class="content">
 				{#if PVOData[0].Unit == 'QI'}
 					{#if PVOData[0].Value == 0}

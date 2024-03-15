@@ -210,8 +210,8 @@
 	const UnSub_Titles_ = Titles_.subscribe(async (value) => {
 		if (value) {
 			SelectedTitles = value;
-			if (SelectedTitles.length > 0 && mySelectedInstallation) {
-				//			await LoadPowerChartData();
+			if ((SelectedTitles.length > 0) && mySelectedInstallation) {
+				await LoadPowerChartData();
 			}
 		}
 	});
