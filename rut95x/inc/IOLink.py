@@ -23,7 +23,7 @@ import settings
 # local Libs
 # -------------------------------------------------------------------------------------------
 from inc.udt import types
-
+from inc.udt.status import status_class
 # ------------------------------------------    Constants      ------------------------------------------------------
 IOLINK_TOUT = settings.IOLINK_TOUT
 iNode1 = settings.IOLINK_NODE_1
@@ -55,7 +55,7 @@ IOLINK_PVO = {
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-
+# ------------------------------------------    Functions      ------------------------------------------------------
 # FUNCTION TO RETURN API PATH FOR GIVEN PORT AND NODE
 def IolinkMakeProcessVariablePath(Node, Port, SensorType):
     if SensorType == "DI":
@@ -353,7 +353,6 @@ def IoLink_Read_PVO(PVO_INDEX):
                 }
             ],
         }
-
         return sJSONData  #
 
 
@@ -391,6 +390,6 @@ def IoLink_Write_DQ(iNode, iPort, xValue):
 
         return False
     except Exception as sError:
-        myError = "Error IoLink_Write_DQ " + str(sError)
+        sError = "Error IoLink_Write_DQ " + str(sError)
 
         return False  #

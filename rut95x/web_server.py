@@ -19,6 +19,7 @@ from inc.udt.status import status_class
 
 # -------------------------------------------------------------------------------------------
 app = Flask(__name__)
+
 CORS(app)
 
 webServerDB = dbClass()
@@ -120,7 +121,7 @@ def trigger_set():
     sData = "Done"
     return sData, 200
 
-
+# -----------------------------------------------------------------------------------------------------
 # ------------------------------------------ Web Server              -------------------------------------------------
 def runWebServer(ServerPort, smStatus): # smStatus is shared memory
     try: 
@@ -128,6 +129,7 @@ def runWebServer(ServerPort, smStatus): # smStatus is shared memory
         sm_main_status = smStatus
         web_server_status.status = "Web Server  :  Running on port : " + str(ServerPort)
         app.run(host="0.0.0.0", port=ServerPort)
-
     except Exception as error:
         web_server_status.status = "Web Server  :  runWebServer Error : " + str(error)
+# ------------------------------------------ Web Server              -------------------------------------------------
+

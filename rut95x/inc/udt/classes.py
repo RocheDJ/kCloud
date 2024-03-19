@@ -18,13 +18,14 @@ class PVO_ValueClass(object):
 # based on article from https://oxylabs.io/blog/python-script-service-guide
 class SignalHandler:
     shutdown_requested = False
-    
-    def __init__(self):
+    ProcessName = ''
+    def __init__(self,inProcessName):
+        self.ProcessName = inProcessName
         signal.signal(signal.SIGINT, self.request_shutdown)
         signal.signal(signal.SIGTERM, self.request_shutdown)
 
     def request_shutdown(self, *args):
-        print('Request to shutdown received, stopping')
+        print('Request to shutdown received, stopping-' + self.ProcessName)
         self.shutdown_requested = True
 
     def can_run(self):

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/siteFragment">
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="ie.djroche.kcloud.ui.about.AboutFragment"
+        android:label="About"
+        tools:layout="@layout/fragment_about" />
+    <fragment
+        android:id="@+id/siteFragment"
+        android:name="ie.djroche.kcloud.ui.site.SiteFragment"
+        android:label="Sites"
+        tools:layout="@layout/fragment_site">
+        <action
+            android:id="@+id/action_siteFragment_to_KPIFragment"
+            app:destination="@id/kpiFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_siteFragment_to_setupFragment"
+            app:destination="@id/setupFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="ie.djroche.kcloud.ui.detail.DetailFragment"
+        android:label="Details"
+        tools:layout="@layout/fragment_detail">
+        <action
+            android:id="@+id/action_detailFragment_to_KPIFragment"
+            app:destination="@id/kpiFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/kpiFragment"
+        android:name="ie.djroche.kcloud.ui.kpi.KPIFragment"
+        android:label="Process Variables"
+        tools:layout="@layout/fragment_k_p_i">
+        <action
+            android:id="@+id/action_KPIFragment_to_siteFragment"
+            app:destination="@id/siteFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_KPIFragment_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <argument
+            android:name="siteID"
+            app:argType="string" />
+        <argument
+            android:name="siteDescription"
+            app:argType="string" />
+        <argument
+            android:name="siteData"
+            app:argType="ie.djroche.kcloud.models.InstallationModel" />
+    </fragment>
+    <activity
+        android:id="@+id/login"
+        android:name="ie.djroche.kcloud.auth.Login"
+        android:label="Login" />
+    <fragment
+        android:id="@+id/setupFragment"
+        android:name="ie.djroche.kcloud.ui.setup.SetupFragment"
+        android:label="Setup"
+        tools:layout="@layout/fragment_setup">
+        <action
+            android:id="@+id/action_setupFragment_to_siteFragment"
+            app:destination="@id/siteFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+</navigation>

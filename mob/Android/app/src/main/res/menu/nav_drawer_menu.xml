@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+
+    <!-- id is the key to call the fragment -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/siteFragment"
+            android:icon="@drawable/baseline_home_24"
+            android:title="@string/nav_site" />
+
+        <item
+            android:id="@+id/kpiFragment"
+            android:icon="@drawable/ic_drag_foreground"
+            android:title="@string/nav_kpi" />
+
+        <item
+            android:id="@+id/detailFragment"
+            android:icon="@drawable/ic_trending_foreground"
+            android:title="@string/nav_details" />
+        <item
+            android:id="@+id/setupFragment"
+            android:icon="@drawable/ic_button_gear"
+            android:title="@string/nav_settings" />
+        <item
+            android:id="@+id/aboutFragment"
+            android:icon="@drawable/baseline_info_40"
+            android:title="@string/nav_about" />
+    </group>
+
+
+    <!-- id is the key used in onNavigationItemSelected -->
+    <item android:title="@string/nav_account">
+        <menu>
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_launcher_foreground"
+                android:title="@string/nav_my_account" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_menu_logout"
+                android:onClick="signOut"
+                android:title="@string/nav_logout" />
+        </menu>
+    </item>
+
+
+</menu>

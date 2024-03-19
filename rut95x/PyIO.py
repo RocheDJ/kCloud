@@ -10,7 +10,7 @@
 from datetime import datetime
 from os import kill
 from time import sleep
-from multiprocessing import Process,shared_memory
+from multiprocessing import Process, shared_memory
 
 
 # User Defined Libs
@@ -40,28 +40,50 @@ process_inputs = aio_eight_class()
 process_times = dt_three_class()  # start,hold start,stop time for process
 hold_temperature = 72
 hold_seconds = 600
+shared_mem_status_post_client = shared_memory.SharedMemory(
+    create=True, size=150
+)  # get status from kcloud API client
+
 # create a shared memory
-shared_mem_status = shared_memory.SharedMemory(create=True, size=150)
+shared_mem_status_web_server_main = shared_memory.SharedMemory(
+    create=True, size=150
+)  # for status of main task to web server
+
+
+
 # ------------------------------------------ Methods                -------------------------------------------------
 
 
 # --start the web interface to run as a separate process
-def startWEBServer(iPort, sStatus):
-    runWebServer(iPort, sStatus)
+def startWEBServer(iPort, sStatusBuffer):
+    runWebServer(iPort, sStatusBuffer)
+
 
 # --start the web interface to run as a separate process
-def startPostClient():
-    run_web_client()
+def startPostClient(iPort,sStatusBuffer):
+    run_web_client(sStatusBuffer)
 
-# --start the web interface to run as a separate process
+
+# --
 def log_status():
-    dtNow =datetime.now()
-    sDateTime= dtNow.strftime("%Y-%m-%d, %H:%M:%S") 
-    sString = sDateTime + ';' + main_status.status + ";" +  str(main_status.cycle_time)+ ";"
-    bString = sString.encode('utf-8')
+    # compile the status of the PyIO main routine and send to the web
+    # server by means of shared memory.
+    dtNow = datetime.now()
+    sDateTime = dtNow.strftime("%Y-%m-%d, %H:%M:%S")
+    sString = (
+        sDateTime + ";" + main_status.status + ";" + str(main_status.cycle_time) + ";"
+    )
+    bString = sString.encode("utf-8")
     iLen = len(bString)
-    shared_mem_status.buf[:iLen] = bString
+    shared_mem_status_web_server_main.buf[:iLen] = bString
+
+    #kcloud status
+
+    bCloudClientStatus = bytes(shared_mem_status_post_client.buf[:150])
+    kCloudClientStatus = bCloudClientStatus.decode('utf-8')
    
+
+
 # --- Read IO link Data from Network -------------
 def Read_Inputs_Physical(aInputs, aPvoList, xFirstRead):
     try:
@@ -164,17 +186,21 @@ def main_sequence():
     iMaxPVO = 6
     fStepInterval = 0.100  # 100 ms
     # start web server as separate process
-    pWebServer = Process(target=startWEBServer, args=(8080, shared_mem_status))
+    pWebServer = Process(
+        target=startWEBServer, args=(8080, shared_mem_status_web_server_main)
+    )
     fErrorInterval = 5.00
     # start Post client as separate process
-    pPostClient = Process(target=startPostClient)
+    pPostClient = Process(
+        target=startPostClient, args=(8080,shared_mem_status_post_client)
+    )
 
     # variables to calculate cycle time
     dtCycleStart = datetime.now()
     dtCycleStop = datetime.now()
     dtLastLog = datetime.now()
     # handles systemd calls in linux to allow for controlled shutdown
-    signal_handler = SignalHandler()
+    signal_handler = SignalHandler("Main App")
     # control Sequence Variables
     max_heating_time = 300
     control_step = step_class()  #
@@ -287,8 +313,10 @@ def main_sequence():
             delta_time = datetime.now() - dtCycleStart
             fSeconds = float(delta_time.total_seconds())
             dtCycleTime = fSeconds
-
             main_status.cycle_time = dtCycleTime
+
+         
+
             log_status()  # log status to updates
 
             udtMainStep = MainStepType.read_inputs
@@ -313,15 +341,20 @@ def main_sequence():
             xNewStep = 1
             udtMainStepOld = udtMainStep
 
+
+
     # end of while tidy up app
-    print("Closing Post client")
+    print("Closing kCloud Web client")
     pPostClient.terminate()  # stop the web server process
     pPostClient.join()  # Wait for it to stop
+    shared_mem_status_post_client.close()
+
     print("Closing Local Web Server")
-    pWebServer.terminate()  # stop the web server process
-    pWebServer.join()  # Wait for it to stop
-    shared_mem_status.close()
-    print("Application Halted")
+    pWebServer.terminate()  # stop the kCloud client process
+    pPostClient.join()
+    shared_mem_status_web_server_main.close()
+
+    print("Application Halted OK ")
 
 
 # ------------------------  Call main Sequence    -----------------------------------------------

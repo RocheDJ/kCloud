@@ -180,3 +180,23 @@ web/!.env.example
 web/vite.config.js.timestamp-*
 web/vite.config.ts.timestamp-*
 api/src/middleware/settings.js
+
+
+# Android stuff
+
+# android Studio Default project file
+*.iml
+.gradle
+/mob/Android/local.properties
+/mob/Android/.idea/caches
+/mob/Android/.idea/libraries
+/mob/Android/.idea/modules.xml
+/mob/Android/.idea/workspace.xml
+/mob/Android/.idea/navEditor.xml
+/mob/Android/.idea/assetWizardSettings.xml
+/mob/Android/.DS_Store
+/mob/Android/build
+/mob/Android/captures
+/mob/Android/.externalNativeBuild
+/mob/Android/.cxx
+/mob/Android/local.properties

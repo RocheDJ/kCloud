@@ -17,12 +17,14 @@ import json
 from inc.udt.status import status_class
 from inc.udt.types import PostStepType
 from inc.udt.dbClass import dbClass
+from inc.udt.classes import SignalHandler
 # ------------------------------------------- Variables -------------------------------------------------------------
 web_post_status = status_class("")
 from time import sleep
 xEnableProcess = False
 sqliteDB = dbClass()
 # ------------------------------------------------------------------------------------------------------------
+signal_handler = SignalHandler("kCloud Client")
 # -------------------------------------------- Methods -------------------------------------------------------
 def post_pvo(data_in):
     try:
@@ -43,13 +45,14 @@ def post_pvo(data_in):
         response = requests.post(url=sApiUrl, data=jsonData,headers=headers)
         responseCode = response.status_code
         if (responseCode == 200):  # all good
+            web_post_status.status = "kCloud Client :  POST PVO OK"
             return 200
         else:
-            web_post_status.status = "Post App  :  post_pvo response Error : %s" % responseCode
+            web_post_status.status = "kCloud Client :  POST PVO CODE : %s" % responseCode
             return responseCode
     except Exception as error:
         if settings.DEBUG:
-            web_post_status.status = "Post App  :  post_pvo Error : " + str(error)
+            web_post_status.status = "kCloud Client :  POST PVO: " + str(error)
             return 999
 # ------------------------------------------------------------------------------------------------------------
 def update_pvo_status(id,code):
@@ -58,7 +61,7 @@ def update_pvo_status(id,code):
 
     except Exception as error:
         if settings.DEBUG:
-            web_post_status.status = "Post App  :  update_pvo_status Error : " + str(error)
+            web_post_status.status = "kCloud Client :  update_pvo_status Error : " + str(error)
 # ------------------------------------------------------------------------------------------------------------
 def post_pdo(data_in):
     try:
@@ -77,13 +80,14 @@ def post_pdo(data_in):
         response = requests.post(url=sApiUrl, data=jsonData,headers=headers)
         responseCode = response.status_code
         if (responseCode == 200):  # all good
+            web_post_status.status = "kCloud Client :  POST PDO OK"
             return 200
         else:
-            web_post_status.status = "Post App  :  post_pdo response Error : %s" % responseCode
+            web_post_status.status = "kCloud Client :  post_pdo response Error : %s" % responseCode
             return responseCode
     except Exception as error:
         if settings.DEBUG:
-            web_post_status.status = "Post App  :  post_pdo Error : " + str(error)
+            web_post_status.status = "kCloud Client :  post_pdo Error : " + str(error)
             return 999
 # ------------------------------------------------------------------------------------------------------------
 def update_pdo_status(id,code):
@@ -92,7 +96,7 @@ def update_pdo_status(id,code):
 
     except Exception as error:
         if settings.DEBUG:
-            web_post_status.status = "Post App  :  update_pdo_status Error : " + str(error)
+            web_post_status.status = "kCloud Client :   update_pdo_status Error : " + str(error)
 # ------------------------------------------------------------------------------------------------------------
 def get_cdo():
     try:
@@ -104,13 +108,14 @@ def get_cdo():
         responseCode = response.status_code
         if (responseCode == 200):  # request received ok
             oJson = response.json()
+            web_post_status.status = "kCloud Client : get_cdo OK"
             return oJson
         else:
-            web_post_status.status = "Post App  :  post_pdo response Error : %s" % responseCode
+            web_post_status.status = "kCloud Client :   post_pdo response Error : %s" % responseCode
             return []
     except Exception as error:
         if settings.DEBUG:
-            web_post_status.status = "Post App  :  post_pdo Error : " + str(error)
+            web_post_status.status = "kCloud Client :  post_pdo Error : " + str(error)
             return []
 # ------------------------------------------------------------------------------------------------------------
 def put_cdo(sCommandID, iCode):
@@ -125,15 +130,22 @@ def put_cdo(sCommandID, iCode):
             oJson = response.json()
             return oJson
         else:
-            web_post_status.status = "Post App  :  post_pdo response Error : %s" % responseCode
+            web_post_status.status = "kCloud Client :   post_pdo response Error : %s" % responseCode
             return []
     except Exception as error:
         if settings.DEBUG:
-            web_post_status.status = "Post App  :  post_pdo Error : " + str(error)
+            web_post_status.status = "kCloud Client :   post_pdo Error : " + str(error)
             return []
 # ------------------------------------------------------------------------------------------------------------
 def call_set_trigger(iIndex,iValue):
      sqliteDB.set_triggers(iIndex,iValue)
+
+# ------------------------------------------------------------------------------------------------------------
+def update_status():
+      sString = web_post_status.status
+      bString = sString.encode("utf-8")
+      iLen = len(bString)
+      sm_client_status.buf[:iLen] = bString
 # --------------------------------------------Main sequence --------------------------------------------------
 def web_client_sequence():
     udtPostStep = PostStepType(PostStepType.init)
@@ -149,7 +161,7 @@ def web_client_sequence():
     aCommandReceived =[]
     iRemoteCommandAckCode=999
     iRemoteCommandID =0
-    while True:
+    while signal_handler.can_run():
         try:
             # ----------------------   Step 0  ---------------------
             if udtPostStep == PostStepType.init:
@@ -167,7 +179,7 @@ def web_client_sequence():
                     iRowsPosted = 0 
                     aDataRows =[]
                     if xDebug :
-                        web_post_status.status = "Post App  :  Reading Local pvo"
+                        web_post_status.status = "kCloud Client :   Reading Local pvo"
             
                 aDataRows = sqliteDB.read_outStanding_PVO()
                 iRowsToPost = len(aDataRows)     
@@ -197,7 +209,7 @@ def web_client_sequence():
                     iRowsPosted = 0 
                     aDataRows =[]
                     if xDebug :
-                        web_post_status.status = "Post App  :  Reading Local pdo"
+                        web_post_status.status = "kCloud Client :   Reading Local pdo"
             
                 aDataRows = sqliteDB.read_outStanding_PDO()
                 iRowsToPost = len(aDataRows)     
@@ -249,7 +261,8 @@ def web_client_sequence():
                 udtPostStep = PostStepType.wait
             # ------------ Idle and Wait ---------------------
             elif udtPostStep == PostStepType.wait:   
-                sleep(fWaitInterval) 
+                sleep(fWaitInterval)
+                update_status(); 
                 udtPostStep = udtPostStep.read_local_data_pvo
             # ----------------------   Step 999  ---------------------
             elif udtPostStep == PostStepType.error:
@@ -269,17 +282,18 @@ def web_client_sequence():
 
         except Exception as error:
             if settings.DEBUG:
-                web_post_status.status = "Post App  :  post_Sequence Error : " + str(error)
+                web_post_status.status = "kCloud Client :   post_Sequence Error : " + str(error)
             udtPostStep == PostStepType.error
+# end of while tidy up app
 
-    # end of while tidy up app
-
-print("Closing Web Client")
+print("Closing kCloud web client")
 
 
 # ------------------------------------------ POST Client     -------------------------------------------------
-def run_web_client():
+def run_web_client(smStatus):
     try:
+        global sm_client_status
+        sm_client_status = smStatus
         web_client_sequence()
     except Exception as error:
-        web_post_status.status = "Post App  :  post_Sequence Error : " + str(error)
+        web_post_status.status = "kCloud Client :   post_Sequence Error : " + str(error)
