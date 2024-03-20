@@ -34,7 +34,7 @@ class User_Manager(application: Application) : UserStore {
     private val listType: Type = object : TypeToken<ArrayList<UserModel>>() {}.type
     private var preferences: SharedPreferences
     private var application: Application? = null
-    var liveUser = MutableLiveData<UserModel>()
+    var liveUser = MutableLiveData<UserModel?>()
     var loggedOut = MutableLiveData<Boolean>()
     var errorStatus = MutableLiveData<Boolean>()
     /*------------------------------------------------------------------------------------------------*/
@@ -189,12 +189,7 @@ class User_Manager(application: Application) : UserStore {
                         val xSuccess = (jsonObject.getBoolean("success"))
                         if (xSuccess) {
                             //user logged in o
-                            var myUser =  UserModel()
-                            myUser.email = email.toString()
-                            myUser.id = jsonObject.getLong("id").toUInt()
-                            var token :   String = jsonObject.getString("token")
-                            loggedOut.postValue(false)
-                            liveUser.postValue(myUser!!)
+                            loggedOut.postValue(true)
                         }
                     }
                 }, object : Response.ErrorListener {
@@ -240,12 +235,12 @@ class User_Manager(application: Application) : UserStore {
     /*------------------------------------------------------------------------------------------------*/
     override fun logOut() {
         SavelogoutUser()
+        liveUser.postValue(null)
         loggedOut.postValue(true)
         errorStatus.postValue(false)
     }
 
     /*-------------                      Private Functions         -------------------------------*/
-
 
     fun SaveCurrentUser(user : UserModel){
         var editor = preferences.edit()

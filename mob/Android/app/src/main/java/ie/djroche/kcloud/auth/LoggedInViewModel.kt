@@ -10,7 +10,7 @@ class LoggedInViewModel(app: Application) : AndroidViewModel(app) {
     var mainApp: MainApp =  app as MainApp
 
 
-    var liveUser: MutableLiveData<UserModel> = mainApp.user_Manager.liveUser
+    var liveUser: MutableLiveData<UserModel?> = mainApp.user_Manager.liveUser
     var loggedOut: MutableLiveData<Boolean> = mainApp.user_Manager.loggedOut
 
     fun logOut() {

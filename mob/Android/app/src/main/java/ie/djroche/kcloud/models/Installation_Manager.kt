@@ -71,6 +71,7 @@ class Site_Manager(application: Application) : InstallationStore  {
                                 val jsonObject = jsonArray.getJSONObject(index)
                                 val myInstallation =InstallationModel()
                                 myInstallation.id = jsonObject.getLong("id").toString()
+                                myInstallation.qrcode =myInstallation.id //added so we can select qr = NFC tag = ID
                                 myInstallation.userid = jsonObject.getLong("UserID").toUInt()
                                 myInstallation.description = jsonObject.getString("Description")
                                 if (myInstallation.userid == userID) {

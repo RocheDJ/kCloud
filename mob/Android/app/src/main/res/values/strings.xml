@@ -103,4 +103,5 @@
     <string name="db_type">Database Type</string>
     <string name="api_endpoint">Api Endpoint</string>
     <string name="btn_save">Save</string>
+    <string name="please_scan_NFC_tag">Please scan NFC tag</string>
 </resources>

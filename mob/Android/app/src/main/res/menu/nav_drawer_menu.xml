@@ -17,10 +17,6 @@
             android:title="@string/nav_kpi" />
 
         <item
-            android:id="@+id/detailFragment"
-            android:icon="@drawable/ic_trending_foreground"
-            android:title="@string/nav_details" />
-        <item
             android:id="@+id/setupFragment"
             android:icon="@drawable/ic_button_gear"
             android:title="@string/nav_settings" />
@@ -34,10 +30,6 @@
     <!-- id is the key used in onNavigationItemSelected -->
     <item android:title="@string/nav_account">
         <menu>
-            <item
-                android:id="@+id/nav_account"
-                android:icon="@drawable/ic_launcher_foreground"
-                android:title="@string/nav_my_account" />
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_menu_logout"

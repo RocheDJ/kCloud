@@ -46,7 +46,7 @@ class SiteViewModel (app: Application) : AndroidViewModel(app) {
         }
     }
     //-----------------------------------------------------------------------------
-    fun findByQR(userid: UInt, id: String){
+    fun findByID(userid: UInt, id: String){
         try {
             mainApp.site_Manager.findByQR(userid,id,_site)
             if (_site.value != null){
@@ -72,8 +72,9 @@ class SiteViewModel (app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun addSite(user:MutableLiveData<UserModel>,
-                site: InstallationModel) {
+    fun addSite(
+        user: MutableLiveData<UserModel?>,
+        site: InstallationModel) {
         try {
 
             Timber.i("Site Add Called")

@@ -5,17 +5,16 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
         android:name="ie.djroche.kcloud.main.MainApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_industry40"
+        android:icon="@mipmap/ic_kcloud"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -28,37 +27,29 @@
             android:exported="true"
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.DataLogViewer">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.SplashScreenActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+           
         </activity>
+        <activity
+            android:name=".activities.NFCActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.QRScanActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.home.Home"
             android:exported="true">
             <meta-data
                 android:name="android.app.lib_name"
+                android:icon="@drawable/industry40"
                 android:value="" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

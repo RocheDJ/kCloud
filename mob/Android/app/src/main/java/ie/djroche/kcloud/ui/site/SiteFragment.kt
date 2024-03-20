@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ie.djroche.kcloud.R
+import ie.djroche.kcloud.activities.NFCActivity
 import ie.djroche.kcloud.activities.QRScanActivity
 import ie.djroche.kcloud.adaptors.SiteAdaptor
 import ie.djroche.kcloud.adaptors.SiteClickListener
@@ -62,6 +63,17 @@ class SiteFragment : Fragment(), SiteClickListener {
                     processQRScan(scannedQR)
                 }
                 Timber.i("QR Observer registerForActivityResult = $scannedQR")
+            }
+        }
+    // -------------------------------- Register Activity for NFC Scan -----------------------------
+    private val intentLauncherNFC =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val scannedID = result.data?.getStringExtra("scannedID")
+                if (scannedID != null) {
+                    processNFCScan(scannedID)
+                }
+                Timber.i("QR Observer registerForActivityResult = $scannedID")
             }
         }
 
@@ -122,7 +134,8 @@ class SiteFragment : Fragment(), SiteClickListener {
         // listen for the fragment button press
         fragBinding.fabScan.setOnClickListener {
             Timber.i("QR Scan Pressed from site")
-            showScanQR()
+           // showScanQR()
+            showScanNFC()
         }
         // listen for the fragment button press
         fragBinding.fabAddSite.setOnClickListener {
@@ -246,7 +259,7 @@ class SiteFragment : Fragment(), SiteClickListener {
         Timber.i("Site clicked " + site.description)
         allowQrSelect = true
         // note for this to work need androidx.navigation.safeargs in both gradle files
-        siteViewModel.findByQR(loggedInViewModel.liveUser.value!!.id,
+        siteViewModel.findByID(loggedInViewModel.liveUser.value!!.id,
             site.qrcode)
 
     }
@@ -275,9 +288,20 @@ class SiteFragment : Fragment(), SiteClickListener {
         intentLauncher.launch(Intent(this.context, QRScanActivity::class.java))
     }
 
+    private fun showScanNFC() {
+        Timber.i("DataLogViewer Scan NFC selected")
+        intentLauncherNFC.launch(Intent(this.context, NFCActivity::class.java))
+    }
+
     /*-------------------------------------------------------------------------------------------*/
     private fun processQRScan(qrCode: String) {
-        siteViewModel.findByQR(loggedInViewModel.liveUser.value!!.id, qrCode)
+        siteViewModel.findByID(loggedInViewModel.liveUser.value!!.id, qrCode)
+        allowQrSelect = true
+    }
+    /*-------------------------------------------------------------------------------------------*/
+    private fun processNFCScan(qrCode: String) {
+        siteViewModel.findByID(loggedInViewModel.liveUser.value!!.id, qrCode)
+
         allowQrSelect = true
     }
 

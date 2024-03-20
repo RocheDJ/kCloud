@@ -11,7 +11,7 @@ class LoginRegisterViewModel (app: Application) : AndroidViewModel(app) {
     var mainApp: MainApp =  app as MainApp
 
 
-    var liveUser: MutableLiveData<UserModel> = mainApp.user_Manager.liveUser
+    var liveUser: MutableLiveData<UserModel?> = mainApp.user_Manager.liveUser
     var userManager:User_Manager =mainApp.user_Manager
 
     fun login(email: String?, password: String?) {

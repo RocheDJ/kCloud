@@ -13,7 +13,7 @@
     <fragment
         android:id="@+id/siteFragment"
         android:name="ie.djroche.kcloud.ui.site.SiteFragment"
-        android:label="Sites"
+        android:label="Installations"
         tools:layout="@layout/fragment_site">
         <action
             android:id="@+id/action_siteFragment_to_KPIFragment"
