@@ -23,8 +23,10 @@ web_post_status = status_class("")
 from time import sleep
 xEnableProcess = False
 sqliteDB = dbClass()
+
+
 # ------------------------------------------------------------------------------------------------------------
-signal_handler = SignalHandler("kCloud Client")
+signal_handler = SignalHandler("kCloud_Client")
 # -------------------------------------------- Methods -------------------------------------------------------
 def post_pvo(data_in):
     try:
@@ -42,7 +44,7 @@ def post_pvo(data_in):
                     'error': data_in['error']
                     }
         jsonData = json.dumps(dataJSON, indent=2,ensure_ascii=False)
-        response = requests.post(url=sApiUrl, data=jsonData,headers=headers)
+        response = requests.post(url=sApiUrl, data=jsonData,headers=headers,timeout=10)
         responseCode = response.status_code
         if (responseCode == 200):  # all good
             web_post_status.status = "kCloud Client :  POST PVO OK"
@@ -77,7 +79,7 @@ def post_pdo(data_in):
                     'jData': jData
                     }
         jsonData = json.dumps(dataJSON, indent=2,ensure_ascii=False)
-        response = requests.post(url=sApiUrl, data=jsonData,headers=headers)
+        response = requests.post(url=sApiUrl, data=jsonData,headers=headers,timeout=10)
         responseCode = response.status_code
         if (responseCode == 200):  # all good
             web_post_status.status = "kCloud Client :  POST PDO OK"
@@ -104,7 +106,7 @@ def get_cdo():
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         sApiUrl =settings.API_POST_ENDPOINT + "CDO/"+ settings.INSTALLATION_ID
         
-        response = requests.get(url=sApiUrl)
+        response = requests.get(url=sApiUrl,timeout=10)
         responseCode = response.status_code
         if (responseCode == 200):  # request received ok
             oJson = response.json()
@@ -124,7 +126,7 @@ def put_cdo(sCommandID, iCode):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         sApiUrl =settings.API_POST_ENDPOINT + "CDO/"+ str(sCommandID) + "/" + str(iCode)
         
-        response = requests.put(url=sApiUrl)
+        response = requests.put(url=sApiUrl,timeout=10)
         responseCode = response.status_code
         if (responseCode == 200):  # request received ok
             oJson = response.json()
@@ -143,9 +145,7 @@ def call_set_trigger(iIndex,iValue):
 # ------------------------------------------------------------------------------------------------------------
 def update_status():
       sString = web_post_status.status
-      bString = sString.encode("utf-8")
-      iLen = len(bString)
-      sm_client_status.buf[:iLen] = bString
+
 # --------------------------------------------Main sequence --------------------------------------------------
 def web_client_sequence():
     udtPostStep = PostStepType(PostStepType.init)
@@ -283,17 +283,18 @@ def web_client_sequence():
         except Exception as error:
             if settings.DEBUG:
                 web_post_status.status = "kCloud Client :   post_Sequence Error : " + str(error)
+           
             udtPostStep == PostStepType.error
 # end of while tidy up app
 
-print("Closing kCloud web client")
 
+# logging.info("ALI client sequence Exited")
 
 # ------------------------------------------ POST Client     -------------------------------------------------
-def run_web_client(smStatus):
+def run_web_client():
     try:
-        global sm_client_status
-        sm_client_status = smStatus
+        print("API client sequence Start")
         web_client_sequence()
+        print("API client sequence Stop")
     except Exception as error:
         web_post_status.status = "kCloud Client :   post_Sequence Error : " + str(error)

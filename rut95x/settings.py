@@ -27,3 +27,5 @@ PVO_LOG_INTERVAL_RUN = config("PVO_LOG_INTERVAL", default=10.0, cast=float)
 PVO_LOG_INTERVAL_IDLE = config("PVO_LOG_INTERVAL_IDLE", default=60.0, cast=float)
 
 API_POST_ENDPOINT = config("API_POST_EndPoint")
+
+DATA_RETAINED_DAYS = config('DATA_RETAINED_DAYS', default=10, cast=int)

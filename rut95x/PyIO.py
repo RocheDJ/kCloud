@@ -8,6 +8,7 @@
 # ------------------------------------------  Import Decelerations -------------------------------------------------
 # Python Libs
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from os import kill
 from time import sleep
 from multiprocessing import Process, shared_memory
@@ -15,6 +16,7 @@ from multiprocessing import Process, shared_memory
 
 # User Defined Libs
 import settings
+import logging
 from inc.udt.types import MainStepType, reportType
 from inc import IOLink
 from inc.udt.classes import (
@@ -40,9 +42,29 @@ process_inputs = aio_eight_class()
 process_times = dt_three_class()  # start,hold start,stop time for process
 hold_temperature = 72
 hold_seconds = 600
-shared_mem_status_post_client = shared_memory.SharedMemory(
-    create=True, size=150
-)  # get status from kcloud API client
+
+#------- For logging
+# ref https://stackoverflow.com/questions/24505145/how-to-limit-log-file-size-in-python
+ # limit file size to 2mB
+rfh = RotatingFileHandler(
+    filename=str(settings.BASE_DIR) + "/logs/main_task.log", 
+    mode='a',
+    maxBytes=2*1024*1024,
+    backupCount=2,
+    encoding='utf-8',
+    delay=0
+)
+
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(message)s',
+                    handlers=[
+                          rfh
+                    ])
+
+
+logger = logging.getLogger(__name__)
+
 
 # create a shared memory
 shared_mem_status_web_server_main = shared_memory.SharedMemory(
@@ -50,9 +72,7 @@ shared_mem_status_web_server_main = shared_memory.SharedMemory(
 )  # for status of main task to web server
 
 
-
 # ------------------------------------------ Methods                -------------------------------------------------
-
 
 # --start the web interface to run as a separate process
 def startWEBServer(iPort, sStatusBuffer):
@@ -60,8 +80,8 @@ def startWEBServer(iPort, sStatusBuffer):
 
 
 # --start the web interface to run as a separate process
-def startPostClient(iPort,sStatusBuffer):
-    run_web_client(sStatusBuffer)
+def startPostClient():
+    run_web_client()
 
 
 # --
@@ -77,11 +97,12 @@ def log_status():
     iLen = len(bString)
     shared_mem_status_web_server_main.buf[:iLen] = bString
 
-    #kcloud status
-
-    bCloudClientStatus = bytes(shared_mem_status_post_client.buf[:150])
-    kCloudClientStatus = bCloudClientStatus.decode('utf-8')
-   
+# ----------------------------Delete Old Values-----------------------------------------      
+def removeOldReadings(ageInDays):
+    try:
+        sqliteDB.ClearOldData(ageInDays) # 
+    except Exception as error:
+        logging.error("Remove Old Readings Error : " + str(error))
 
 
 # --- Read IO link Data from Network -------------
@@ -99,9 +120,7 @@ def Read_Inputs_Physical(aInputs, aPvoList, xFirstRead):
                 aPvoList[x] = dataJSON
                 aInputs.value[x - 1] = dataJSON["data"][0]["value"]
     except Exception as error:
-        if settings.DEBUG:
-            main_status.status = "Main App  :  UpdateReading Error : " + str(error)
-
+        logging.error("Read_Inputs_Physical Error : " + str(error))
 
 # --- Read IO link Data from Network -------------
 def Read_Inputs_Software(oTriggers):
@@ -111,6 +130,7 @@ def Read_Inputs_Software(oTriggers):
             oTriggers.value[x] = triggers[x]
 
     except Exception as error:
+        logging.error("Read_Inputs_Software Error : " + str(error))
         if settings.DEBUG:
             main_status.status = "Main App  :  Read_Inputs_Software Error : " + str(
                 error
@@ -128,6 +148,7 @@ def Write_Outputs_Physical(aOutputs):
                 IOLink.IoLink_Write_DQ(settings.IOLINK_NODE_1, iPort, aOutputs.value[x])
                 old_process_outputs.value[x] = aOutputs.value[x]
     except Exception as error:
+        logging.error("Write_Outputs_Physical Error : " + str(error))
         if settings.DEBUG:
             main_status.status = "Main App  :  Write_Outputs_Physical Error : " + str(
                 error
@@ -172,6 +193,7 @@ def make_report(report_type, stepCode):  # start,hold start,stop time for proces
             return sJSONData
 
     except Exception as error:
+        logging.error("Make_report Error : " + str(error))
         if settings.DEBUG:
             main_status.status = "Main App  :  make_report Error : " + str(error)
 
@@ -192,15 +214,16 @@ def main_sequence():
     fErrorInterval = 5.00
     # start Post client as separate process
     pPostClient = Process(
-        target=startPostClient, args=(8080,shared_mem_status_post_client)
+        target=startPostClient
     )
 
     # variables to calculate cycle time
     dtCycleStart = datetime.now()
     dtCycleStop = datetime.now()
     dtLastLog = datetime.now()
+    dtLastDeleteCheck = datetime.now()
     # handles systemd calls in linux to allow for controlled shutdown
-    signal_handler = SignalHandler("Main App")
+    signal_handler = SignalHandler(__name__)
     # control Sequence Variables
     max_heating_time = 300
     control_step = step_class()  #
@@ -208,8 +231,8 @@ def main_sequence():
     trigger_inputs = io_eight_class()
     process_outputs = io_eight_class()
     aPVO = [{} for x in range(settings.IOLINK_PVO_MAX)]  # List to hold JSONS ?
-
     xFirstRead = True
+    xCheckDBStart = True
     # -----------------------------------------
     while signal_handler.can_run():
         # ----------------------   Step 0  ---------------------
@@ -217,22 +240,26 @@ def main_sequence():
             sqliteDB.create_PVO_Live(iMaxPVO)  # create the local tables
             if xDebugOn:
                 main_status.status = "Main App  :  Init: "
+                logging.info('Init')
             udtMainStep = MainStepType.load_config
         # ----------------------   Step 1  ---------------------
         elif udtMainStep == MainStepType.load_config:
             if xDebugOn:
                 main_status.status = "Main App  :  Load Config: "
+                logging.info('Load Config: ')
             udtMainStep = MainStepType.start_web_client
         # ----------------------   Step 2  ---------------------
         elif udtMainStep == MainStepType.start_web_client:
             if xDebugOn:
                 main_status.status = "Main App  :  Start Web Client: "
+                logging.info('Start Web Client: ')
             pPostClient.start()
             udtMainStep = MainStepType.start_web_server
         # ----------------------   Step 3  ---------------------
         elif udtMainStep == MainStepType.start_web_server:
             if xDebugOn:
                 main_status.status = "Main App  :  Start Web Server: "
+                logging.info('Start Web Server: ')
             pWebServer.start()
             udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 4  ---------------------
@@ -315,19 +342,31 @@ def main_sequence():
             dtCycleTime = fSeconds
             main_status.cycle_time = dtCycleTime
 
-         
-
             log_status()  # log status to updates
 
-            udtMainStep = MainStepType.read_inputs
+            udtMainStep = MainStepType.check_old_data
+        # ----------------------   Step 10  ---------------------
+        # delete old db data on power up or every 24 hours
+        elif udtMainStep == MainStepType.check_old_data:
+            if xNewStep:
+                delta_time = datetime.now() - dtLastDeleteCheck
+                fSeconds = float(delta_time.total_seconds())
 
+            # Do we have any time left oer to sleep
+            if ((fSeconds > 86400.0) or (xCheckDBStart)): # 86400 = number of seconds in 24 hours
+               removeOldReadings(settings.DATA_RETAINED_DAYS)
+               xCheckDBStart = False
+
+            udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 999  -------------------
         elif udtMainStep == MainStepType.error:
             if xDebugOn:
                 main_status.status = "Main App  :  ERROR : "
+                logging.error("Main App  :  ERROR :  Wait restart")
 
             log_status()
-            sleep(fErrorInterval)  # wait 100 ms
+            sleep(fErrorInterval)  # wait 
+            logging.info("Main App  :  ERROR : Re-start")
             udtMainStep = MainStepType.init
 
         # ----------------------   Catch All  -----------------
@@ -345,18 +384,20 @@ def main_sequence():
 
     # end of while tidy up app
     print("Closing kCloud Web client")
-    pPostClient.terminate()  # stop the web server process
-    pPostClient.join()  # Wait for it to stop
-    shared_mem_status_post_client.close()
+    logging.info("Closing kCloud Web client")
+    pPostClient.kill()  # stop the web server process
 
     print("Closing Local Web Server")
-    pWebServer.terminate()  # stop the kCloud client process
-    pPostClient.join()
+    logging.info("Closing kCloud Web Server")
+    pWebServer.kill()  # stop the kCloud client process
     shared_mem_status_web_server_main.close()
+    shared_mem_status_web_server_main.unlink()
 
     print("Application Halted OK ")
 
-
+    logging.info("Application Halted OK ")
 # ------------------------  Call main Sequence    -----------------------------------------------
 if __name__ == "__main__":
+    print("Main sequence Start")
     main_sequence()
+    print("Main sequence Stop")

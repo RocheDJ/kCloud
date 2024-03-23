@@ -1,6 +1,6 @@
 # PyIo - FOG NODE Application
 
-![version](https://img.shields.io/badge/version-0.0.24019-blue.svg) ![license](https://img.shields.io/badge/license-MIT-blue.svg)
+![version](https://img.shields.io/badge/version-1.0.24083-blue.svg) ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ---
 
@@ -33,7 +33,7 @@ It also uses [Flask](https://flask.palletsprojects.com/en/3.0.x/#) to host a loc
 ![Data List page][image2]
 
 
-### Process Trend screen shot.
+### Process Trend screen shot
 
 > Allows the user to view trend data for a particular variable.
 

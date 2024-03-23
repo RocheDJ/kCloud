@@ -28,6 +28,7 @@ class MainStepType(Enum):
     control_logic=8
     write_outputs=9
     wait=10
+    check_old_data=11
     error=999
     
 

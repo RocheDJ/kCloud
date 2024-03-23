@@ -128,7 +128,11 @@ def runWebServer(ServerPort, smStatus): # smStatus is shared memory
         global sm_main_status
         sm_main_status = smStatus
         web_server_status.status = "Web Server  :  Running on port : " + str(ServerPort)
+        print("Web Server Start")
         app.run(host="0.0.0.0", port=ServerPort)
+        smStatus.close()
+        smStatus.unlink()
+        print("Web Server Stop")
     except Exception as error:
         web_server_status.status = "Web Server  :  runWebServer Error : " + str(error)
 # ------------------------------------------ Web Server              -------------------------------------------------
