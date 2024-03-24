@@ -53,12 +53,6 @@
 			]
 		};
 	}
-	//------------------------------------------------------------
-	const onDataSelect = (event) => {
-		console.log('Data select event fired!', event);
-		selected = event;
-	};
-
 	//-------------------------------------------------------
 	function populateByTitle(PVOS: any[]) {
 		ClearPVOChartData();
@@ -103,6 +97,8 @@
 	tooltipOptions={tooltipOptions}
 	bind:this={chartRef}
 />
+
+
 
 <button style="font-size:24px" title="Export Chart to SVG image file."
 	>Export <i class="fas fa-image" on:click={onExport}></i></button

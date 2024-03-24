@@ -1,97 +1,90 @@
 <script>
-	
-	import { Accordion, AccordionItem } from 'svelte-collapsible';
-
-	const items = [
-		{
-			key: 'a',
-			img: 'https://picsum.photos/100?random=1',
-			title: 'untoward',
-			subtitle: 'unexpected and inappropriate or inconvenient',
-			text: "Suppose you're moving toward a goal. You are, as they say, \"on the right path.\" But when you add the prefix un- you reverse that, and you're no longer on the path to that goal — you're untoward."
-		},
-		{
-			key: 'b',
-			img: 'https://picsum.photos/100?random=2',
-			title: 'trill',
-			subtitle:
-				'a quavering or vibratory sound, especially a rapid alternation of sung or played notes.',
-			text: 'Many languages include a trill in their pronunciation, the sound of a consonant spoken while the tongue vibrates in a very specific way against the teeth or roof of the mouth. To pronounce this sound is also to trill. The word originally referred to a vibrating or warbling sound made by a singer, from the Italian word trillio, "a quavering or warbling," and its also often used to describe the sound a bird makes.'
-		},
-		{
-			key: 'c',
-			img: 'https://picsum.photos/100?random=3',
-			title: 'chinwag',
-			subtitle: 'a long and pleasant conversation between friends',
-			text: 'The journalist, who seems oddly unalarmed by the frequent reports of murders, loves a good chin-wag and keeps trying to chum up to Tshembe, who wants none of him.'
+	import { user } from '../../stores.js';
+	import SignupLogin from '$lib/SignupLogin.svelte';
+	import Logout from '$lib/Logout.svelte';
+	export let title = 'kCloud Portal';
+	export let subTitle = 'by David Roche for Kilderry V1.0.24083';
+	// Append the following
+	// Navigation component
+	let active = false;
+	let sActive = '';
+	function myFunction(element) {
+		active = !active;
+		if (active) {
+			sActive = 'is-active';
+		} else {
+			sActive = '';
 		}
-	];
+	}
 </script>
 
-<Accordion>
-	{#each items as item}
-		<AccordionItem key={item.key}>
-			<div slot="header" class="header">
-				{item.title}      
+<div class="box is-fluid">
+	<nav class="navbar" role="navigation" aria-label="main navigation">
+		<!-- Logo  -->
+		<div class="navbar-brand">
+			<a class="navbar-item" href="http://www.kilderry.ie">
+				<img src="/LoGo0016.png" width="112" height="32" alt="logo" />
+			</a>
+		</div>
+		<!-- nav menu  -->
+		<div class="navbar-end">
+			<!-- svelte-ignore a11y-interactive-supports-focus -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-missing-attribute -->
+			<a
+				role="button"
+				class="navbar-burger {sActive}"
+				on:click={myFunction}
+				data-target="navMenu"
+				aria-label="menu"
+				aria-expanded="false"
+			>
+				<span aria-hidden="true"></span>
+				<span aria-hidden="true"></span>
+				<span aria-hidden="true"></span>
+			</a>
+		</div>
+
+		<div id="navbar" class="navbar-menu {sActive}">
+			<!-- nav menu  -->
+			<div class="navbar-start ">
+				{#if $user.email}
+					<a class="navbar-item" href="/home"> Home </a>
+					<a class="navbar-item" href="/dashboard"> Overview </a>
+					<div class="navbar-item has-dropdown is-hoverable">
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<a class="navbar-link"> More </a>
+						<div class="navbar-dropdown">
+							<a class="navbar-item" href="/about"> About </a>
+							<a class="navbar-item" href="/contact"> Contact </a>
+							<hr class="navbar-divider" />
+							<a class="navbar-item" href="/scratch"> Report an issue </a>
+						</div>
+					</div>
+				{:else}
+					<div class="column">
+						<div class="title is-1"> {title}</div>
+						<div class="subtitle is-5">{subTitle}</div>
+					</div>
+				{/if}
 			</div>
-			<p slot="body" class="body">
-				<span class="panel-icon">
-					<i class="fas fa-chart-bar" aria-hidden="true"></i>
-				</span>
-				<label class="panel-block">
-					<span class="panel-icon">
-						<i class="fas fa-chart-bar" aria-hidden="true"></i>
-					</span>
-					<input type="checkbox" />
-					CheckBox 1 {item.key}
-				</label>
-				<label class="panel-block">
-					<span class="panel-icon">
-						<i class="fas fa-chart-bar" aria-hidden="true"></i>
-					</span>
-					<input type="checkbox" />
-					CheckBox 2{item.key}
-				</label>
-			</p>
-		</AccordionItem>
-	{/each}
-</Accordion>
 
-<style>
-	:global(.accordion) {
-		width: 100%;
-		max-width: 450px;
-		margin: 0 auto;
-	}
+			<!-- title menu  -->
+			<div class="navbar-middle">
+				{#if $user.email}
+					<div>
+						<div class="title is-5">{title}</div>
+						<div class="subtitle is-7">{subTitle}</div>
+					</div>
 
-	:global(.accordion-item) {
-		border-bottom: 1px solid rgb(100, 120, 140);
-	}
-
-	.header {
-		display: flex;
-		align-items: center;
-		padding: 0.5em;
-	}
-
-	.header > img {
-		margin-right: 1em;
-		border-radius: 5px;
-	}
-
-	.header h2 {
-		margin: 0;
-		padding: 0;
-	}
-
-	.header p {
-		font-size: 18px;
-		margin: 0;
-	}
-
-	.body {
-		padding: 0.5em;
-		margin: 0;
-		font-size: 18px;
-	}
-</style>
+					<p class="subtitle is-7">{$user.email}</p>
+				{/if}
+			</div>
+			{#if $user.email}
+				<Logout />
+			{:else}
+				<SignupLogin />
+			{/if}
+		</div>
+	</nav>
+</div>

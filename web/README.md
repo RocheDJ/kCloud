@@ -45,5 +45,7 @@ This application also utilizes Frappe charts to visualize trend data.
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
+[Frappe Charts API](https://frappe.io/charts/docs/reference/api)
 
+[Makes it easy to use frappe-charts in your Svelte project](https://www.npmjs.com/package/svelte-frappe-charts?activeTab=readme)
 [image1]: ./images/FogHome.png
