@@ -14,7 +14,7 @@
         } else {
             email = "";
             password = "";
-            errorMessage = "Invalid Credentials";
+            errorMessage = "Invalid Credentials or other error !";
         }
     }
 </script>

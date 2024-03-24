@@ -1,10 +1,6 @@
 <script>
-	import TopMenu from '$lib/TopMenu.svelte';
     import LoginForm from '$lib/LoginForm.svelte';
 </script>
-
-<TopMenu title ={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'}/>
-
 
 <div class="box" >
    <div class="columns">

@@ -1,38 +1,49 @@
-# create-svelte
+# SETU HDip Computer Science  Final Project
+
+
+![logo](https://placement-project-23-24.netlify.app/topic-02-project/unit-2-project-showcases/talk-09-project-older/project-samples-pre2020.png)
+
+---
+
+## kCloud Web Server readme file
+
+---
+
+## Originator
+
+- David Roche
+
+---
+
+## A Svelte based Front end application for kCloud Project
+
+## Description
+
+The front end application is built using the Svelte frame work with Type Script support.
+It uses Bulma Open source CSS framework to present a clean clutter free modern interface to the end user.
+This application also utilizes Frappe charts to visualize trend data.
+
+[Development Server](http://34.240.177.253:5173/)
+
+---
+
+## Screen shots
+
+### Test Rig
+
+> A simple test rig was constructed for the project.
+
+![Test Rig][image1]
+
+---
+
+## References
+
+---
+
+[Bulma Framework](https://bulma.io/)
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
-## Creating a project
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+[image1]: ./images/FogHome.png

@@ -1,6 +1,5 @@
 <script>
-	import TopMenu from '$lib/TopMenu.svelte';
-
+	
 	import { Accordion, AccordionItem } from 'svelte-collapsible';
 
 	const items = [
@@ -29,9 +28,6 @@
 	];
 </script>
 
-<section>
-	<TopMenu />
-</section>
 <Accordion>
 	{#each items as item}
 		<AccordionItem key={item.key}>

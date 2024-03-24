@@ -2,9 +2,7 @@
 	\\src\routes\dashboard\powermeter\
 -->
 <script lang="ts">
-	import TopMenu from '$lib/TopMenu.svelte';
-	import SideMenu from '$lib/SideMenu.svelte';
-	import { SelectedInstallation, Titles_ } from '../../../stores';
+	import { SelectedInstallation} from '../../../stores';
 	import { onDestroy, onMount } from 'svelte';
 	import Tab1 from './inc/Tab1.svelte';
 	import Tab2 from './inc/Tab2.svelte';
@@ -43,7 +41,6 @@
 	onMount(async () => {
 		await LoadPage();
 	});
-
 	//--------------------------------------------------------------------------------------------
 
 	onDestroy(() => {
@@ -51,20 +48,10 @@
 	});
 </script>
 
-<TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />
-
-<div class="box">
-	<div class="columns">
-		<!-- Left Hand side System Navigation -->
-		<div class="column is-one-quarter">
-			<SideMenu PanelData={kCloudInstallations} />
-		</div>
-		<!-- Right Hand system Display-->
-		<div class="column is-three-quarters">
-			<div class="box">
-				<h1 class="title">{mySelectedInstallation.description}</h1>
-			</div>
-			<Tabs {items} />
-		</div>
+<!-- Right Hand system Display-->
+<div class="column is-three-quarters">
+	<div class="box">
+		<h1 class="title">{mySelectedInstallation.description}</h1>
 	</div>
+	<Tabs {items} />
 </div>

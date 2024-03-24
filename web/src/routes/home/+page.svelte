@@ -1,5 +1,4 @@
 <script lang="ts">
-	import TopMenu from '$lib/TopMenu.svelte';
 	import StatusTable from '$lib/StatusTable.svelte';
 	import SideMenu from '$lib/SideMenu.svelte';
 	import { kCloudUserService } from '../../services/kcloud-user-service';
@@ -25,9 +24,6 @@
 		await LoadUserData();
 	});
 </script>
-
-<TopMenu title={' Kilderry Instruments Ltd'} subTitle={' kCloud Portal V 0.0.1'} />
-
 
 <div class="box">
 	<div class="columns">

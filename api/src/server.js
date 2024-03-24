@@ -21,7 +21,7 @@ process.on("unhandledRejection", (error) =>
 ); //
 
 // CORS options
-var allowedOrigins = ["http://localhost:5173/", "http://yourapp.com"];
+var allowedOrigins = ["http://localhost:5173/"];
 
 var corsOptions = {
   origin: function (origin, callback) {
@@ -41,11 +41,9 @@ var corsOptions = {
 };
 
 var corsOptions_test = {
-  origin: '*',
+  origin: "*",
   credentials: true, //access-control-allow-credentials:true
 };
-
-
 
 // -----------------------Function to Initialize the Server -----------------------------
 async function init() {
@@ -57,7 +55,6 @@ async function init() {
 
   api_Server.use(cors(corsOptions_test));
 
-
   // Serve Swagger documentation
   api_Server.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
@@ -68,8 +65,6 @@ async function init() {
   api_Server.use("/cdo", cdo_api);
   api_Server.use("/installation", installation_api);
 
-
- 
   // start the server
   api_Server.listen(3000, () => {
     console.log("Server is running on port 3000");

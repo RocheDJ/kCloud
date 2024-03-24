@@ -47,13 +47,13 @@ There are four modules in the project, there is a readme with more details for e
 
     A Svelte TS web server to provide a user front end for observing telemetry data and process interaction.
 
-- [Web Server Readme](/web/readme.md)
+- [Web Server Readme](/web/README.md)
 
 ### Android App
 
     An Kotlin Based android app to allow a user to view telemetry data via the API back end in a clear and simple manner.
 
-- [Android App Readme](/mob/Adroid/readme.md)
+- [Android App Readme](/mob/Android/README.md)
 
 ## Git Approach
 

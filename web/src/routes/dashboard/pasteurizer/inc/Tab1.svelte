@@ -81,7 +81,7 @@
 <!-- Simple CSS fro Scrolling through Variables-->
 <style>
 	#Variables {
-		height: 60%;
+		height: 80%;
 		display: flex;
 		overflow-y: auto;
 		flex-direction: column;

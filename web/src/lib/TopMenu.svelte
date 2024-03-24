@@ -21,12 +21,12 @@
 				{#if $user.email}
 					<a class="navbar-item" href="/home"> Home </a>
 					<a class="navbar-item" href="/dashboard"> Overview </a>
-					<a class="navbar-item" href="/trend"> Trend </a>
 					<div class="navbar-item has-dropdown is-hoverable">
-						<a class="navbar-link" href="/scratch"> More </a>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<a class="navbar-link"> More </a>
 						<div class="navbar-dropdown">
-							<a class="navbar-item" href="/scratch"> About </a>
-							<a class="navbar-item" href="/scratch"> Contact </a>
+							<a class="navbar-item" href="/about"> About </a>
+							<a class="navbar-item" href="/contact"> Contact </a>
 							<hr class="navbar-divider" />
 							<a class="navbar-item" href="/scratch"> Report an issue </a>
 						</div>
