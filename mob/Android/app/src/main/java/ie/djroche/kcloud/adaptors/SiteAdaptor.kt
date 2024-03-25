@@ -78,6 +78,7 @@ class SiteAdaptor constructor(
             binding.root.setOnClickListener {
                 listener.onSiteClick(site)
             }
+
         }
     }
 

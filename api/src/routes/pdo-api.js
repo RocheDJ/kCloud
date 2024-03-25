@@ -8,7 +8,7 @@
  */
 const express = require("express");
 const app = express();
-const {writePDOData} = require('../models/db')
+const {writePDOData,readPDO} = require('../models/db')
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -18,9 +18,9 @@ const {writePDOData} = require('../models/db')
  *      type: object
  *      properties:
  *          InstallationID:
- *                type: string
+ *                type: integer
  *                description: The source id.
- *                example: Swagger1001
+ *                example: 1001
  *          EventDate:
  *                 type: string
  *                 description: UTC Date Time Stamp of Event.
@@ -108,5 +108,61 @@ app.post("/", async function (req, res){
         res.status(500).send(error);
     }
   });
+
+//----------------------------------------------- PDO read All PDO for ID -----------------------------
+/**
+ * @swagger
+ * /pdo/{id}:
+ *   get:
+ *     tags:
+ *      - P.D.O.
+ *     summary: Read Latest PDOs for a given ID.
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        example: 1234
+ *        required: true
+ *        description: Numeric ID of the installation to retrieve.
+ *        schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A list of PDO Data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/components/schemas/PDO'
+ */
+ app.get("/:id", async function (req, res){
+  const webReq = req;
+  const InstallationId = webReq.params.id;
+  try {
+    console.log("GET /:id Called:");
+    await readPDO(InstallationId).then(
+      (response) => {
+        if (response.err) {
+          response.data=[];
+          res.status(200).send(response);
+        } else {
+          response.data=response;
+          res.status(200).send(response);
+        }
+      },
+      (response) => {
+        console.log(" app.get Failure:" + response);
+        res.send(response);
+      }
+    );
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
 
 module.exports = app;

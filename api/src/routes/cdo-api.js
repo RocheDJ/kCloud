@@ -18,9 +18,9 @@ const { writeCDO, readCDO, updateCDO } = require("../models/db");
  *      type: object
  *      properties:
  *          InstallationID:
- *                type: string
+ *                type: integer
  *                description: Destination Installation ID.
- *                example: 1001a
+ *                example: 1001
  *          requestDate:
  *                type: string
  *                description: UTC Date Time Stamp of Event.

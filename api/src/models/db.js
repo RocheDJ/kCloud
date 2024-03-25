@@ -181,6 +181,43 @@ async function writePDOData(InstillationID, EventDate, Type, Version, Data) {
     });
   });
 }
+
+//--------------------------------------------------------------------------------------------
+async function readPDO(sInstallationID, iStatus) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection(ConnectionData);
+    }
+    var myQuery =
+      "SELECT * FROM pdo WHERE InstallationID=" +
+      sInstallationID +
+      " order by EventDate desc;";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.length > 0) {
+        retVal = result;
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "InstallationID ID Not found",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
+
+
 //--------------------------------------------------------------------------------------------
 
 async function addUser(userData) {
@@ -777,10 +814,12 @@ async function readPVO_Specific(
   });
 }
 
+
 //--------------------------------------------------------------------------------------------
 module.exports = {
   writePVOData,
   writePDOData,
+  readPDO,
   addUser,
   getUserByEmail,
   writeCDO,

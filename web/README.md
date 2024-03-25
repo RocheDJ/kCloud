@@ -29,11 +29,25 @@ This application also utilizes Frappe charts to visualize trend data.
 
 ## Screen shots
 
-### Test Rig
+> Landing Page once logged in gives an overview of systems online status.
 
-> A simple test rig was constructed for the project.
+![Home][image1]
 
-![Test Rig][image1]
+> Overview page showing the PVO data and control panel.
+
+![Over view][image2]
+
+> Pasto Trend page showing the individual data set plot of 1st selected value from check box
+
+![Trend 1][image3]
+
+> Power Meter Trend  page showing the combined data set plots of selected value from check box
+
+![Trend 2][image4]
+
+> Report Data (PDO) information is shown for the selected installation. This can be exported to csv for further use.
+![Reports ][image5]
+
 
 ---
 
@@ -48,4 +62,20 @@ Everything you need to build a Svelte project, powered by [`create-svelte`](http
 [Frappe Charts API](https://frappe.io/charts/docs/reference/api)
 
 [Makes it easy to use frappe-charts in your Svelte project](https://www.npmjs.com/package/svelte-frappe-charts?activeTab=readme)
-[image1]: ./images/FogHome.png
+
+[Export CSV from JSON in Svelte](https://dev.to/karkranikhil/csv-generation-from-json-in-svelte-5cgf)
+
+[NPM Export to CSV]( https://www.npmjs.com/package/export-to-csv)
+
+Good Learning resource for Type Script [Tutorials Point](https://www.tutorialspoint.com/typescript/index.htm)
+
+
+[image1]: ./images/home.jpg
+
+[image2]: ./images/overview.jpg
+
+[image3]: ./images/trend.png
+
+[image4]: ./images/trend_p.jpg
+
+[image5]: ./images/PDOData.jpg

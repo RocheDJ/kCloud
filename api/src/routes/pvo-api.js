@@ -18,9 +18,9 @@ const {writePVOData,readPVO,readPVO_Titles,readPVO_Single,readPVO_Specific} = re
  *      type: object
  *      properties:
  *          InstallationID:
- *                type: string
+ *                type: integer
  *                description: The source id.
- *                example: Swagger1001
+ *                example: 1001
  *          NodeID:
  *                 type: integer
  *                 description: IO link Node number.

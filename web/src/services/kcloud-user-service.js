@@ -147,6 +147,21 @@ export const kCloudUserService = {
 			return [];
 		}
 	},
+		//------------------------------------------------------------------------------------------------
+	/**
+	 * @param {any} InstallationID
+	 */
+	 async getPDOValue(InstallationID) {
+		try {
+			const response = await axios.get(this.baseUrl + '/pdo/' + InstallationID);
+			const PDOValue = response.data;
+			const StorageID = 'PDO_' + InstallationID;
+			//localStorage.setItem(StorageID, JSON.stringify(PDOValue));
+			return PDOValue;
+		} catch (error) {
+			return [];
+		}
+	},
 	//------------------------------------------------------------------------------------------------
 	/**
 	 * @param {any} CDO

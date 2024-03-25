@@ -10,8 +10,8 @@ data class InstallationModel(
     var userid          : UInt   = 0u,
     var description     : String = "",
     var type            : String = "",
+    var updated         : String    = "",
 
-    var updated         : Int    = 0,
     var qrcode          : String = UUID.randomUUID().toString(),
     var modelVersion    : Int    = 1,
     var data            : MutableList<PVOModel> = mutableListOf<PVOModel>()

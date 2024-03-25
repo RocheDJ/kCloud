@@ -74,6 +74,7 @@ class Site_Manager(application: Application) : InstallationStore  {
                                 myInstallation.qrcode =myInstallation.id //added so we can select qr = NFC tag = ID
                                 myInstallation.userid = jsonObject.getLong("UserID").toUInt()
                                 myInstallation.description = jsonObject.getString("Description")
+                                myInstallation.updated = jsonObject.getString("Updated")
                                 if (myInstallation.userid == userID) {
                                     installations.add(myInstallation)
                                 }
