@@ -77,6 +77,11 @@ class Home : AppCompatActivity() {
                 updateNavHeader(loggedInViewModel.liveUser.value!!)
         })
 
+        // if the logged in user is null then log out
+        if (loggedInViewModel.liveUser.value==null){
+            signOut()
+        }
+
         // if the live data changes to logged out then open the login dialogue
         loggedInViewModel.loggedOut.observe(this, Observer { userLoggedOut ->
             if (userLoggedOut) {
