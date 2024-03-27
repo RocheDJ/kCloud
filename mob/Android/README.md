@@ -63,7 +63,8 @@ Good Stackoverflow discussion on writing blocks to the tag and reading back [Wri
 ## Debug APK 
 
 ---
-Debug APK package file for the application can be found here [APK File](./app-kcloud.apk)
+Debug APK package file for the application can be found here
+[APK Download](https://github.com/RocheDJ/kCloud/tree/main/mob/Android/app-kcloud.apk "download")
 
 [image1]: ./images/login.jpg
 
