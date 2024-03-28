@@ -42,14 +42,17 @@
 			if (localStorage) {
 				const sTitleList = localStorage.getItem(StorageID);
 				SavedTitleList = JSON.parse(sTitleList);
+
 				console.log('Panel LoadSavedTitles ' + SavedTitleList);
+
 				// save it back to local storage to trigger update on other panels
-				localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
+				 localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
+
 				$Titles_ = PVOTitleList;
 				//Titles_.update(() => PVOTitleList);
 			}
 		} catch (error) {
-			console.log('Panel LoadSavedTitles error ' + error);
+			console.log('Panel LoadSavedTitles error ');
 		}
 	}
 
@@ -83,7 +86,7 @@
 		// open the page
 		setTimeout(() => goto(route), 0);
 
-		LoadSavedTitles();
+		await LoadSavedTitles();
 	}
 	// -----------------------------------------------------------------------
 	// What happens when we click on the check box

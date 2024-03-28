@@ -11,5 +11,5 @@
 
 <div class="container is-fluid">  
     <TopMenu title={'kCloud Portal'} subTitle={'by David Roche for Kilderry V1.0.24083'} />
-	<slot />
+	<slot></slot> 
 </div>
