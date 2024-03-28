@@ -200,3 +200,4 @@ api/src/middleware/settings.js
 /mob/Android/.externalNativeBuild
 /mob/Android/.cxx
 /mob/Android/local.properties
+rut95x/token.dat

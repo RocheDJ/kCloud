@@ -20,6 +20,62 @@ function UpdateDataTableValues() {
 }
 
 // --------------------------------------------------------------------------------
+function UpdateSettings() {
+      try {
+        let sDescription = document.getElementById("fdescription").value;
+        let sToken = document.getElementById("token").value;
+        let sApiServer = document.getElementById("apiserver").value
+        let sID = document.getElementById("lid").value
+        const apiUrl = sApiServer +'installation';
+        const data =
+               {
+                "id": sID,
+                "Description": sDescription,
+                };
+        const requestOptions = {
+            method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${sToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+            };
+        fetch(apiUrl, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                throw new Error('Network response was not ok');
+             }
+            alert("Update Settings  Called")
+            })
+            .then(data => {
+                outputElement.textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error
+
+                ('Error:', error);
+             });
+
+
+
+      } catch (error) {
+        console.log(error);
+      }
+  }
+// --------------------------------------------------------------------------------
+function RegisterNode() {
+      try {
+        let sDescription = document.getElementById("fdescription").value;
+        let sType= document.getElementById("lname").value;
+        let sEmail = document.getElementById("uname").value;
+        let sPassword= document.getElementById("pword").value;
+        alert("RegisterNode not implemented")
+
+      } catch (error) {
+        console.log(error);
+      }
+  }
+// --------------------------------------------------------------------------------
 
 function UpdateTrendChart() {
   //https://www.chartjs.org/docs/latest/getting-started/usage.html
@@ -165,6 +221,18 @@ function Update_Overview() {
         }
         if (jData.title == "Agitator") {
           document.getElementById("Agitator").innerHTML = jData.value;
+        }
+        //Conductivity
+        if (jData.title == "Conductivity") {
+          document.getElementById("Conductivity").innerHTML = jData.value;
+        }
+        //Level
+        if (jData.title == "Level") {
+          document.getElementById("Level").innerHTML = jData.value;
+        }
+        //Heater
+         if (jData.title == "Heater") {
+          document.getElementById("Heater").innerHTML = jData.value;
         }
       });
     })

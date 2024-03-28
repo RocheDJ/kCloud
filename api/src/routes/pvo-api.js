@@ -9,6 +9,8 @@
 const express = require("express");
 const app = express();
 const {writePVOData,readPVO,readPVO_Titles,readPVO_Single,readPVO_Specific} = require('../models/db')
+const verifyToken = require("../middleware/verifyToken");
+
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -122,7 +124,7 @@ const {writePVOData,readPVO,readPVO_Titles,readPVO_Single,readPVO_Specific} = re
  *             schema:
  *               $ref: '#/components/schemas/SQLReturn'
  */
-app.post("/", async function (req, res){
+app.post("/",verifyToken, async function (req, res){
     const webReq = req;
     const data = webReq.body;
     try {

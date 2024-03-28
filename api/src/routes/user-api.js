@@ -20,7 +20,7 @@ const {
   getUserById,
 } = require("../models/db");
 const bcrypt = require("bcrypt");
-//const { createToken } = require( "../../node_modules/jwt-utils");
+
 const jwt = require("jsonwebtoken");
 
 //-------------------------------------------------------------------------------------------

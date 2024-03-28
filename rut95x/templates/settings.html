@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="canonical" href="https://html5-templates.com/"/>
+    <title>kEdge Register</title>
+    <meta name="description" content="Simple HTML5 Dashboard for kEdge"/>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}"/>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+</head>
+<body>
+<header>
+    <div id="logo">
+        <img src="{{url_for('static', filename='LoGo0016.png')}}"/>
+        kEdge&nbsp;Register
+    </div>
+    <nav>
+        <ul>
+            <li><a href="/">Overview</a></li>
+            <li><a href="/list">List</a></li>
+            <li><a href="/trend">Trend</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+</header>
+<section id="pageHeadder">
+    <strong>Pasteurizer Settings</strong>
+</section>
+<section class="flex_layout_1">
+    <main role="main">
+        <article>
+            <div class="flex_layout_1">
+                <div>
+                    <img src="{{url_for('static', filename='Pasto_1.png')}}"/>
+                </div>
+                <div class="grid_1">
+                    <div>
+                        <label for="lid">Installation ID:</label><br>
+                        <input type="text" id="lid" name="lid" value={{ id }} readonly
+                               style="background-color:#FCF5D8;">
+                    </div>
+                    <div>
+                        <label for="fdescription">Description:</label><br>
+                        <input type="text" id="fdescription" name="fdescription" value={{ description }}>
+                    </div>
+                    <div>
+                        <label for="lname">Type:</label><br>
+                        <input type="text" id="lname" name="lname" value="Pasteurizer" readonly
+                               style="background-color:#FCF5D8;">
+                    </div>
+                    <div>
+                        <label for="uname">Username:</label><br>
+                        <input type="text" id="uname" name="uname" value={{ username }} readonly
+                               style="background-color:#FCF5D8;">
+                    </div>
+                    <div>
+                        <label for="pword">Password:</label><br>
+                        <input type="password" id="pword" name="pword" value={{ password }} readonly
+                               style="background-color:#FCF5D8;">
+                    </div>
+                    <input type="text" id="token" name="token" value={{ token }} hidden readonly>
+                    <input type="text" id="apiserver" name="apiserver" value={{ apiserver }} hidden readonly>
+                </div>
+            </div>
+        </article>
+    </main>
+    <aside>
+        <nav>
+            <div class="flex_layout_buttons">
+                <button class="button button_green" onclick="RegisterNode()">kCloud Register</button>
+                <button class="button button_green"onclick="UpdateSettings()">kCloud Update</button>
+            </div>
+        </nav>
+    </aside>
+</section>
+<footer>
+    <div>
+        <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
+    </div>
+</footer>
+</body>
+</html>

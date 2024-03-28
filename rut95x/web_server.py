@@ -9,7 +9,8 @@
 # Python Libs
 from flask import Flask, request, render_template  # use flash for rendering web pages
 from flask_cors import CORS
-from multiprocessing import shared_memory
+
+import settings
 # -------------------------------------------------------------------------------------------
 # local Libs
 # -------------------------------------------------------------------------------------------
@@ -64,7 +65,7 @@ def home():
     sEventDate = aStatus[0]
     sStatus = aStatus[1]
     sCycleTime = aStatus[2]
-    return render_template("index.html", EventDate = sEventDate, Status = sStatus, CycleTime=sCycleTime)
+    return render_template("index.html", EventDate=sEventDate, Status=sStatus, CycleTime=sCycleTime)
 
 
 # -------------------------------------------------------------------------------------------------------------------
@@ -96,6 +97,23 @@ def trend():
 
 
 # -------------------------------------------------------------------------------------------------------------------
+# local settings page
+@app.route("/settings")
+def settings_show():
+    try:
+        sID = settings.INSTALLATION_ID
+        sDescription = settings.INSTALLATION_DESCRIPTION
+        sUsername = settings.API_POST_USER
+        sPassword = settings.API_POST_PASSWORD
+        sToken = settings.get_token()
+        sAPIServer = settings.API_POST_ENDPOINT
+        return render_template("settings.html", username=sUsername, password=sPassword, token=sToken,
+                               apiserver=sAPIServer, id=sID,description=sDescription)
+    except Exception as error:
+        web_server_status.status = "Settings  :  runWebServer Error : " + str(error)
+
+
+# -------------------------------------------------------------------------------------------------------------------
 # get value of single variable between start date and stop date
 @app.route("/data/read", methods=["GET"])
 def data_read():
@@ -121,10 +139,11 @@ def trigger_set():
     sData = "Done"
     return sData, 200
 
+
 # -----------------------------------------------------------------------------------------------------
 # ------------------------------------------ Web Server              -------------------------------------------------
-def runWebServer(ServerPort, smStatus): # smStatus is shared memory
-    try: 
+def runWebServer(ServerPort, smStatus):  # smStatus is shared memory
+    try:
         global sm_main_status
         sm_main_status = smStatus
         web_server_status.status = "Web Server  :  Running on port : " + str(ServerPort)
@@ -136,4 +155,3 @@ def runWebServer(ServerPort, smStatus): # smStatus is shared memory
     except Exception as error:
         web_server_status.status = "Web Server  :  runWebServer Error : " + str(error)
 # ------------------------------------------ Web Server              -------------------------------------------------
-

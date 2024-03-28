@@ -13,7 +13,6 @@ from os import kill
 from time import sleep
 from multiprocessing import Process, shared_memory
 
-
 # User Defined Libs
 import settings
 import logging
@@ -33,7 +32,6 @@ from web_server import runWebServer
 from inc.Control import Control_Sequence
 from web_client import run_web_client
 
-
 # ------------------------------------------ Variables              -------------------------------------------------
 sqliteDB = dbClass()
 main_status = status_class("")
@@ -43,28 +41,25 @@ process_times = dt_three_class()  # start,hold start,stop time for process
 hold_temperature = 72
 hold_seconds = 600
 
-#------- For logging
+# ------- For logging
 # ref https://stackoverflow.com/questions/24505145/how-to-limit-log-file-size-in-python
- # limit file size to 2mB
+# limit file size to 2mB
 rfh = RotatingFileHandler(
-    filename=str(settings.BASE_DIR) + "/logs/main_task.log", 
+    filename=str(settings.BASE_DIR) + "/logs/main_task.log",
     mode='a',
-    maxBytes=2*1024*1024,
+    maxBytes=2 * 1024 * 1024,
     backupCount=2,
     encoding='utf-8',
     delay=0
 )
 
-
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(message)s',
                     handlers=[
-                          rfh
+                        rfh
                     ])
 
-
 logger = logging.getLogger(__name__)
-
 
 # create a shared memory
 shared_mem_status_web_server_main = shared_memory.SharedMemory(
@@ -91,16 +86,17 @@ def log_status():
     dtNow = datetime.now()
     sDateTime = dtNow.strftime("%Y-%m-%d, %H:%M:%S")
     sString = (
-        sDateTime + ";" + main_status.status + ";" + str(main_status.cycle_time) + ";"
+            sDateTime + ";" + main_status.status + ";" + str(main_status.cycle_time) + ";"
     )
     bString = sString.encode("utf-8")
     iLen = len(bString)
     shared_mem_status_web_server_main.buf[:iLen] = bString
 
-# ----------------------------Delete Old Values-----------------------------------------      
+
+# ----------------------------Delete Old Values-----------------------------------------
 def removeOldReadings(ageInDays):
     try:
-        sqliteDB.ClearOldData(ageInDays) # 
+        sqliteDB.ClearOldData(ageInDays)  #
     except Exception as error:
         logging.error("Remove Old Readings Error : " + str(error))
 
@@ -121,6 +117,7 @@ def Read_Inputs_Physical(aInputs, aPvoList, xFirstRead):
                 aInputs.value[x - 1] = dataJSON["data"][0]["value"]
     except Exception as error:
         logging.error("Read_Inputs_Physical Error : " + str(error))
+
 
 # --- Read IO link Data from Network -------------
 def Read_Inputs_Software(oTriggers):
@@ -200,7 +197,6 @@ def make_report(report_type, stepCode):  # start,hold start,stop time for proces
 
 # ------------------------------------------ Main Control Sequence -------------------------------------------------
 def main_sequence():
-
     udtMainStep = MainStepType(MainStepType.init)
     udtMainStepOld = udtMainStep
     xNewStep = 0
@@ -282,9 +278,9 @@ def main_sequence():
                     xWriteReport = True
 
                 if (
-                    (control_step.step == 40)
-                    or (control_step.step == 990)
-                    or (control_step.step == 991)
+                        (control_step.step == 40)
+                        or (control_step.step == 990)
+                        or (control_step.step == 991)
                 ):  # batch stop
                     my_report_type = reportType.batch_stop
                     xWriteReport = True
@@ -353,9 +349,9 @@ def main_sequence():
                 fSeconds = float(delta_time.total_seconds())
 
             # Do we have any time left oer to sleep
-            if ((fSeconds > 86400.0) or (xCheckDBStart)): # 86400 = number of seconds in 24 hours
-               removeOldReadings(settings.DATA_RETAINED_DAYS)
-               xCheckDBStart = False
+            if ((fSeconds > 86400.0) or (xCheckDBStart)):  # 86400 = number of seconds in 24 hours
+                removeOldReadings(settings.DATA_RETAINED_DAYS)
+                xCheckDBStart = False
 
             udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 999  -------------------
@@ -380,8 +376,6 @@ def main_sequence():
             xNewStep = 1
             udtMainStepOld = udtMainStep
 
-
-
     # end of while tidy up app
     print("Closing kCloud Web client")
     logging.info("Closing kCloud Web client")
@@ -396,6 +390,8 @@ def main_sequence():
     print("Application Halted OK ")
 
     logging.info("Application Halted OK ")
+
+
 # ------------------------  Call main Sequence    -----------------------------------------------
 if __name__ == "__main__":
     print("Main sequence Start")

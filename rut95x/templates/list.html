@@ -1,85 +1,91 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="https://html5-templates.com/" />
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="canonical" href="https://html5-templates.com/"/>
     <title>kEdge List Page</title>
-    <meta name="description" content="Simple HTML5 Dashboard for kEdge" />
+    <meta name="description" content="Simple HTML5 Dashboard for kEdge"/>
     <meta http-equiv="refresh" content="8">
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}"/>
     <script src="{{url_for('static', filename='script.js')}}"></script>
 </head>
 
-  <body>
-    <header>
-      <div id="logo">
-        <img src="{{url_for('static', filename='LoGo0016.png')}}" /> kEdge&nbsp;Dashboard
-      </div>
-      <nav>
+<body>
+<header>
+    <div id="logo">
+        <img src="{{url_for('static', filename='LoGo0016.png')}}"/> kEdge&nbsp;Dashboard
+    </div>
+    <nav>
         <ul>
-          <li><a href="/">Overview</a></li>
-          <li><a href="/list">List</a></li>
-          <li><a href="/trend">Trend</a></li>
+            <li><a href="/">Overview</a></li>
+            <li><a href="/list">List</a></li>
+            <li><a href="/trend">Trend</a></li>
+            <li><a href="/settings">Settings</a></li>
         </ul>
-      </nav>
-    </header>
-    <section id="pageHeadder">
-      <strong>Pasteurizer 1 PVO List</strong>
-    </section>
-    <section class="flex_layout_1">
-      <main role="main">
+    </nav>
+</header>
+<section id="pageHeadder">
+    <strong>Pasteurizer List</strong>
+</section>
+<section class="flex_layout_1">
+    <main role="main">
         <article>
-          <table hidden id="dataSummery">
-            <thead>
-              <td>Rows</td>
-           </thead>
-           <tr>
-            <td id ="row_count"> {{ count }}</td>
-           </tr>
-           </table>
+            <table hidden id="dataSummery">
+                <thead>
+                <td>Rows</td>
+                </thead>
+                <tr>
+                    <td id="row_count"> {{ count }}</td>
+                </tr>
+            </table>
         </article>
         <article>
-          <table id="dataTable">
-            <tr>
-               <th>ID</th>
-               <th>Installation ID</th>
-               <th>EventDate</th>
-               <th>Title</th>
-               <th hidden >Data</th> 
-               <th>Value</th> 
-            </tr>
-            {% for row in rows %}
-              <tr>
-                <td id ="row_{{row["id"]}}">{{row["id"]}}</td>
-                <td>{{row["InstallationID"]}}</td>
-                <td> {{row["EventDate"]}}</td>
-                <td id ="title_row_{{row["id"]}}"></td>
-                <td hidden id ="json_row_{{row["id"]}}">{{row['jData']}}</td>
-                <td id ="value_row_{{row["id"]}}"></td>	
-              </tr>
-            {% endfor %}
-         </table>
-         <script>
+            <table id="dataTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Installation ID</th>
+                    <th>EventDate</th>
+                    <th>Title</th>
+                    <th hidden>Data</th>
+                    <th>Value</th>
+                </tr>
+                {% for row in rows %}
+                <tr>
+                    <td id="row_{{row[" id
+                    "]}}">{{row["id"]}}</td>
+                    <td>{{row["InstallationID"]}}</td>
+                    <td> {{row["EventDate"]}}</td>
+                    <td id="title_row_{{row[" id
+                    "]}}"></td>
+                    <td hidden id="json_row_{{row[" id
+                    "]}}">{{row['jData']}}</td>
+                    <td id="value_row_{{row[" id
+                    "]}}"></td>
+                </tr>
+                {% endfor %}
+            </table>
+            <script>
              UpdateDataTableValues();
-          </script>
+
+            </script>
         </article>
-        
-      </main>
-      <aside>
-          <nav>
-            <div class ="flex_layout_buttons">
+
+    </main>
+    <aside>
+        <nav>
+            <div class="flex_layout_buttons">
                 <button class="button button_green">START Batch</button>
                 <button class="button button_red">STOP Batch</button>
                 <button class="button button_green">START Agitator</button>
                 <button class="button button_red">STOP Agitator</button>
             </div>
         </nav>
-      </aside>
-    </section>
-    <footer>
-      <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
-    </footer>
-  </body>
+    </aside>
+</section>
+<footer>
+    <p>@ Kilderry Instruments Ltd, IIOT EDGE Webpage</p>
+</footer>
+</body>
 </html>

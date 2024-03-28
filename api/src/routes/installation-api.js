@@ -7,8 +7,14 @@
  *
  */
 const express = require("express");
+const verifyToken = require("../middleware/verifyToken");
 const app = express();
-const { writeInstallation,readInstallation,readInstallationByUser} = require("../models/db");
+const {
+  writeInstallation,
+  readInstallation,
+  readInstallationByUser,
+  updateInstallation,
+} = require("../models/db");
 //-----------------------------------Define the schemas for swagger ---------------------------
 /**
  * @swagger
@@ -50,7 +56,20 @@ const { writeInstallation,readInstallation,readInstallationByUser} = require("..
  *                example: 1
  *          Description:
  *                type: string
- *                description: Site name and or Description.
+ *                description: Installation name and or Description.
+ *                example: Kilderry Test Site
+ *
+ *     UpdatedInstallation:
+ *      type: object
+ *      properties:
+ *          id:
+ *                type: integer
+ *                description: Installation ID Number.
+ *                example: 20001
+ *
+ *          Description:
+ *                type: string
+ *                description: Installation name and or Description.
  *                example: Kilderry Test Site
  */
 
@@ -70,7 +89,7 @@ const { writeInstallation,readInstallation,readInstallationByUser} = require("..
  *              $ref: '#/components/schemas/NewInstallation'
  *     responses:
  *       200:
- *         description: CDO ADDED
+ *         description: Installation added
  *         content:
  *           application/json:
  *             schema:
@@ -96,6 +115,47 @@ app.post("/", async function (req, res) {
   }
 });
 
+//---------------------------------------------------- API Calls -----------------------------
+/**
+ * @swagger
+ * /Installation:
+ *   put:
+ *     tags:
+ *      - Installation
+ *     summary: Update Site Description.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/UpdatedInstallation'
+ *     responses:
+ *       200:
+ *         description: Installation Updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: object
+ *             example:
+ *                "id":  1001
+ */
+app.put("/", verifyToken, async function (req, res) {
+  const webReq = req;
+  const data = webReq.body;
+  try {
+    await updateInstallation(data).then(
+      (response) => {
+        res.send(response);
+      },
+      (response) => {
+        console.log(" Then Failure:" + response);
+        res.send(response);
+      }
+    );
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 //---------------------------------------------------- API Calls -----------------------------
 /**
  * @swagger
@@ -138,7 +198,6 @@ app.get("/:id", async function (req, res) {
   }
 });
 
-
 //---------------------------------------------------- API Calls -----------------------------
 /**
  * @swagger
@@ -163,7 +222,7 @@ app.get("/:id", async function (req, res) {
  *             schema:
  *              $ref: '#/components/schemas/InstallationData'
  */
- app.get("/user/:id", async function (req, res) {
+app.get("/user/:id", async function (req, res) {
   const webReq = req;
   const myId = req.params.id;
   try {

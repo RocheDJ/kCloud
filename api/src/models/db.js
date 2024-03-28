@@ -543,8 +543,7 @@ async function writeInstallation(requestData) {
     }
 
     sRequestDate = nodeDate.format(new Date(), "YYYY-MM-DD hh:mm:ss");
-    iStatus = CDO_Status.CommandNew;
-    cdo_JSON = JSON.stringify(requestData.jData);
+
     var myQuery =
       "INSERT installation (UserID,GroupID,Description) VALUES ( " +
       requestData.UserID +
@@ -575,6 +574,46 @@ async function writeInstallation(requestData) {
   });
 }
 
+//--------------------------------------------------------------------------------------------
+async function updateInstallation(requestData) {
+  return new Promise(async function (resolve, reject) {
+    var disconnected = await new Promise((resolve) => {
+      dbConnection.ping((err) => {
+        resolve(err);
+      });
+    });
+    if (disconnected) {
+      dbConnection = mysql.createConnection(ConnectionData);
+    }
+    sRequestDate = nodeDate.format(new Date(), "YYYY-MM-DD hh:mm:ss");
+  
+    //UPDATE `kcloud`.`installation` SET `Type`='Pasteurizer' WHERE  `id`=2001;
+    var myQuery =
+      "UPDATE installation SET Description ='" +
+      requestData.Description +
+      "' where id = " +
+      requestData.id + ";";
+
+    await dbConnection.execute(myQuery, (err, result) => {
+      if (err) {
+        retVal = {
+          err: err,
+        };
+        reject(err);
+      } else if (result.affectedRows > 0) {
+        retVal = {
+          id: result.insertId,
+        };
+        resolve(retVal);
+      } else {
+        retVal = {
+          err: "Woops",
+        };
+        resolve(retVal);
+      }
+    });
+  });
+}
 //--------------------------------------------------------------------------------------------
 async function readInstallation(sInstallationID) {
   return new Promise(async function (resolve, reject) {
@@ -827,6 +866,7 @@ module.exports = {
   updateCDO,
   readInstallation,
   writeInstallation,
+  updateInstallation,
   getUsers,
   deleteAllUsers,
   getUserById,

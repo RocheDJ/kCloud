@@ -41,7 +41,7 @@ There are four modules in the project, there is a readme with more details for e
 
     NodeJS back end with MySql data base to receive telemetry from the system and allow user interaction.
 
-- [API Server Readme](/api/readme.md)
+- [API Server Readme](/api/README.md)
 
 ### Web Server
 
@@ -57,7 +57,7 @@ There are four modules in the project, there is a readme with more details for e
 
 ## Git Approach
 
-The was a solo work based project so I chose to use a single repository and branch on GIT with each project section contained in its own folder with separate readme files.
+This was a solo work based project so I chose to use a single repository and branch on GIT with each project section contained in its own folder with separate readme files.
 
 ## License
 

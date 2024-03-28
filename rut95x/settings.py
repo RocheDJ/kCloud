@@ -4,11 +4,33 @@
 from decouple import config
 from unipath import Path
 
+
+def get_token():
+    token = ''
+    try:
+        f = open("token.dat", "r")
+        token = f.read()
+    except Exception as error:
+        print("Error Getting Token " + str(error))
+    finally:
+        return token
+
+
+def set_token(value):
+    try:
+        f = open("token.dat", "w")
+        f.write(value)
+    except Exception as error:
+        print("Error Setting Token"+ str(error))
+
+
 BASE_DIR = Path(__file__).parent
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-INSTALLATION_ID = config("INSTALLATION_ID", default="Not Set")
+INSTALLATION_ID = config("INSTALLATION_ID", default=0)
+
+INSTALLATION_DESCRIPTION=config("INSTALLATION_DESCRIPTION", default="PASTEURIZER")
 
 IOLINK_TOUT = config("IOLINK_TOUT", default=1.0, cast=float)
 
@@ -27,5 +49,9 @@ PVO_LOG_INTERVAL_RUN = config("PVO_LOG_INTERVAL", default=10.0, cast=float)
 PVO_LOG_INTERVAL_IDLE = config("PVO_LOG_INTERVAL_IDLE", default=60.0, cast=float)
 
 API_POST_ENDPOINT = config("API_POST_EndPoint")
+
+API_POST_USER = config("user")
+
+API_POST_PASSWORD = config("password")
 
 DATA_RETAINED_DAYS = config('DATA_RETAINED_DAYS', default=10, cast=int)
