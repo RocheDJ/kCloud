@@ -53,17 +53,14 @@
                 </tr>
                 {% for row in rows %}
                 <tr>
-                    <td id="row_{{row[" id
-                    "]}}">{{row["id"]}}</td>
+                    <td id ="row_{{row["id"]}}">{{row["id"]}}</td>
                     <td>{{row["InstallationID"]}}</td>
                     <td> {{row["EventDate"]}}</td>
-                    <td id="title_row_{{row[" id
-                    "]}}"></td>
-                    <td hidden id="json_row_{{row[" id
-                    "]}}">{{row['jData']}}</td>
-                    <td id="value_row_{{row[" id
-                    "]}}"></td>
-                </tr>
+                    <td id ="title_row_{{row["id"]}}"></td>
+                    <td hidden id ="json_row_{{row["id"]}}">{{row['jData']}}</td>
+                    <td id ="value_row_{{row["id"]}}"></td>	
+                  </tr>
+    
                 {% endfor %}
             </table>
             <script>
