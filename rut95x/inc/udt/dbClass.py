@@ -41,8 +41,10 @@ class dbClass:
             self.connectionOpen = True
 
     # -----------------------------------------------------------------------------------------
-    def ClearOldData(self, days):
+    def ClearOldData(self, days,logger):
         try:
+
+            logger.info("ClearOldData  Called" )
             # open db and connect
             self.OpenConn()
 
@@ -71,6 +73,7 @@ class dbClass:
             self.CloseConn()
 
         except Exception as error:
+            logger.error("ClearOldData Error " + str(error))
             self.errorString = "ClearOldData Error " + str(error)
 
     # -----------------------------------------------------------------------------------------
@@ -299,7 +302,7 @@ class dbClass:
             self.errorString = "log_PVO_to_DB Error " + str(error)
 
     # ----------------------------------------------------------------------------------------------------------------------
-    def update_PVO_Live(self, dataJSON, pvoIndex):
+    def update_PVO_Live(self, dataJSON, pvoIndex,logger):
         try:
             # open db and connect
             self.OpenConn()
@@ -355,6 +358,7 @@ class dbClass:
             # Just be sure any changes have been committed or they will be lost.
             self.CloseConn()
         except Exception as error:
+            logger.error("update_PVO_Live Error :" + str(error))
             self.errorString = "log_PVO_to_DB Error " + str(error)
 
     # ------------------------------------------------------------------------------------------

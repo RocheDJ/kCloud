@@ -4,11 +4,11 @@ const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "kCloud API",
-    version: "1.0.24043",
+    version: "1.0.24088",
     description: "RESTful API for Kilderry kCloud",
     license: {
       name: "Licensed Under MIT",
-      url: "https://spdx.org/licenses/MIT.html",
+      url: "https://opensource.org/license/mit",
     },
     contact: {
       name: "David Roche",

@@ -34,6 +34,7 @@
 	};
 
 	onMount(async () => {
+		console.log('Dashboard Pasto onMount');
 		await LoadPage();
 	});
 

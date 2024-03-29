@@ -1,11 +1,9 @@
 <script>
     import { beforeUpdate } from "svelte";
     import { kCloudUserService } from '../services/kcloud-user-service';
-    import { goto } from '$app/navigation';
     import TopMenu from '$lib/TopMenu.svelte';
     beforeUpdate(() => {
         kCloudUserService.reload();
-       // goto(`/home`);
     });
 </script>
 

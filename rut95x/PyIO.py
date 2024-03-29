@@ -59,7 +59,7 @@ logging.basicConfig(level=logging.INFO,
                         rfh
                     ])
 
-logger = logging.getLogger(__name__)
+logger_main = logging.getLogger(__name__)
 
 # create a shared memory
 shared_mem_status_web_server_main = shared_memory.SharedMemory(
@@ -96,10 +96,9 @@ def log_status():
 # ----------------------------Delete Old Values-----------------------------------------
 def removeOldReadings(ageInDays):
     try:
-        sqliteDB.ClearOldData(ageInDays)  #
+        sqliteDB.ClearOldData(ageInDays,logger_main)  #
     except Exception as error:
-        logging.error("Remove Old Readings Error : " + str(error))
-
+       logger_main.error("Remove Old Readings Error : " + str(error))
 
 # --- Read IO link Data from Network -------------
 def Read_Inputs_Physical(aInputs, aPvoList, xFirstRead):
@@ -111,23 +110,25 @@ def Read_Inputs_Physical(aInputs, aPvoList, xFirstRead):
             sError = dataJSON["error"]
             if sError != "":
                 main_status.status = "Main App  :  Input Error : " + str(sError)
+                logger_main.error("Read_Inputs_Physical IO Link Error : " + str(sError))
             if (aInputs.value[x - 1] != dataJSON["data"][0]["value"]) or (xFirstRead):
-                sqliteDB.update_PVO_Live(dataJSON, x)
+                sqliteDB.update_PVO_Live(dataJSON, x,logger_main)
                 aPvoList[x] = dataJSON
                 aInputs.value[x - 1] = dataJSON["data"][0]["value"]
     except Exception as error:
-        logging.error("Read_Inputs_Physical Error : " + str(error))
+       logger_main.error("Read_Inputs_Physical Error : " + str(error))
 
 
 # --- Read IO link Data from Network -------------
 def Read_Inputs_Software(oTriggers):
     try:
         triggers = sqliteDB.read_reset_triggers()
-        for x in [0, 1, 2, 3, 4]:
-            oTriggers.value[x] = triggers[x]
+        if triggers is not None:
+            for x in [0, 1, 2, 3, 4]:
+                oTriggers.value[x] = triggers[x]
 
     except Exception as error:
-        logging.error("Read_Inputs_Software Error : " + str(error))
+        logger_main.error("Read_Inputs_Software Error : " + str(error))
         if settings.DEBUG:
             main_status.status = "Main App  :  Read_Inputs_Software Error : " + str(
                 error
@@ -145,7 +146,7 @@ def Write_Outputs_Physical(aOutputs):
                 IOLink.IoLink_Write_DQ(settings.IOLINK_NODE_1, iPort, aOutputs.value[x])
                 old_process_outputs.value[x] = aOutputs.value[x]
     except Exception as error:
-        logging.error("Write_Outputs_Physical Error : " + str(error))
+        logger_main.error("Write_Outputs_Physical Error : " + str(error))
         if settings.DEBUG:
             main_status.status = "Main App  :  Write_Outputs_Physical Error : " + str(
                 error
@@ -190,7 +191,7 @@ def make_report(report_type, stepCode):  # start,hold start,stop time for proces
             return sJSONData
 
     except Exception as error:
-        logging.error("Make_report Error : " + str(error))
+        logger_main.error("Make_report Error : " + str(error))
         if settings.DEBUG:
             main_status.status = "Main App  :  make_report Error : " + str(error)
 
@@ -236,26 +237,26 @@ def main_sequence():
             sqliteDB.create_PVO_Live(iMaxPVO)  # create the local tables
             if xDebugOn:
                 main_status.status = "Main App  :  Init: "
-                logging.info('Init')
+                logger_main.info('Init')
             udtMainStep = MainStepType.load_config
         # ----------------------   Step 1  ---------------------
         elif udtMainStep == MainStepType.load_config:
             if xDebugOn:
                 main_status.status = "Main App  :  Load Config: "
-                logging.info('Load Config: ')
+                logger_main.info('Load Config: ')
             udtMainStep = MainStepType.start_web_client
         # ----------------------   Step 2  ---------------------
         elif udtMainStep == MainStepType.start_web_client:
             if xDebugOn:
                 main_status.status = "Main App  :  Start Web Client: "
-                logging.info('Start Web Client: ')
+                logger_main.info('Start Web Client: ')
             pPostClient.start()
             udtMainStep = MainStepType.start_web_server
         # ----------------------   Step 3  ---------------------
         elif udtMainStep == MainStepType.start_web_server:
             if xDebugOn:
                 main_status.status = "Main App  :  Start Web Server: "
-                logging.info('Start Web Server: ')
+                logger_main.info('Start Web Server: ')
             pWebServer.start()
             udtMainStep = MainStepType.read_inputs
         # ----------------------   Step 4  ---------------------
@@ -266,6 +267,8 @@ def main_sequence():
 
             Read_Inputs_Physical(process_inputs, aPVO, xFirstRead)
             Read_Inputs_Software(trigger_inputs)
+            if xFirstRead:
+                  logger_main.info('First Read inputs Complete: ')
             xFirstRead = False  # always log the first read
             udtMainStep = MainStepType.check_event_triggers
 
@@ -358,11 +361,11 @@ def main_sequence():
         elif udtMainStep == MainStepType.error:
             if xDebugOn:
                 main_status.status = "Main App  :  ERROR : "
-                logging.error("Main App  :  ERROR :  Wait restart")
+                logger_main.error("Main App  :  ERROR :  Wait restart")
 
             log_status()
             sleep(fErrorInterval)  # wait 
-            logging.info("Main App  :  ERROR : Re-start")
+            logger_main.info("Main App  :  ERROR : Re-start")
             udtMainStep = MainStepType.init
 
         # ----------------------   Catch All  -----------------
@@ -378,18 +381,18 @@ def main_sequence():
 
     # end of while tidy up app
     print("Closing kCloud Web client")
-    logging.info("Closing kCloud Web client")
+    logger_main.info("Closing kCloud Web client")
     pPostClient.kill()  # stop the web server process
 
     print("Closing Local Web Server")
-    logging.info("Closing kCloud Web Server")
+    logger_main.info("Closing kCloud Web Server")
     pWebServer.kill()  # stop the kCloud client process
     shared_mem_status_web_server_main.close()
     shared_mem_status_web_server_main.unlink()
 
     print("Application Halted OK ")
 
-    logging.info("Application Halted OK ")
+    logger_main.info("Application Halted OK ")
 
 
 # ------------------------  Call main Sequence    -----------------------------------------------

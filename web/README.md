@@ -69,6 +69,7 @@ Everything you need to build a Svelte project, powered by [`create-svelte`](http
 
 Good Learning resource for Type Script [Tutorials Point](https://www.tutorialspoint.com/typescript/index.htm)
 
+[Svelte Storage example](https://svelte.dev/repl/309a407bbc5340c1a1168c7415d65ba6?version=3.48.0)
 
 [image1]: ./images/home.jpg
 

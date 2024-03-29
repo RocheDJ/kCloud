@@ -42,6 +42,8 @@ How to Document an Express API with Swagger UI and JSDoc[Kate Bartolo](https://d
 Describing  parameters [Swagger.io](https://swagger.io/docs/specification/2-0/describing-parameters/)
 
 Checking if and Object is an Object [Stack Overflow](https://stackoverflow.com/questions/8834126/how-to-efficiently-check-if-variable-is-array-or-object-in-nodejs-v8)
+
+
 ---
 
 ## License

@@ -203,7 +203,7 @@ def web_client_sequence():
     udtPostStepOld = udtPostStep
     xNewStep = 0
     fWaitInterval = 1.00  # 1 second
-    fErrorInterval = 30.0
+    fErrorInterval = 300.0 # 5 mins 
     xDebug = settings.DEBUG
     aDataRows = []
     iRowsToPost = 0
@@ -247,7 +247,10 @@ def web_client_sequence():
                 if xNewStep:
                     iPostResponseCode = post_pvo(aDataRows[iRowsPosted])
 
-                udtPostStep = PostStepType.ack_local_data_pvo
+                if (iPostResponseCode == 401): # invalid token
+                    udtPostStep = PostStepType.error # go to error and wait and re login
+                else:
+                    udtPostStep = PostStepType.ack_local_data_pvo
             # ------------ Put API Response In DB--------------------
             elif udtPostStep == PostStepType.ack_local_data_pvo:
                 if xNewStep:
@@ -317,7 +320,7 @@ def web_client_sequence():
             # ------------ Idle and Wait ---------------------
             elif udtPostStep == PostStepType.wait:
                 sleep(fWaitInterval)
-                update_status();
+                update_status()
                 udtPostStep = udtPostStep.read_local_data_pvo
             # ----------------------   Step 999  ---------------------
             elif udtPostStep == PostStepType.error:

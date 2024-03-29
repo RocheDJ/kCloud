@@ -45,17 +45,18 @@ def Control_Sequence(
     # Wait
     elif step.step == 1:
         # wait for triggers
-        # Start the processes ?
-        if sdIn.value[1]:  # Process Start Trigger
-            step.step = 10
-            sdIn.value[1] = False
-        elif sdIn.value[3]:  # Agitator Start Trigger
-            sdIn.value[3] = False
-            dOut.value[0] = True  #  Agitator on
-        elif sdIn.value[4]:  # Agitator Stop Trigger
-            sdIn.value[4] = False
-            dOut.value[0] = False  #  Agitator off
-
+        if sdIn is not None:
+            # Start the processes ?
+            if sdIn.value[1]:  # Process Start Trigger
+                step.step = 10
+                sdIn.value[1] = False
+            elif sdIn.value[3]:  # Agitator Start Trigger
+                sdIn.value[3] = False
+                dOut.value[0] = True  #  Agitator on
+            elif sdIn.value[4]:  # Agitator Stop Trigger
+                sdIn.value[4] = False
+                dOut.value[0] = False  #  Agitator off
+        
     # start the batch process
     elif step.step == 10:
         dOut.value[1] = True  #  Heater On

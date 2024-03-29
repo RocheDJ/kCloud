@@ -42,12 +42,9 @@
 			if (localStorage) {
 				const sTitleList = localStorage.getItem(StorageID);
 				SavedTitleList = JSON.parse(sTitleList);
-
-				console.log('Panel LoadSavedTitles ' + SavedTitleList);
-
+				console.log('Panel LoadSavedTitles ' );
 				// save it back to local storage to trigger update on other panels
-				 localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
-
+				localStorage.setItem(StorageID, JSON.stringify(PVOTitleList));
 				$Titles_ = PVOTitleList;
 				//Titles_.update(() => PVOTitleList);
 			}
@@ -62,16 +59,19 @@
 		let route: string = `/dashboard`;
 		switch (installationType) {
 			case 'PowerMeter':
-				// statement 1
+				// powermeters
+				console.log('Panel Says PowerMeter');
 				route = route + '/powermeter';
 				break;
 			case 'Pasteurizer':
-				// statement 2
+				console.log('Panel Says Pasteurizer');
+				// Pasteurizer
 				route = route + '/pasteurizer';
 				break;
 			default:
 				//
-				route = route + '/';
+				console.log('Panel Says Unknown ?');
+				route = route + '/home';
 				break;
 		}
 		//set the selected ID data
@@ -79,14 +79,17 @@
 			id: InstallationId,
 			description: Description
 		};
-		SelectedInstallation.set(SelectedInstallationData);
+		//SelectedInstallation.set(SelectedInstallationData);
+		$SelectedInstallation=SelectedInstallationData
 		//await goto(route);
-
-		console.log(' Goto ' + route);
+		console.log(' Goto ' + route);		
+		
 		// open the page
-		setTimeout(() => goto(route), 0);
+		setTimeout(() => goto(route), 500);
+
 
 		await LoadSavedTitles();
+
 	}
 	// -----------------------------------------------------------------------
 	// What happens when we click on the check box

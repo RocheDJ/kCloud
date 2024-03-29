@@ -1,4 +1,4 @@
-<!-- Dashboard Pasteurizer - Tab 3 Data Table 
+<!-- Dashboard Pasteurizer - Tab 4 PDO Reports
 	\\src\routes\dashboard\pasteurizer\inc
 -->
 <script lang="ts">
@@ -118,7 +118,7 @@
 				if (TableDataRaw) {
 					TableData = [{}];
 					if (TableDataRaw.err) {
-						alert('Load Table Data Error ' + TableDataRaw.err);
+						alert('Pasto Data grid Load Table Data Error ' + TableDataRaw.err);
 					} else {
 						// load data to chart based on interval
 						for (var PDO of TableDataRaw) {

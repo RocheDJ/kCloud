@@ -62,9 +62,9 @@ const jwt = require("jsonwebtoken");
  *               description: The user's role.
  *               example: 0
  *             groupID:
- *               type: string
+ *               type: int
  *               description: Future Use.
- *               example: Unassigned
+ *               example: 0
  *         - $ref: '#/components/schemas/UserCredentials'
  *      User:
  *       allOf:
@@ -278,7 +278,7 @@ app.post("/authenticate", async function (req, res) {
                   },
                   Settings.AppSettings.JWT_SECRET(),
                   {
-                    expiresIn: "1h",
+                    expiresIn: "48h",
                   }
                 );
                 res

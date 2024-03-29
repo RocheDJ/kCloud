@@ -121,7 +121,7 @@
 				if (TableDataRaw) {
 					TableData = [{}];
 					if (TableDataRaw.err) {
-						alert('Load Table Data Error ' + TableDataRaw.err);
+						alert('Pasto Chart Load Table Data Error ' + TableDataRaw.err);
 					} else {
 						// load data to chart based on interval
 						switch (sInterval) {
