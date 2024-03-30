@@ -37,7 +37,24 @@ It uses J Docs and Swagger UI to document the API.
 
 ## References
 
-How to Document an Express API with Swagger UI and JSDoc[Kate Bartolo](https://dev.to/kabartolo/how-to-document-an-express-api-with-swagger-ui-and-jsdoc-50do)
+Fast, unopinionated, minimalist web framework for Node.js [express](https://www.npmjs.com/package/express)
+
+JWT Utilities Module [jwt-utils](https://www.npmjs.com/package/jwt-utils)
+
+JSON Web token Handler [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
+
+MySQL interface lib [mysql2](https://www.npmjs.com/package/mysql2)
+
+Swagger JS docs [swagger-jsdoc](https://www.npmjs.com/package/swagger-jsdoc)
+
+Swagger UI for express [swagger-ui-express](https://www.npmjs.com/package/swagger-ui-express)
+
+Bcript library for hashing passwords [bcrypt](https://www.npmjs.com/package/bcrypt)
+
+Cross-origin resource sharing Library [cors](https://www.npmjs.com/package/cors)
+
+
+How to Document an Express API with Swagger UI and JSDoc [Kate Bartolo](https://dev.to/kabartolo/how-to-document-an-express-api-with-swagger-ui-and-jsdoc-50do)
 
 Describing  parameters [Swagger.io](https://swagger.io/docs/specification/2-0/describing-parameters/)
 

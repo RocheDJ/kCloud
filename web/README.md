@@ -55,21 +55,38 @@ This application also utilizes Frappe charts to visualize trend data.
 
 ---
 
-[Bulma Framework](https://bulma.io/)
+Sveltekit 'web development, streamlined'[svelte](https://kit.svelte.dev/)
+
+Bulma CSS [Bulma Framework](https://bulma.io/)
+
+AXIOS make HTML requests [axios](https://www.npmjs.com/package/axios)
+
+Accordion control Svelte [svelte-collapsible](svelte-collapsible)
+
+Date time Picker in svelte [svelty-picker](https://www.npmjs.com/package/svelty-picker)
+
+Exporting To CSV [export-to-csv]( https://www.npmjs.com/package/export-to-csv)
+
+Data Table Control [svelte-datatables-net](https://www.npmjs.com/package/svelte-datatables-net)
+
+Frappe Charts on NPM[frappe-charts](https://www.npmjs.com/package/frappe-charts)
+
+Frappe charts API reference[Frappe Charts API](https://frappe.io/charts/docs/reference/api)
+
+Setting up a Repeater Class as used in ValueBox [slingacademy](https://www.slingacademy.com/article/typescript-setinterval-and-clearinterval-methods/#Example_2_Using_setInterval_with_Classes?utm_content=cmp-true)
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
-
-[Frappe Charts API](https://frappe.io/charts/docs/reference/api)
 
 [Makes it easy to use frappe-charts in your Svelte project](https://www.npmjs.com/package/svelte-frappe-charts?activeTab=readme)
 
 [Export CSV from JSON in Svelte](https://dev.to/karkranikhil/csv-generation-from-json-in-svelte-5cgf)
 
-[NPM Export to CSV]( https://www.npmjs.com/package/export-to-csv)
-
 Good Learning resource for Type Script [Tutorials Point](https://www.tutorialspoint.com/typescript/index.htm)
 
 [Svelte Storage example](https://svelte.dev/repl/309a407bbc5340c1a1168c7415d65ba6?version=3.48.0)
+
+Adding Type Script to an existing project[MDN docs](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Svelte_TypeScript#adding_typescript_support_to_an_existing_svelte_project)
+
 
 [image1]: ./images/home.jpg
 
