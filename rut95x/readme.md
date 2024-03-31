@@ -1,13 +1,24 @@
-# PyIo - FOG NODE Application
+# SETU HDip Computer Science Final Project
 
-![version](https://img.shields.io/badge/version-1.0.24083-blue.svg) ![license](https://img.shields.io/badge/license-MIT-blue.svg)
+
+
+## kCloud - PyIO Fog Node Application
+
+- An example pasteurization application written in Python to run on a Teltonika Rut95X industrial router.
+
+![Version](https://img.shields.io/badge/version-1.0.24089-blue.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
+
 
 ---
 
+## Originator
 
-## An application written in Python to run on a Teltonika Rut95X industrial router
+- David Roche
 
-This is an example application written in python as part of my SETU final project for HDip in computer science.
+---
+
+## Description
 
 It implements a simplified pasteurizer application running on a [Teltonika](https://teltonika-networks.com/products/routers/rut956) industrial router with an [IFM](https://www.ifm.com/ie/en/product/AL1350) IOlink master to communicate to various edge sensors and outputs.
 

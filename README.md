@@ -1,21 +1,22 @@
 # SETU HDip Computer Science  Final Project
 
+![logo][image1]
 
-![logo](https://placement-project-23-24.netlify.app/topic-02-project/unit-2-project-showcases/talk-09-project-older/project-samples-pre2020.png)
+AI generated logo from [app.logo.com](https://app.logo.com/flow/business-name)
 
 ---
 
-## IIOT customizable solution for data transfer in small to medium industrial control.
+## kCloud
+
+- IIOT customizable solution for data transfer in small to medium industrial control.
+
+![Version](https://img.shields.io/badge/version-1.0.24089-blue.svg)
 
 ---
 
 ## Originator
 
 - David Roche
-
----
-
-## A work based project for Kilderry Instruments Ltd
 
 ---
 
@@ -61,7 +62,10 @@ This was a solo work based project so I chose to use a single repository and bra
 
 ## License
 
-The software in this project is a demonstration of what can be done,new ideas and uses open source controls and platforms where possible.
+The software in this project is a demonstration of what can be done,new ideas and uses open source controls and platforms.
 It comes wil no warranty express or implied.
 
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
+
+
+[image1]: ./images/logo45.png

@@ -1,10 +1,11 @@
 # SETU HDip Computer Science  Final Project kCloud app
 
-![version](https://img.shields.io/badge/version-1.01.24079-blue.svg)
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
----
+## kCloud - Android Application
 
-## kCloud Android APP Readme File
+- An example Android application written to showcase the possibilities of using an android app with kCloud.
+
+![Version](https://img.shields.io/badge/version-1.0.24089-blue.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ---
 
@@ -21,7 +22,8 @@
 ## Description
 
 This Demonstration application allows the user to log in and view data from industrial installations in real time using an application rather than a web site.
-The project is based on a previous project I did from Mobile Development Assignment II Github [Link](https://github.com/RocheDJ/DataViewLogger/tree/Assignment-II) but with some under the hood changes.
+
+The project is based on a previous project I did for Mobile Development Assignment II Github [Link](https://github.com/RocheDJ/DataViewLogger/tree/Assignment-II) but with some under the hood changes.
 
 1) Data retrieved from kCloud API server using Volly.
 

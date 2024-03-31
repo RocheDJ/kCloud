@@ -1,10 +1,12 @@
-# SETU HDip Computer Science  Final Project
+# SETU HDip Computer Science  Final Project 
 
-![logo](https://placement-project-23-24.netlify.app/topic-02-project/unit-2-project-showcases/talk-09-project-older/project-samples-pre2020.png)
+## kCloud - API Server
 
----
+- A node JS express backend for kCloud Project
 
-## kCloud API server readme file
+![Version](https://img.shields.io/badge/version-1.0.24089-blue.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
+
 
 ---
 
@@ -14,13 +16,9 @@
 
 ---
 
-## A node JS express backend for kCloud Project
-
----
-
 ## Description
 
-Constructed in NodeJS Express and using a MySQL this API backend provides an end point for control system data from the fog nodes, Web and android applications.
+Constructed in NodeJS Express and using a MySQL database. This API server provides an end point for control system data from the fog nodes, Web and android applications.
 It uses J Docs and Swagger UI to document the API.
 
 [Development Server API Docs](http://34.240.177.253:3000/api-docs/#/)

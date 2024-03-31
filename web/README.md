@@ -1,11 +1,12 @@
 # SETU HDip Computer Science  Final Project
 
 
-![logo](https://placement-project-23-24.netlify.app/topic-02-project/unit-2-project-showcases/talk-09-project-older/project-samples-pre2020.png)
+## kCloud - Web Application
 
----
+- An example web application written to showcase two possible kCloud fog node installation types.
 
-## kCloud Web Server readme file
+![Version](https://img.shields.io/badge/version-1.0.24089-blue.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ---
 
