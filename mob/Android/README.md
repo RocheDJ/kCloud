@@ -25,13 +25,11 @@ This Demonstration application allows the user to log in and view data from indu
 
 The project is based on a previous project I did for Mobile Development Assignment II Github [Link](https://github.com/RocheDJ/DataViewLogger/tree/Assignment-II) but with some under the hood changes.
 
-1) Data retrieved from kCloud API server using Volly.
+1) User Login and Data retrieved from kCloud API server using Volly.
 
-2) User login and registration from the same API server.
+2) User can scan NFC tag to ID particular instillation.
 
-3) User can scan NFC tag to ID particular instillation.
-
-4) APK file built for limited user testing.
+3) APK file built for limited user testing.
 
 ---
 
@@ -53,11 +51,11 @@ The project is based on a previous project I did for Mobile Development Assignme
 
 ## References
 
-Using volly [Volley Library in Android](https://www.geeksforgeeks.org/volley-library-in-android/)
+Using Volly [Volley Library in Android](https://www.geeksforgeeks.org/volley-library-in-android/)
 
 NFC Developer docs for NFCV [NfcV](https://developer.android.com/reference/android/nfc/tech/NfcV)
 
-Good Example 'all be it 3 years old'  from marcosdecris on Git hub[NFC Activity](https://github.com/marcosdecris/Nfc_desde_cero/blob/master/app/src/main/java/com/marcos/nfctutorial/BeamActivity.kt) found from this medium article [NFC From Scratch (With a Practical Example)](https://medium.com/flux-it-thoughts/nfc-from-scratch-with-a-practical-example-ce0c7995595b)
+Medium Article on NFC[NFC From Scratch (With a Practical Example)](https://medium.com/flux-it-thoughts/nfc-from-scratch-with-a-practical-example-ce0c7995595b)
 
 Good Stackoverflow discussion on writing blocks to the tag and reading back [Writing Single Block command fails over NfcV](https://stackoverflow.com/questions/55856674/writing-single-block-command-fails-over-nfcv)
 
@@ -65,7 +63,7 @@ Good Stackoverflow discussion on writing blocks to the tag and reading back [Wri
 ## Debug APK 
 
 ---
-Debug APK package file for the application can be found here
+A Debug APK package file for the application can be found here
 [APK Download](https://github.com/RocheDJ/kCloud/tree/main/mob/Android/app-kcloud.apk "download")
 
 [image1]: ./images/login.jpg
